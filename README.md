@@ -12,7 +12,10 @@ make
 ```
 
 After a successful build, you'll have the `glitcher.uf2` file in the build
-directory.
+directory that can be flashed:
+```bash
+picotool load glitcher.uf2 && picotool reboot
+```
 
 ## Note for GCC13
 Ensure this PR is merged: https://github.com/raspberrypi/pico-sdk/pull/1367
