@@ -23,6 +23,14 @@ project(glitcher C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
+# Check build env
+if (NOT TARGET tinyusb_device)
+  message(FATAL_ERROR "not building glitcher because TinyUSB submodule is not initialized in the SDK")
+endif()
+if(NOT PICO_ON_DEVICE)
+  message(WARNING "Not building glitcher for Pico target. Are you sure you want to do this?")
+endif()
+
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(glitcher glitcher.c )
@@ -30,8 +38,8 @@ add_executable(glitcher glitcher.c )
 pico_set_program_name(glitcher "glitcher")
 pico_set_program_version(glitcher "0.1")
 
-pico_enable_stdio_uart(glitcher 1)
-pico_enable_stdio_usb(glitcher 0)
+pico_enable_stdio_usb(glitcher 1)
+pico_enable_stdio_uart(glitcher 0)
 
 # Add the standard library to the build
 target_link_libraries(glitcher
@@ -44,4 +52,3 @@ target_include_directories(glitcher PRIVATE
 )
 
 pico_add_extra_outputs(glitcher)
-

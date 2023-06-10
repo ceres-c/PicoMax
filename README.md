@@ -10,3 +10,9 @@ cd build
 cmake ..
 make
 ```
+
+After a successful build, you'll have the `glitcher.uf2` file in the build
+directory.
+
+## Note for GCC13
+Ensure this PR is merged: https://github.com/raspberrypi/pico-sdk/pull/1367
