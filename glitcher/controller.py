@@ -9,17 +9,19 @@ import time
 import serial
 
 CMD = {
-	'DELAY'		: b'D',
-	'WIDTH'		: b'W',
-	'GLITCH'	: b'G',
-	'TRIG_OUT'	: b'O',
-	'TRIG_IN'	: b'I',
-	'PING'		: b'P',
+	'DELAY'			: b'D',
+	'WIDTH'			: b'W',
+	'GLITCH'		: b'G',
+	'TRIG_OUT_EN'	: b'O',
+	'TRIG_OUT_DIS'	: b'o',
+	'TRIG_IN_EN'	: b'I',
+	'TRIG_IN_DIS'	: b'i',
+	'PING'			: b'P',
 }
 RESP = {
-	'GLITCH'	: b'g',
-	'TRIG_OUT'	: b'o',
-	'PING'		: b'p',
+	'OK'		: b'k',
+	'KO'		: b'x',
+	'PONG'		: b'p',
 }
 
 def success() -> bool:
@@ -34,28 +36,19 @@ def main(args):
 		exit(1)
 
 	s.write(CMD['PING'])
-	r = s.read(len(RESP['PING']))
-	if r != RESP['PING']:
+	r = s.read(len(RESP['PONG']))
+	if r != RESP['PONG']:
 		print(f'[!] Could not ping the glitcher. Got:\n{r}\nAborting.')
 		exit(1)
 	print('[+] Glitcher available.')
 
 	if args.output_trigger:
-		s.write(CMD['TRIG_OUT'])
-		r = s.read(len(RESP['TRIG_OUT']))
-		if r != RESP['TRIG_OUT']:
+		s.write(CMD['TRIG_OUT_EN'])
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
 			print(f'[!] Could not enable output trigger. Got:\n{r}\nAborting.')
 			exit(1)
 		print('[+] Output trigger enabled.')
-	
-	for _ in range(10):
-		# Glitch with random values to make the timing consistent
-		# For some reason, the first 3-4 glitches take longer
-		s.write(b'G')
-		r = s.read(len(RESP['GLITCH']))
-		if r != RESP['GLITCH']:
-			print(f'[!] Glitch failed. Got:\n{r}\nAborting.')
-			exit(1)
 
 	i = 0
 	for i, (d, w) in enumerate(((x, y) for x in range(*args.delay) for y in range(*args.width))):
@@ -67,11 +60,10 @@ def main(args):
 		s.write(CMD['WIDTH'] + struct.pack('<i', w))
 		s.read(1) # TODO remove
 		s.write(b'G')
-		r = s.read(len(RESP['GLITCH']))
-		if r != RESP['GLITCH']:
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
 			print(f'[!] Glitch failed. Got:\n{r}\nAborting.')
 			exit(1)
-		# s.read(100) # TODO remove
 	
 	print(f'[+] Sent {i}. Done')
 

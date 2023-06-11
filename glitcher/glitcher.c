@@ -83,27 +83,37 @@ int main() {
 			case CMD_DELAY:
 				fread(&delay, 1, 4, stdin);
 				// printf("Poweron->glitch delay set to %d\n", delay);
-				putchar(RESP_DELAY);
+				putchar(RESP_OK);
 				break;
 			case CMD_WIDTH:
 				fread(&pulse_width, 1, 4, stdin);
 				// printf("Glitch pulse width set to %d\n", pulse_width);
-				putchar(RESP_WIDTH);
+				putchar(RESP_OK);
 				break;
-			case CMD_TRIG_IN:
+			case CMD_TRIG_IN_EN:
 				// trig_in = true;
 				// printf("Enabled trigger in on pin %d\n", TRIG_IN_PIN);
 				printf("Unimplemented\n");
 				break;
-			case CMD_TRIG_OUT:
-				trig_out ^= 1;
-				putchar(RESP_TRIG_OUT);
+			case CMD_TRIG_IN_DIS:
+				// trig_in = false;
+				// printf("Disabled trigger in on pin %d\n", TRIG_IN_PIN);
+				printf("Unimplemented\n");
+				break;
+			case CMD_TRIG_OUT_EN:
+				trig_out = true;
+				putchar(RESP_OK);
 				// printf("Trigger out on pin %d, state: %d\n", TRIG_OUT_PIN, trig_out);
+				break;
+			case CMD_TRIG_OUT_DIS:
+				trig_out = false;
+				putchar(RESP_OK);
+				// printf("Disabled trigger out on pin %d\n", TRIG_OUT_PIN);
 				break;
 			case CMD_GLITCH:
 				glitch(delay, pulse_width, trig_out);
 
-				putchar(RESP_GLITCH_DONE);
+				putchar(RESP_OK);
 				break;
 		}
 	}
