@@ -50,23 +50,24 @@ def main(args):
 			exit(1)
 		print('[+] Output trigger enabled.')
 
+	start = time.time()
 	i = 0
 	for i, (d, w) in enumerate(((x, y) for x in range(*args.delay) for y in range(*args.width))):
 		if i % 10 == 0:
 			print(f'[.] Sending {i}', end='\r', flush=True)
 
-		s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian on boot
-		s.read(1) # TODO remove
+		s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian
+		s.read(len(CMD['DELAY']))
 		s.write(CMD['WIDTH'] + struct.pack('<i', w))
-		s.read(1) # TODO remove
-		s.write(b'G')
+		s.read(len(CMD['WIDTH']))
+		s.write(CMD['GLITCH'])
 		r = s.read(len(RESP['OK']))
 		if r != RESP['OK']:
 			print(f'[!] Glitch failed. Got:\n{r}\nAborting.')
 			exit(1)
-	
-	print(f'[+] Sent {i}. Done')
+	end = time.time()
 
+	print(f'[+] Sent {i} in {end - start}s.')
 
 	s.close()
 

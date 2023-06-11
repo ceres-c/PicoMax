@@ -93,12 +93,12 @@ int main() {
 			case CMD_TRIG_IN_EN:
 				// trig_in = true;
 				// printf("Enabled trigger in on pin %d\n", TRIG_IN_PIN);
-				printf("Unimplemented\n");
+				puts("Unimplemented");
 				break;
 			case CMD_TRIG_IN_DIS:
 				// trig_in = false;
 				// printf("Disabled trigger in on pin %d\n", TRIG_IN_PIN);
-				printf("Unimplemented\n");
+				puts("Unimplemented");
 				break;
 			case CMD_TRIG_OUT_EN:
 				trig_out = true;
@@ -112,7 +112,6 @@ int main() {
 				break;
 			case CMD_GLITCH:
 				glitch(delay, pulse_width, trig_out);
-
 				putchar(RESP_OK);
 				break;
 		}
