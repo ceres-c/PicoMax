@@ -24,6 +24,44 @@ static void init_pins() {
 	*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low, so disable it
 }
 
+// This function must be in RAM to have consistent timing. Due to Pi Pico's slow flash, first few
+// executions were taking far longer
+void __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
+	uint32_t mask_glitch = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
+
+	////////// Power cycle //////////
+	*(uint32_t*)SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // MAX4619's input pin EN=high disables MAX4619's output
+	*(uint32_t*)CLR_GPIO_ATOMIC = TRIG_OUT_MASK;
+	// Right now we have:
+	// EN=high, SEL=high, TRIG_OUT=low
+	// (output disabled, highest voltage selected, trigger out disabled)
+	sleep_ms(50);
+	*(uint32_t*)XOR_GPIO_ATOMIC = MAX_EN_MASK;
+	// Right now we have:
+	// EN=low, SEL=high, TRIG_OUT=low
+	// (output enabled, highest voltage selected, trigger out disabled)
+
+	////////// Wait for glitch moment //////////
+	for(uint32_t i = 0; i < delay; i++) {
+		asm("NOP");
+	}
+
+	////////// Glitch //////////
+	*(uint32_t*)XOR_GPIO_ATOMIC = mask_glitch;
+	// Right now we have:
+	// EN=low, SEL=low, TRIG_OUT=?
+	// (output enabled, lowest voltage selected, trigger out enabled/disabled)
+
+	for(uint32_t i = 0; i < pulse_width; i++) {
+		asm("NOP");
+	}
+
+	*(uint32_t*)XOR_GPIO_ATOMIC = mask_glitch;
+	// Right now we have:
+	// EN=low, SEL=high, TRIG_OUT=low
+	// (output enabled, highest voltage selected, trigger out disabled)
+}
+
 int main() {
 	stdio_init_all();
 
@@ -63,39 +101,7 @@ int main() {
 				// printf("Trigger out on pin %d, state: %d\n", TRIG_OUT_PIN, trig_out);
 				break;
 			case CMD_GLITCH:
-				uint32_t mask_glitch = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
-
-				////////// Power cycle //////////
-				*(uint32_t*)SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // MAX4619's input pin EN=high disables MAX4619's output
-				*(uint32_t*)CLR_GPIO_ATOMIC = TRIG_OUT_MASK;
-				// Right now we have:
-				// EN=high, SEL=high, TRIG_OUT=low
-				// (output disabled, highest voltage selected, trigger out disabled)
-				sleep_ms(50);
-				*(uint32_t*)XOR_GPIO_ATOMIC = MAX_EN_MASK;
-				// Right now we have:
-				// EN=low, SEL=high, TRIG_OUT=low
-				// (output enabled, highest voltage selected, trigger out disabled)
-
-				////////// Wait for glitch moment //////////
-				for(uint32_t i = 0; i < delay; i++) {
-					asm("NOP");
-				}
-
-				////////// Glitch //////////
-				*(uint32_t*)XOR_GPIO_ATOMIC = mask_glitch;
-				// Right now we have:
-				// EN=low, SEL=low, TRIG_OUT=?
-				// (output enabled, lowest voltage selected, trigger out enabled/disabled)
-
-				for(uint32_t i = 0; i < pulse_width; i++) {
-					asm("NOP");
-				}
-
-				*(uint32_t*)XOR_GPIO_ATOMIC = mask_glitch;
-				// Right now we have:
-				// EN=low, SEL=high, TRIG_OUT=low
-				// (output enabled, highest voltage selected, trigger out disabled)
+				glitch(delay, pulse_width, trig_out);
 
 				putchar(RESP_GLITCH_DONE);
 				break;
