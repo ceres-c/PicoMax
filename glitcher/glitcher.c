@@ -3,14 +3,6 @@
 
 #include "glitcher.h"
 
-unsigned int* gpio_out = (unsigned int*)(SIO_BASE + SIO_GPIO_OUT_OFFSET);
-
-static void power_cycle_target() {
-	gpio_put(MAX_EN_PIN, 0);
-	sleep_ms(50);
-	gpio_put(MAX_EN_PIN, 1);
-}
-
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO);
@@ -29,7 +21,7 @@ static void init_pins() {
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(TRIG_OUT_PIN, GPIO_OUT);
 
-	*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low, so disable it
+	*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_HI_MASK; // MAX4619 enable is active low, so disable it
 }
 
 int main() {
@@ -37,21 +29,26 @@ int main() {
 
 	init_pins();
 
-	uint32_t delay = 0;
-	uint32_t pulse_width = 0;
+	// uint32_t delay = 0;
+	uint32_t delay = 10; // TODO remove and uncomment above
+	// uint32_t pulse_width = 0;
+	uint32_t pulse_width = 10; // TODO remove and uncomment above
 	// bool trig_in = false;
 	bool trig_out = false;
 
 	while (true) {
 		uint8_t cmd = getchar();
 		switch(cmd) {
+			case CMD_PING:
+				putchar(RESP_PONG);
+				break;
 			case CMD_DELAY:
 				fread(&delay, 1, 4, stdin);
-				printf("Poweron->glitch delay set to %d\n", delay);
+				// printf("Poweron->glitch delay set to %d\n", delay);
 				break;
 			case CMD_WIDTH:
 				fread(&pulse_width, 1, 4, stdin);
-				printf("Glitch pulse width set to %d\n", pulse_width);
+				// printf("Glitch pulse width set to %d\n", pulse_width);
 				break;
 			case CMD_TRIG_IN:
 				// trig_in = true;
@@ -60,36 +57,67 @@ int main() {
 				break;
 			case CMD_TRIG_OUT:
 				trig_out ^= 1;
-				printf("Trigger out on pin %d, state: %d\n", TRIG_OUT_PIN, trig_out);
+				putchar(RESP_TRIG_OUT);
+				// printf("Trigger out on pin %d, state: %d\n", TRIG_OUT_PIN, trig_out);
 				break;
 			case CMD_GLITCH:
-				// power_cycle_target(); // TODO decomment this
+				// MAX4619's input pin EN=high disables MAX4619's output
+				uint32_t mask = (MAX_SEL_HI_MASK | MAX_EN_LO_MASK | trig_out << TRIG_OUT_PIN);
 
-				uint32_t mask = (MAX_SEL_MASK | MAX_EN_MASK | trig_out << TRIG_OUT_PIN);
-				printf("Glitching with mask: %d\n", mask); // TODO remove
+				////////// Power cycle //////////
+				*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_HI_MASK;
+				sleep_ms(50);
+				*(uint32_t*)GPIO_ATOMIC = mask;
 
-				// Invert the mask to bring EN to 0 and SEL & TRIG_OUT to 1 in a single clock cycle
-				*(uint32_t*)XOR_GPIO_ATOMIC = mask;
-				sleep_ms(10); // TODO use delay
-				*(uint32_t*)CLR_GPIO_ATOMIC = MAX_SEL_MASK; // Switch to glitch voltage
-				sleep_ms(1); // TODO use pulse_width
-				*(uint32_t*)SET_GPIO_ATOMIC = MAX_SEL_MASK; // Switch back to nominal voltage
-				sleep_ms(10); // TODO remove
-				*(uint32_t*)XOR_GPIO_ATOMIC = mask; // TODO move this at the beginning, should clear when starting the glitch
+				////////// Wait for glitch moment //////////
+				for(uint32_t i = 0; i < delay; i++) {
+					asm("NOP");
+				}
 
-				// gpio_put(MAX_EN_PIN, 1);
-				// sleep_ms(1000);
-				// gpio_put(MAX_EN_PIN, 0);
+				////////// Glitch //////////
+				*(uint32_t*)CLR_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch to glitch voltage (clear SEL)
 
-				// while(!gpio_get(1 + IN_NRF_VDD));
-				// for(uint32_t i=0; i < delay; i++) {
+				for(uint32_t i = 0; i < pulse_width; i++) {
+					asm("NOP");
+				}
+
+				*(uint32_t*)SET_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch back to nominal voltage (set SEL)
+				*(uint32_t*)CLR_GPIO_ATOMIC = TRIG_OUT_HI_MASK; // Disable trigger out (if enabled, or keep low)
+
+				// putchar(RESP_GLITCH_DONE);
+
+
+
+				// // OLD CODE BELOW
+
+
+
+
+				// uint32_t power_mask = (MAX_SEL_HI_MASK | MAX_EN_LO_MASK | trig_out << TRIG_OUT_PIN);
+				// // printf("Glitching with mask: %d\n", power_mask); // TODO remove
+
+				// ////////// Power cycle //////////
+				// *(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619's input pin EN=high disables MAX4619's output
+				// sleep_ms(50);
+				// *(uint32_t*)GPIO_ATOMIC = power_mask;
+
+				// ////////// Wait for glitch moment //////////
+				// for(uint32_t i = 0; i < delay; i++) {
 				// 	asm("NOP");
 				// }
-				// gpio_put(PDND_GLITCH, 1);
-				// for(uint32_t i=0; i < pulse_width; i++) {
+
+				// ////////// Glitch //////////
+				// *(uint32_t*)CLR_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch to glitch voltage
+
+				// for(uint32_t i = 0; i < pulse_width; i++) {
 				// 	asm("NOP");
 				// }
-				// gpio_put(PDND_GLITCH, 0);
+
+				// *(uint32_t*)SET_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch back to nominal voltage
+				// *(uint32_t*)CLR_GPIO_ATOMIC = TRIG_OUT_HI_MASK; // Disable trigger out (if enabled, or keep low)
+
+				// putchar(RESP_GLITCH_DONE);
+
 				break;
 		}
 	}
