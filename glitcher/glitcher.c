@@ -45,10 +45,12 @@ int main() {
 			case CMD_DELAY:
 				fread(&delay, 1, 4, stdin);
 				// printf("Poweron->glitch delay set to %d\n", delay);
+				putchar(RESP_DELAY);
 				break;
 			case CMD_WIDTH:
 				fread(&pulse_width, 1, 4, stdin);
 				// printf("Glitch pulse width set to %d\n", pulse_width);
+				putchar(RESP_WIDTH);
 				break;
 			case CMD_TRIG_IN:
 				// trig_in = true;

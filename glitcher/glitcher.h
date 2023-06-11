@@ -4,6 +4,8 @@
 #define CMD_TRIG_OUT		'O'
 #define CMD_TRIG_IN			'I'
 #define CMD_PING			'P'
+#define RESP_DELAY			'd'
+#define RESP_WIDTH			'w'
 #define RESP_TRIG_OUT		'o'
 #define RESP_GLITCH_DONE	'g'
 #define RESP_PONG			'p'

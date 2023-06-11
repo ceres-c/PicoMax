@@ -52,3 +52,6 @@ target_include_directories(glitcher PRIVATE
 )
 
 pico_add_extra_outputs(glitcher)
+
+# Set to run from ram to make the first glitch consistent with the rest
+pico_set_binary_type(glitcher no_flash)

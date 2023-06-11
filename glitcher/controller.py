@@ -47,15 +47,25 @@ def main(args):
 			print(f'[!] Could not enable output trigger. Got:\n{r}\nAborting.')
 			exit(1)
 		print('[+] Output trigger enabled.')
+	
+	for _ in range(10):
+		# Glitch with random values to make the timing consistent
+		# For some reason, the first 3-4 glitches take longer
+		s.write(b'G')
+		r = s.read(len(RESP['GLITCH']))
+		if r != RESP['GLITCH']:
+			print(f'[!] Glitch failed. Got:\n{r}\nAborting.')
+			exit(1)
 
+	i = 0
 	for i, (d, w) in enumerate(((x, y) for x in range(*args.delay) for y in range(*args.width))):
 		if i % 10 == 0:
-			print(f'[+] Sending {i}', end='\r', flush=True)
+			print(f'[.] Sending {i}', end='\r', flush=True)
 
-		# s.write(cmd['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian on boot
-		# # s.read(100) # TODO remove
-		# s.write(cmd['WIDTH'] + struct.pack('<i', w))
-		# # s.read(100) # TODO remove
+		s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian on boot
+		s.read(1) # TODO remove
+		s.write(CMD['WIDTH'] + struct.pack('<i', w))
+		s.read(1) # TODO remove
 		s.write(b'G')
 		r = s.read(len(RESP['GLITCH']))
 		if r != RESP['GLITCH']:
@@ -63,8 +73,7 @@ def main(args):
 			exit(1)
 		# s.read(100) # TODO remove
 	
-	print() # newline
-	print('[+] Done.')
+	print(f'[+] Sent {i}. Done')
 
 
 	s.close()
