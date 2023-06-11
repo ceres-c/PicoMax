@@ -28,6 +28,8 @@ static void init_pins() {
 	gpio_set_dir(MAX_EN_PIN, GPIO_OUT);
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(TRIG_OUT_PIN, GPIO_OUT);
+
+	*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low, so disable it
 }
 
 int main() {
@@ -63,20 +65,17 @@ int main() {
 			case CMD_GLITCH:
 				// power_cycle_target(); // TODO decomment this
 
-				uint32_t sel_trig_mask = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
-				printf("Glitching with mask: %d\n", sel_trig_mask);
+				uint32_t mask = (MAX_SEL_MASK | MAX_EN_MASK | trig_out << TRIG_OUT_PIN);
+				printf("Glitching with mask: %d\n", mask); // TODO remove
 
-				// Sart off with enable because because the currently selected voltage is the lowest one anyway,
-				// so the output is 0V anways. Note that there is an 800ns delay between the following two lines.
-				*(unsigned int*)CLR_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low
-				*(unsigned int*)SET_GPIO_ATOMIC = sel_trig_mask;
+				// Invert the mask to bring EN to 0 and SEL & TRIG_OUT to 1 in a single clock cycle
+				*(uint32_t*)XOR_GPIO_ATOMIC = mask;
 				sleep_ms(10); // TODO use delay
-				*(unsigned int*)CLR_GPIO_ATOMIC = MAX_SEL_MASK; // Switch to glitch voltage
+				*(uint32_t*)CLR_GPIO_ATOMIC = MAX_SEL_MASK; // Switch to glitch voltage
 				sleep_ms(1); // TODO use pulse_width
-				*(unsigned int*)SET_GPIO_ATOMIC = MAX_SEL_MASK; // Switch back to nominal voltage
+				*(uint32_t*)SET_GPIO_ATOMIC = MAX_SEL_MASK; // Switch back to nominal voltage
 				sleep_ms(10); // TODO remove
-				*(unsigned int*)CLR_GPIO_ATOMIC = sel_trig_mask; // TODO move this at the beginning, should clear when starting the glitch
-				*(unsigned int*)SET_GPIO_ATOMIC = MAX_EN_MASK;
+				*(uint32_t*)XOR_GPIO_ATOMIC = mask; // TODO move this at the beginning, should clear when starting the glitch
 
 				// gpio_put(MAX_EN_PIN, 1);
 				// sleep_ms(1000);
