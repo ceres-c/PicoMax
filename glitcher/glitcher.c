@@ -21,7 +21,7 @@ static void init_pins() {
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(TRIG_OUT_PIN, GPIO_OUT);
 
-	*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_HI_MASK; // MAX4619 enable is active low, so disable it
+	*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low, so disable it
 }
 
 int main() {
@@ -61,13 +61,19 @@ int main() {
 				// printf("Trigger out on pin %d, state: %d\n", TRIG_OUT_PIN, trig_out);
 				break;
 			case CMD_GLITCH:
-				// MAX4619's input pin EN=high disables MAX4619's output
-				uint32_t mask = (MAX_SEL_HI_MASK | MAX_EN_LO_MASK | trig_out << TRIG_OUT_PIN);
+				uint32_t mask_glitch = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
 
 				////////// Power cycle //////////
-				*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_HI_MASK;
+				*(uint32_t*)SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // MAX4619's input pin EN=high disables MAX4619's output
+				*(uint32_t*)CLR_GPIO_ATOMIC = TRIG_OUT_MASK;
+				// Right now we have:
+				// EN=high, SEL=high, TRIG_OUT=low
+				// (output disabled, highest voltage selected, trigger out disabled)
 				sleep_ms(50);
-				*(uint32_t*)GPIO_ATOMIC = mask;
+				*(uint32_t*)XOR_GPIO_ATOMIC = MAX_EN_MASK;
+				// Right now we have:
+				// EN=low, SEL=high, TRIG_OUT=low
+				// (output enabled, highest voltage selected, trigger out disabled)
 
 				////////// Wait for glitch moment //////////
 				for(uint32_t i = 0; i < delay; i++) {
@@ -75,49 +81,21 @@ int main() {
 				}
 
 				////////// Glitch //////////
-				*(uint32_t*)CLR_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch to glitch voltage (clear SEL)
+				*(uint32_t*)XOR_GPIO_ATOMIC = mask_glitch;
+				// Right now we have:
+				// EN=low, SEL=low, TRIG_OUT=?
+				// (output enabled, lowest voltage selected, trigger out enabled/disabled)
 
 				for(uint32_t i = 0; i < pulse_width; i++) {
 					asm("NOP");
 				}
 
-				*(uint32_t*)SET_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch back to nominal voltage (set SEL)
-				*(uint32_t*)CLR_GPIO_ATOMIC = TRIG_OUT_HI_MASK; // Disable trigger out (if enabled, or keep low)
+				*(uint32_t*)XOR_GPIO_ATOMIC = mask_glitch;
+				// Right now we have:
+				// EN=low, SEL=high, TRIG_OUT=low
+				// (output enabled, highest voltage selected, trigger out disabled)
 
-				// putchar(RESP_GLITCH_DONE);
-
-
-
-				// // OLD CODE BELOW
-
-
-
-
-				// uint32_t power_mask = (MAX_SEL_HI_MASK | MAX_EN_LO_MASK | trig_out << TRIG_OUT_PIN);
-				// // printf("Glitching with mask: %d\n", power_mask); // TODO remove
-
-				// ////////// Power cycle //////////
-				// *(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619's input pin EN=high disables MAX4619's output
-				// sleep_ms(50);
-				// *(uint32_t*)GPIO_ATOMIC = power_mask;
-
-				// ////////// Wait for glitch moment //////////
-				// for(uint32_t i = 0; i < delay; i++) {
-				// 	asm("NOP");
-				// }
-
-				// ////////// Glitch //////////
-				// *(uint32_t*)CLR_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch to glitch voltage
-
-				// for(uint32_t i = 0; i < pulse_width; i++) {
-				// 	asm("NOP");
-				// }
-
-				// *(uint32_t*)SET_GPIO_ATOMIC = MAX_SEL_HI_MASK; // Switch back to nominal voltage
-				// *(uint32_t*)CLR_GPIO_ATOMIC = TRIG_OUT_HI_MASK; // Disable trigger out (if enabled, or keep low)
-
-				// putchar(RESP_GLITCH_DONE);
-
+				putchar(RESP_GLITCH_DONE);
 				break;
 		}
 	}
