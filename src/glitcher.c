@@ -6,12 +6,16 @@
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO);
-	// NO need to set TRIG_IN_PIN because it's an input and those are always accessible to the cpu
+	// No need to set TRIG_IN_PIN because it's an input and those are always accessible to the cpu
 	gpio_set_function(TRIG_OUT_PIN, GPIO_FUNC_SIO);
+	gpio_set_function(PIC_IN_PIN, GPIO_FUNC_SIO);
+	// No need to set PIC_OUT_PIN because it's an input and those are always accessible to the cpu
 
 	gpio_pull_up(MAX_EN_PIN); // MAX4619 EN is active low
 	gpio_pull_up(MAX_SEL_PIN); // Default selected voltage to the highest of the two
 	gpio_pull_down(TRIG_OUT_PIN);
+	gpio_pull_down(PIC_OUT_PIN);
+	gpio_pull_down(PIC_IN_PIN);
 
 	gpio_set_slew_rate(MAX_EN_PIN, GPIO_SLEW_RATE_FAST); // SPEED
 	gpio_set_slew_rate(MAX_SEL_PIN, GPIO_SLEW_RATE_FAST);
@@ -20,6 +24,7 @@ static void init_pins() {
 	gpio_set_dir(MAX_EN_PIN, GPIO_OUT);
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(TRIG_OUT_PIN, GPIO_OUT);
+	gpio_set_dir(PIC_IN_PIN, GPIO_OUT);
 
 	*SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low, so disable it
 }
@@ -45,25 +50,59 @@ void __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	// EN=low, SEL=high, TRIG_OUT=low
 	// (output enabled, highest voltage selected, trigger out disabled)
 
+	/////////// Wait for PIC to boot //////////
+	while (!gpio_get(PIC_OUT_PIN));
+	putchar('I'); // TODO remove
+
+	// *SET_GPIO_ATOMIC = TRIG_OUT_MASK; // TODO remove
+	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to ready
+
+	while(gpio_get(PIC_OUT_PIN)); // Wait for PIC ACK to ACK
+
+	////////// Now we're in sync with PIC //////////
+
+	*CLR_GPIO_ATOMIC = PIC_IN_MASK; // Signal to start the loop
+
+	while(!gpio_get(PIC_OUT_PIN)); // Wait for PIC to start loop
+
 	////////// Wait for glitch moment //////////
 	for(uint32_t i = 0; i < delay; i++) {
 		asm("NOP");
 	}
 
-	////////// Glitch //////////
-	*XOR_GPIO_ATOMIC = mask_glitch;
-	// Right now we have:
-	// EN=low, SEL=low, TRIG_OUT=?
-	// (output enabled, lowest voltage selected, trigger out enabled/disabled)
+	// ////////// Glitch //////////
+	// *XOR_GPIO_ATOMIC = mask_glitch;
+	// // Right now we have:
+	// // EN=low, SEL=low, TRIG_OUT=?
+	// // (output enabled, lowest voltage selected, trigger out enabled/disabled)
 
-	for(uint32_t i = 0; i < pulse_width; i++) {
-		asm("NOP");
+	// for(uint32_t i = 0; i < pulse_width; i++) {
+	// 	asm("NOP");
+	// }
+
+	// *XOR_GPIO_ATOMIC = mask_glitch;
+	// // Right now we have:
+	// // EN=low, SEL=high, TRIG_OUT=low
+	// // (output enabled, highest voltage selected, trigger out disabled)
+
+	// ////////// Check if PIC survived //////////
+
+	int32_t timeout = 1000000;
+	while(timeout && (gpio_get(PIC_OUT_PIN) || !gpio_get(PIC_BOD_CANARY_PIN))) {
+		// PIC is still running or BOD canary is tripped
+		timeout--;
+	}
+	if (!timeout || !gpio_get(PIC_BOD_CANARY_PIN)) {
+		// PIC is still running or BOD canary is tripped
+		putchar('F');
+		power_off();
+		return;
 	}
 
-	*XOR_GPIO_ATOMIC = mask_glitch;
-	// Right now we have:
-	// EN=low, SEL=high, TRIG_OUT=low
-	// (output enabled, highest voltage selected, trigger out disabled)
+	// TODO Do UART read
+
+	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to finish
+
 }
 
 int main() {
@@ -72,8 +111,8 @@ int main() {
 	init_pins();
 
 	// uint32_t delay = 0;
-	uint32_t delay = 10; // TODO remove and uncomment above
-	uint32_t pulse_width = 1;
+	uint32_t delay = 50; // TODO remove and uncomment above
+	uint32_t pulse_width = 0;
 	// bool trig_in = false;
 	bool trig_out = false;
 	bool powered_on = false;

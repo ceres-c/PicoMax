@@ -25,6 +25,8 @@
 #define PIC_IN_MASK			(1 << PIC_IN_PIN)
 #define PIC_OUT_PIN			0x07 // pin 10
 #define PIC_OUT_MASK		(1 << PIC_OUT_PIN)
+#define PIC_BOD_CANARY_PIN	0x08 // pin 11
+#define PIC_BOD_CANARY_MASK	(1 << PIC_BOD_CANARY_PIN)
 
 #define GPIO_ATOMIC			((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_OFFSET))
 #define SET_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_SET_OFFSET))
