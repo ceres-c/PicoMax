@@ -9,6 +9,8 @@
 #define RESP_OK				'k'
 #define RESP_KO				'x'
 #define RESP_PONG			'p'
+#define CMD_POWERON			'+'
+#define CMD_POWEROFF		'-'
 
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)
@@ -18,9 +20,6 @@
 #define TRIG_IN_MASK		(1 << TRIG_IN_PIN)
 #define TRIG_OUT_PIN		0x05 // pin 7
 #define TRIG_OUT_MASK		(1 << TRIG_OUT_PIN)
-
-#define SET_ATOMIC_OFFST	0x2000 // Set on write atomic access ofset (see rp2040 datasheet 2.1.2)
-#define CLR_ATOMIC_OFFST	0x3000 // Clear on write
 
 #define GPIO_ATOMIC			(SIO_BASE + SIO_GPIO_OUT_OFFSET)
 #define SET_GPIO_ATOMIC		(SIO_BASE + SIO_GPIO_OUT_SET_OFFSET)

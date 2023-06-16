@@ -69,10 +69,10 @@ int main() {
 
 	// uint32_t delay = 0;
 	uint32_t delay = 10; // TODO remove and uncomment above
-	// uint32_t pulse_width = 0;
-	uint32_t pulse_width = 10; // TODO remove and uncomment above
+	uint32_t pulse_width = 1;
 	// bool trig_in = false;
 	bool trig_out = false;
+	bool powered_on = false;
 
 	while (true) {
 		uint8_t cmd = getchar();
@@ -114,6 +114,27 @@ int main() {
 				glitch(delay, pulse_width, trig_out);
 				putchar(RESP_OK);
 				break;
+			case CMD_POWERON:
+				if (powered_on) {
+					putchar(RESP_KO);
+					break;
+				}
+				powered_on = true;
+				*(uint32_t*)SET_GPIO_ATOMIC = MAX_SEL_MASK;
+				*(uint32_t*)CLR_GPIO_ATOMIC = MAX_EN_MASK;
+				putchar(RESP_OK);
+				break;
+			case CMD_POWEROFF:
+				if (!powered_on) {
+					putchar(RESP_KO);
+					break;
+				}
+				powered_on = false;
+				*(uint32_t*)SET_GPIO_ATOMIC = MAX_EN_MASK;
+				*(uint32_t*)CLR_GPIO_ATOMIC = MAX_SEL_MASK;
+				putchar(RESP_OK);
+				break;
+
 		}
 	}
 
