@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include "pico/stdlib.h"
+
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
 #define CMD_GLITCH			'G'
@@ -11,6 +14,9 @@
 #define RESP_PONG			'p'
 #define CMD_POWERON			'+'
 #define CMD_POWEROFF		'-'
+
+#define UART_TX_PIN			0x00 // Rpi pico pin 0
+#define UART_RX_PIN			0x01 // pin 1
 
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)
@@ -32,3 +38,6 @@
 #define SET_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_SET_OFFSET))
 #define CLR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_CLR_OFFSET))
 #define XOR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_XOR_OFFSET))
+
+#define UART_ID				uart0
+#define BAUD_RATE			9600

@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include "pico/stdlib.h"
-
 #include "glitcher.h"
 
 static void init_pins() {
@@ -27,12 +24,15 @@ static void init_pins() {
 	gpio_set_dir(PIC_IN_PIN, GPIO_OUT);
 
 	*SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low, so disable it
+
+	gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
+	gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
 }
 
 void __no_inline_not_in_flash_func(power_off)() {
 	// *SET_GPIO_ATOMIC = TRIG_OUT_MASK; // TODO remove
 	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // MAX4619's input pin EN=high disables MAX4619's output
-	*CLR_GPIO_ATOMIC = TRIG_OUT_MASK;
+	*CLR_GPIO_ATOMIC = (TRIG_OUT_MASK | PIC_IN_MASK); // PIC_IN needs to be cleared, otherwise the PIC will be "powered" by the Pico
 	// Right now we have:
 	// EN=high, SEL=high, TRIG_OUT=low
 	// (output disabled, highest voltage selected, trigger out disabled)
@@ -70,45 +70,73 @@ void __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 		asm("NOP");
 	}
 
-	// ////////// Glitch //////////
-	// *XOR_GPIO_ATOMIC = mask_glitch;
-	// // Right now we have:
-	// // EN=low, SEL=low, TRIG_OUT=?
-	// // (output enabled, lowest voltage selected, trigger out enabled/disabled)
+	////////// Glitch //////////
+	*XOR_GPIO_ATOMIC = mask_glitch;
+	// Right now we have:
+	// EN=low, SEL=low, TRIG_OUT=?
+	// (output enabled, lowest voltage selected, trigger out enabled/disabled)
+
 
 	// for(uint32_t i = 0; i < pulse_width; i++) {
-	// 	asm("NOP");
+	//  	asm("NOP");
 	// }
 
-	// *XOR_GPIO_ATOMIC = mask_glitch;
-	// // Right now we have:
-	// // EN=low, SEL=high, TRIG_OUT=low
-	// // (output enabled, highest voltage selected, trigger out disabled)
+	*XOR_GPIO_ATOMIC = mask_glitch;
+	// Right now we have:
+	// EN=low, SEL=high, TRIG_OUT=low
+	// (output enabled, highest voltage selected, trigger out disabled)
 
-	// ////////// Check if PIC survived //////////
+	////////// Check if PIC survived //////////
 
-	int32_t timeout = 1000000;
+	uint32_t timeout = 100000;
 	while(timeout && (gpio_get(PIC_OUT_PIN) || !gpio_get(PIC_BOD_CANARY_PIN))) {
 		// PIC is still running or BOD canary is tripped
+		sleep_us(1);
 		timeout--;
 	}
-	if (!timeout || !gpio_get(PIC_BOD_CANARY_PIN)) {
+	if (!timeout) {
+		putchar('E');
+		power_off();
+		return;
+	}
+	if (!gpio_get(PIC_BOD_CANARY_PIN)) {
 		// PIC is still running or BOD canary is tripped
 		putchar('F');
 		power_off();
 		return;
 	}
 
-	// TODO Do UART read
+	////////// Read UART //////////
+	bool is_readable = uart_is_readable_within_us(UART_ID, 50); // Check if anyone responded
+	if (!is_readable) {
+		// No response
+		putchar(RESP_KO);
+		// power_off();
+		return;
+	}
+	putchar('u');
 
+	char c = uart_getc(UART_ID);
+	while (c) {
+		putchar(c);
+		c = uart_getc(UART_ID);
+	}
+	putchar('-'); // TODO remove this and replace with uart_read_blocking and correct amount of bytes below
+
+	////////// Reset to initial state //////////
 	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to finish
-
 }
 
 int main() {
 	stdio_init_all();
-
 	init_pins();
+	uart_init(UART_ID, BAUD_RATE);
+
+	// Clear UART buffer, whatever
+	char c = uart_getc(UART_ID);
+	while (c) {
+		c = uart_getc(UART_ID);
+	}
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
