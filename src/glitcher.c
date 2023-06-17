@@ -45,7 +45,6 @@ void read_uart() {
 	if (!is_readable) {
 		// No response
 		putchar(RESP_KO);
-		// power_off();
 		return;
 	}
 
@@ -131,6 +130,7 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	timeout = 100000;
 	while(timeout && gpio_get(PIC_OUT_PIN) && gpio_get(PIC_BOD_CANARY_PIN)) {
 		// Timeout not hit and PIC is still running
+		// This also waits for the PIC UART TX to finish
 		sleep_us(1);
 		timeout--;
 	}
@@ -139,12 +139,12 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 		return false;
 	}
 	if (!gpio_get(PIC_BOD_CANARY_PIN)) {
-		// PIC is still running or BOD canary is tripped
+		// BOD canary is tripped, AKA PIC is dead
 		putchar('F');
 		return false;
 	}
 
-	// ////////// Reset to initial state //////////
+	////////// Reset to initial state //////////
 	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to finish
 	return true;
 }
@@ -153,11 +153,6 @@ int main() {
 	stdio_init_all();
 	init_pins();
 	uart_init(UART_ID, BAUD_RATE);
-
-	// Clear UART buffer, whatever
-	while (uart_is_readable_within_us(UART_ID, 110)) { // 1000000/9600 = 104us
-		uart_getc(UART_ID);
-	}
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
@@ -214,11 +209,9 @@ int main() {
 					putchar(RESP_KO);
 					break;
 				}
-				if (!glitch(delay, pulse_width, trig_out)) {
-					putchar(RESP_KO);
-				} else {
+				if (glitch(delay, pulse_width, trig_out)) {
 					read_uart();
-				}
+				} // Else PIC is dead and the glitch function will write on UART why
 				break;
 			case CMD_POWERON:
 				if (powered_on) {
@@ -239,10 +232,6 @@ int main() {
 				*SET_GPIO_ATOMIC = MAX_EN_MASK;
 				*CLR_GPIO_ATOMIC = MAX_SEL_MASK;
 				putchar(RESP_OK);
-				break;
-			case 'R':
-				// UART receive
-				read_uart();
 				break;
 		}
 	}
