@@ -49,7 +49,7 @@ void read_uart() {
 		return;
 	}
 
-	while (uart_is_readable_within_us(UART_ID, 110)) { // 1000000/9600 = 104us
+	while (uart_is_readable_within_us(UART_ID, 200)) { // 1000000/9600 = 104us
 		char c = uart_getc(UART_ID);
 		putchar(c);
 	}
@@ -162,8 +162,10 @@ int main() {
 	init_pins();
 	uart_init(UART_ID, BAUD_RATE);
 
-	// // Clear UART buffer, whatever
-	// read_uart();
+	// Clear UART buffer, whatever
+	while (uart_is_readable_within_us(UART_ID, 110)) { // 1000000/9600 = 104us
+		uart_getc(UART_ID);
+	}
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
@@ -246,7 +248,10 @@ int main() {
 				*CLR_GPIO_ATOMIC = MAX_SEL_MASK;
 				putchar(RESP_OK);
 				break;
-
+			case 'R':
+				// UART receive
+				read_uart();
+				break;
 		}
 	}
 
