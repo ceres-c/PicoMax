@@ -40,27 +40,24 @@ void __no_inline_not_in_flash_func(power_off)() {
 }
 
 void read_uart() {
-	bool is_readable = uart_is_readable_within_us(UART_ID, 10000); // Check if anyone responded
+	// Poor man's uart_getc_timeout
+	bool is_readable = uart_is_readable_within_us(UART_ID, 50); // Check if anyone responded
 	if (!is_readable) {
 		// No response
 		putchar(RESP_KO);
 		// power_off();
 		return;
 	}
-	putchar('u');
 
-	char c = uart_getc(UART_ID);
-	putchar(c); // TODO remove
-	// while (c) {
-	// 	putchar(c);
-	// 	// printf(" %x (%c)", c, c);
-	// 	c = uart_getc(UART_ID);
-	// }
-	putchar('\n');
+	while (uart_is_readable_within_us(UART_ID, 110)) { // 1000000/9600 = 104us
+		char c = uart_getc(UART_ID);
+		putchar(c);
+	}
 }
 
-void __no_inline_not_in_flash_func(glitch_init)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
+bool __no_inline_not_in_flash_func(glitch_init)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
 	uint32_t mask_glitch = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
+	uint32_t timeout;
 
 	////////// Power on //////////
 	*SET_GPIO_ATOMIC = mask_glitch; // Default selected voltage to the highest of the two
@@ -70,13 +67,30 @@ void __no_inline_not_in_flash_func(glitch_init)(uint32_t delay, uint32_t pulse_w
 	// (output enabled, highest voltage selected, trigger out enabled/disabled)
 
 	/////////// Wait for PIC to boot //////////
-	while (!gpio_get(PIC_OUT_PIN));
-	putchar('I'); // TODO remove
+	timeout = 100000;
+	while(timeout && !gpio_get(PIC_OUT_PIN)) {
+		sleep_us(1);
+		timeout--;
+	}
+	if (!timeout) {
+		putchar('T');
+		return false;
+	}
 
 	// *SET_GPIO_ATOMIC = TRIG_OUT_MASK; // TODO remove
 	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to ready
 
-	while(gpio_get(PIC_OUT_PIN)); // Wait for PIC ACK to ACK
+	timeout = 100000;
+	while(timeout && gpio_get(PIC_OUT_PIN)) { // Wait for PIC ACK to ACK
+		sleep_us(1);
+		timeout--;
+	}
+	if (!timeout) {
+		putchar('T');
+		return false;
+	}
+
+	return true;
 
 	////////// Now we're in sync with PIC //////////
 }
@@ -86,9 +100,19 @@ void __no_inline_not_in_flash_func(glitch_init)(uint32_t delay, uint32_t pulse_w
 bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
 	uint32_t mask_glitch = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
 
+	uint32_t timeout;
+
 	*CLR_GPIO_ATOMIC = PIC_IN_MASK; // Signal to start the loop
 
-	while(!gpio_get(PIC_OUT_PIN)); // Wait for PIC to start loop
+	timeout = 100;
+	while(timeout && !gpio_get(PIC_OUT_PIN)) { // Wait for PIC to start loop
+		sleep_us(1);
+		timeout--;
+	}
+	if (!timeout) {
+		putchar('T');
+		return false;
+	}
 
 	////////// Wait for glitch moment //////////
 	for(uint32_t i = 0; i < delay; i++) {
@@ -101,10 +125,9 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	// EN=low, SEL=low, TRIG_OUT=?
 	// (output enabled, lowest voltage selected, trigger out enabled/disabled)
 
-
-	// for(uint32_t i = 0; i < pulse_width; i++) {
-	//  	asm("NOP");
-	// }
+	for(uint32_t i = 0; i < pulse_width; i++) {
+		asm("NOP");
+	}
 
 	*XOR_GPIO_ATOMIC = mask_glitch;
 	// Right now we have:
@@ -113,14 +136,14 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 
 	////////// Check if PIC survived //////////
 
-	uint32_t timeout = 100000;
+	timeout = 100000;
 	while(timeout && gpio_get(PIC_OUT_PIN) && gpio_get(PIC_BOD_CANARY_PIN)) {
 		// Timeout not hit and PIC is still running
 		sleep_us(1);
 		timeout--;
 	}
 	if (!timeout) {
-		putchar('E');
+		putchar('T');
 		return false;
 	}
 	if (!gpio_get(PIC_BOD_CANARY_PIN)) {
@@ -128,10 +151,6 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 		putchar('F');
 		return false;
 	}
-
-	////////// Read UART //////////
-	read_uart();
-	putchar('-'); // TODO remove this and replace with uart_read_blocking and correct amount of bytes below
 
 	// ////////// Reset to initial state //////////
 	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to finish
@@ -143,8 +162,8 @@ int main() {
 	init_pins();
 	uart_init(UART_ID, BAUD_RATE);
 
-	// Clear UART buffer, whatever
-	read_uart();
+	// // Clear UART buffer, whatever
+	// read_uart();
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
@@ -201,10 +220,10 @@ int main() {
 					putchar(RESP_KO);
 					break;
 				}
-				if (glitch(delay, pulse_width, trig_out)) {
-					putchar(RESP_OK);
-				} else {
+				if (!glitch(delay, pulse_width, trig_out)) {
 					putchar(RESP_KO);
+				} else {
+					read_uart();
 				}
 				break;
 			case CMD_POWERON:
