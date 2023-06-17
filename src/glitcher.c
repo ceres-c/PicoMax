@@ -23,7 +23,7 @@ static void init_pins() {
 	gpio_set_dir(TRIG_OUT_PIN, GPIO_OUT);
 	gpio_set_dir(PIC_IN_PIN, GPIO_OUT);
 
-	*SET_GPIO_ATOMIC = MAX_EN_MASK; // MAX4619 enable is active low, so disable it
+	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // MAX4619 enable is active low, so disable it
 
 	gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
 	gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
@@ -39,16 +39,35 @@ void __no_inline_not_in_flash_func(power_off)() {
 	sleep_ms(50);
 }
 
-// This function must be in RAM to have consistent timing. Due to Pi Pico's slow flash, first few
-// executions were taking far longer
-void __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
+void read_uart() {
+	bool is_readable = uart_is_readable_within_us(UART_ID, 10000); // Check if anyone responded
+	if (!is_readable) {
+		// No response
+		putchar(RESP_KO);
+		// power_off();
+		return;
+	}
+	putchar('u');
+
+	char c = uart_getc(UART_ID);
+	putchar(c); // TODO remove
+	// while (c) {
+	// 	putchar(c);
+	// 	// printf(" %x (%c)", c, c);
+	// 	c = uart_getc(UART_ID);
+	// }
+	putchar('\n');
+}
+
+void __no_inline_not_in_flash_func(glitch_init)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
 	uint32_t mask_glitch = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
 
 	////////// Power on //////////
-	*XOR_GPIO_ATOMIC = MAX_EN_MASK;
+	*SET_GPIO_ATOMIC = mask_glitch; // Default selected voltage to the highest of the two
+	*CLR_GPIO_ATOMIC = MAX_EN_MASK;
 	// Right now we have:
-	// EN=low, SEL=high, TRIG_OUT=low
-	// (output enabled, highest voltage selected, trigger out disabled)
+	// EN=low, SEL=high, TRIG_OUT=?
+	// (output enabled, highest voltage selected, trigger out enabled/disabled)
 
 	/////////// Wait for PIC to boot //////////
 	while (!gpio_get(PIC_OUT_PIN));
@@ -60,6 +79,12 @@ void __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	while(gpio_get(PIC_OUT_PIN)); // Wait for PIC ACK to ACK
 
 	////////// Now we're in sync with PIC //////////
+}
+
+// This function must be in RAM to have consistent timing. Due to Pi Pico's slow flash, first few
+// executions were taking far longer
+bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
+	uint32_t mask_glitch = (MAX_SEL_MASK | trig_out << TRIG_OUT_PIN);
 
 	*CLR_GPIO_ATOMIC = PIC_IN_MASK; // Signal to start the loop
 
@@ -89,42 +114,28 @@ void __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	////////// Check if PIC survived //////////
 
 	uint32_t timeout = 100000;
-	while(timeout && (gpio_get(PIC_OUT_PIN) || !gpio_get(PIC_BOD_CANARY_PIN))) {
-		// PIC is still running or BOD canary is tripped
+	while(timeout && gpio_get(PIC_OUT_PIN) && gpio_get(PIC_BOD_CANARY_PIN)) {
+		// Timeout not hit and PIC is still running
 		sleep_us(1);
 		timeout--;
 	}
 	if (!timeout) {
 		putchar('E');
-		power_off();
-		return;
+		return false;
 	}
 	if (!gpio_get(PIC_BOD_CANARY_PIN)) {
 		// PIC is still running or BOD canary is tripped
 		putchar('F');
-		power_off();
-		return;
+		return false;
 	}
 
 	////////// Read UART //////////
-	bool is_readable = uart_is_readable_within_us(UART_ID, 50); // Check if anyone responded
-	if (!is_readable) {
-		// No response
-		putchar(RESP_KO);
-		// power_off();
-		return;
-	}
-	putchar('u');
-
-	char c = uart_getc(UART_ID);
-	while (c) {
-		putchar(c);
-		c = uart_getc(UART_ID);
-	}
+	read_uart();
 	putchar('-'); // TODO remove this and replace with uart_read_blocking and correct amount of bytes below
 
-	////////// Reset to initial state //////////
+	// ////////// Reset to initial state //////////
 	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to finish
+	return true;
 }
 
 int main() {
@@ -133,10 +144,7 @@ int main() {
 	uart_init(UART_ID, BAUD_RATE);
 
 	// Clear UART buffer, whatever
-	char c = uart_getc(UART_ID);
-	while (c) {
-		c = uart_getc(UART_ID);
-	}
+	read_uart();
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
@@ -144,6 +152,7 @@ int main() {
 	// bool trig_in = false;
 	bool trig_out = false;
 	bool powered_on = false;
+	bool init = false;
 
 	while (true) {
 		uint8_t cmd = getchar();
@@ -181,10 +190,22 @@ int main() {
 				putchar(RESP_OK);
 				// printf("Disabled trigger out on pin %d\n", TRIG_OUT_PIN);
 				break;
-			case CMD_GLITCH:
+			case CMD_GLITCH_INIT:
 				power_off();
-				glitch(delay, pulse_width, trig_out);
+				glitch_init(delay, pulse_width, trig_out);
+				init = true;
 				putchar(RESP_OK);
+				break;
+			case CMD_GLITCH:
+				if (!init) {
+					putchar(RESP_KO);
+					break;
+				}
+				if (glitch(delay, pulse_width, trig_out)) {
+					putchar(RESP_OK);
+				} else {
+					putchar(RESP_KO);
+				}
 				break;
 			case CMD_POWERON:
 				if (powered_on) {

@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/uart.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
+#define CMD_GLITCH_INIT		'g'
 #define CMD_GLITCH			'G'
 #define CMD_TRIG_OUT_EN		'O'
 #define CMD_TRIG_OUT_DIS	'o'
@@ -15,8 +17,8 @@
 #define CMD_POWERON			'+'
 #define CMD_POWEROFF		'-'
 
-#define UART_TX_PIN			0x00 // Rpi pico pin 0
-#define UART_RX_PIN			0x01 // pin 1
+#define UART_TX_PIN			0x00 // Rpi pico pin 1 (which is GPIO 0)
+#define UART_RX_PIN			0x01 // pin 2
 
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)
