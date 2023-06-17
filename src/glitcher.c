@@ -104,15 +104,7 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 
 	*CLR_GPIO_ATOMIC = PIC_IN_MASK; // Signal to start the loop
 
-	timeout = 100;
-	while(timeout && !gpio_get(PIC_OUT_PIN)) { // Wait for PIC to start loop
-		sleep_us(1);
-		timeout--;
-	}
-	if (!timeout) {
-		putchar('T');
-		return false;
-	}
+	while(!gpio_get(PIC_OUT_PIN)); // Wait for PIC to start loop
 
 	////////// Wait for glitch moment //////////
 	for(uint32_t i = 0; i < delay; i++) {
