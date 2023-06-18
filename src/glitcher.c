@@ -37,19 +37,16 @@ void __no_inline_not_in_flash_func(power_on)() {
 // This function must be in RAM to have consistent timing. Due to Pi Pico's slow flash, first few
 // executions were taking far longer
 bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
-	// TODO configure gpio function to PIO (if needed?)
-	// TODO enable PIO
-	// TODO wait for interrupt from PIO after glitching is done
-	// TODO check if PIC is still alive
-
 	uint sm = 0;
 	glitch_trigger_program_init(pio, sm, glitcher_prog_offst, trig_out, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
 
 	pio_sm_put_blocking(pio, sm, delay);
 	pio_sm_put_blocking(pio, sm, pulse_width);
-	putchar('P'); // TODO remove
-	// uint32_t ret = pio_sm_get_blocking(pio, sm);
-	// printf("%x\n", ret); // TODO remove
+	uint32_t ret = pio_sm_get_blocking(pio, sm);
+
+	// TODO check if PIC is still alive
+
+	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
 
 	return true;
 }
@@ -63,8 +60,7 @@ int main() {
 	uint32_t delay = 50; // TODO remove and uncomment above
 	uint32_t pulse_width = 0;
 	// bool trig_in = false;
-	// bool trig_out = false;
-	bool trig_out = true; // TODO remove and uncomment above
+	bool trig_out = false;
 	bool powered_on = false;
 	bool init = false;
 
@@ -107,10 +103,9 @@ int main() {
 					break;
 				}
 				if (glitch(delay, pulse_width, trig_out)) {
-					// TODO do something here
+					putchar(RESP_OK);
+					break;
 				} // Else PIC is dead and the glitch function will write on UART why
-				// TODO should set the MAX_SEL_PIN to SIO?
-				// gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // TODO keep or remove this?
 				break;
 			case CMD_POWERON:
 				if (powered_on) {
