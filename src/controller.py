@@ -11,17 +11,24 @@ import serial
 CMD = {
 	'DELAY'			: b'D',
 	'WIDTH'			: b'W',
+	'GLITCH_INIT'	: b'g',
 	'GLITCH'		: b'G',
 	'TRIG_OUT_EN'	: b'O',
 	'TRIG_OUT_DIS'	: b'o',
 	'TRIG_IN_EN'	: b'I',
 	'TRIG_IN_DIS'	: b'i',
 	'PING'			: b'P',
+	'POWERON'		: b'+',
+	'POWEROFF'		: b'-',
 }
 RESP = {
-	'OK'		: b'k',
-	'KO'		: b'x',
-	'PONG'		: b'p',
+	'OK'			: b'k',
+	'KO'			: b'x',
+	'PONG'			: b'p',
+	'GLITCH'		: b'!',
+	'GLITCH_FAIL'	: b'.',
+	'GLITCH_DEAD'	: b'F', # Brownout
+	'GLITCH_TIMEOUT': b'T', # WTF?
 }
 
 def success() -> bool:
@@ -29,6 +36,16 @@ def success() -> bool:
 	return False
 
 def main(args):
+
+	def glitch_init(s: serial.Serial) -> bool:
+		s.write(CMD['GLITCH_INIT'])
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
+			print(f'[!] Could not initialize glitcher. Got:\n{r}\nAborting.')
+			return False
+		return True
+
+
 	try: 
 		s = serial.Serial(port=args.port, baudrate=args.baud, timeout=args.timeout)
 	except Exception as e:
@@ -49,24 +66,39 @@ def main(args):
 			print(f'[!] Could not enable output trigger. Got:\n{r}\nAborting.')
 			exit(1)
 		print('[+] Output trigger enabled.')
+	
+	if not glitch_init(s):
+		exit(1)
 
 	start = time.time()
 	i = 0
 	for i, (d, w) in enumerate(((x, y) for x in range(*args.delay) for y in range(*args.width))):
 		if i % 10 == 0:
-			print(f'[.] Sending {i}', end='\r', flush=True)
+			# print(f'[.] Sending {i}', end='\r', flush=True)
+			print('.', end='', flush=True)
 
 		s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian
-		s.read(len(CMD['DELAY']))
+		r = s.read(len(CMD['DELAY']))
 		s.write(CMD['WIDTH'] + struct.pack('<i', w))
-		s.read(len(CMD['WIDTH']))
+		r = s.read(len(CMD['WIDTH']))
 		s.write(CMD['GLITCH'])
 		r = s.read(len(RESP['OK']))
-		if r != RESP['OK']:
-			print(f'[!] Glitch failed. Got:\n{r}\nAborting.')
+		print(r.decode('ascii'), end='', flush=True)
+		if r == RESP['GLITCH']:
+			print('\n[!] GLITCHED!')
+			glitch_r = s.read(100) # Arbitrary amount of bytes
+			print(f'\tGot: {glitch_r}')
+		elif r == RESP['GLITCH_FAIL']:
+			s.read(1) # Get rid of the trailing '\x00'
+		elif r == RESP['GLITCH_DEAD'] or r == RESP['GLITCH_TIMEOUT']:
+			if not glitch_init(s):
+				exit(1)
+		else:
+			print(f'[!] Unknown response: {r}')
 			exit(1)
-	end = time.time()
 
+	end = time.time()
+	print()
 	print(f'[+] Sent {i} in {end - start}s.')
 
 	s.close()

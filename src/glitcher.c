@@ -50,7 +50,10 @@ void read_uart() {
 
 	while (uart_is_readable_within_us(UART_ID, 200)) { // 1000000/9600 = 104us
 		char c = uart_getc(UART_ID);
-		putchar(c);
+		if (c) {
+			// Cleanup the output to remove spurious \x00
+			putchar(c);
+		}
 	}
 }
 
@@ -89,6 +92,7 @@ bool __no_inline_not_in_flash_func(glitch_init)(uint32_t delay, uint32_t pulse_w
 		return false;
 	}
 
+	putchar(RESP_OK);
 	return true;
 
 	////////// Now we're in sync with PIC //////////
@@ -128,7 +132,8 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	////////// Check if PIC survived //////////
 
 	timeout = 100000;
-	while(timeout && gpio_get(PIC_OUT_PIN) && gpio_get(PIC_BOD_CANARY_PIN)) {
+	while(timeout && gpio_get(PIC_OUT_PIN)) {
+	// while(timeout && gpio_get(PIC_OUT_PIN) && gpio_get(PIC_BOD_CANARY_PIN)) {
 		// Timeout not hit and PIC is still running
 		// This also waits for the PIC UART TX to finish
 		sleep_us(1);
@@ -138,11 +143,11 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 		putchar('T');
 		return false;
 	}
-	if (!gpio_get(PIC_BOD_CANARY_PIN)) {
-		// BOD canary is tripped, AKA PIC is dead
-		putchar('F');
-		return false;
-	}
+	// if (!gpio_get(PIC_BOD_CANARY_PIN)) {
+	// 	// BOD canary is tripped, AKA PIC is dead
+	// 	putchar('F');
+	// 	return false;
+	// }
 
 	////////// Reset to initial state //////////
 	*SET_GPIO_ATOMIC = PIC_IN_MASK; // ACK to finish
@@ -200,9 +205,9 @@ int main() {
 				break;
 			case CMD_GLITCH_INIT:
 				power_off();
-				glitch_init(delay, pulse_width, trig_out);
-				init = true;
-				putchar(RESP_OK);
+				if (glitch_init(delay, pulse_width, trig_out)) {
+					init = true;
+				}
 				break;
 			case CMD_GLITCH:
 				if (!init) {
