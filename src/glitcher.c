@@ -43,8 +43,7 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	// TODO check if PIC is still alive
 
 	uint sm = 0;
-	// glitch_trigger_program_init(pio, sm, offset, trig_out, MAX_SEL_PIN, TRIG_IN_PIN, TRIG_OUT_PIN);
-	glitch_trigger_program_init(pio, sm, glitcher_prog_offst, trig_out, 5, TRIG_IN_PIN, TRIG_OUT_PIN); // TODO using random pin for now
+	glitch_trigger_program_init(pio, sm, glitcher_prog_offst, trig_out, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
 
 	pio_sm_put_blocking(pio, sm, delay);
 	pio_sm_put_blocking(pio, sm, pulse_width);
@@ -64,7 +63,8 @@ int main() {
 	uint32_t delay = 50; // TODO remove and uncomment above
 	uint32_t pulse_width = 0;
 	// bool trig_in = false;
-	bool trig_out = false;
+	// bool trig_out = false;
+	bool trig_out = true; // TODO remove and uncomment above
 	bool powered_on = false;
 	bool init = false;
 
@@ -101,6 +101,7 @@ int main() {
 				putchar(RESP_OK);
 				break;
 			case CMD_GLITCH:
+				// gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_PIO0);
 				if (!init) {
 					putchar(RESP_KO);
 					break;
@@ -108,6 +109,8 @@ int main() {
 				if (glitch(delay, pulse_width, trig_out)) {
 					// TODO do something here
 				} // Else PIC is dead and the glitch function will write on UART why
+				// TODO should set the MAX_SEL_PIN to SIO?
+				// gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // TODO keep or remove this?
 				break;
 			case CMD_POWERON:
 				if (powered_on) {
