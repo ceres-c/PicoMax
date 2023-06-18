@@ -1,5 +1,7 @@
 #include "glitcher.h"
 
+uint glitcher_prog_offst = 0;
+
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // This will be handed over to PIO when we start glitching
@@ -40,15 +42,15 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	// TODO wait for interrupt from PIO after glitching is done
 	// TODO check if PIC is still alive
 
-	PIO pio = pio0;
 	uint sm = 0;
-	uint offset = pio_add_program(pio, &glitch_trigger_program);
 	// glitch_trigger_program_init(pio, sm, offset, trig_out, MAX_SEL_PIN, TRIG_IN_PIN, TRIG_OUT_PIN);
-	glitch_trigger_program_init(pio, sm, offset, trig_out, 5, TRIG_IN_PIN, TRIG_OUT_PIN); // TODO using random pin for now
+	glitch_trigger_program_init(pio, sm, glitcher_prog_offst, trig_out, 5, TRIG_IN_PIN, TRIG_OUT_PIN); // TODO using random pin for now
 
-	// pio_sm_put_blocking(pio, sm, 1); // TODO decomment once the PIO actually pulls anything
-	// pio_sm_put_blocking(pio, sm, 2);
-	// pio_sm_get_blocking(pio, sm); // TODO decomment once the PIO actually returns something
+	pio_sm_put_blocking(pio, sm, delay);
+	pio_sm_put_blocking(pio, sm, pulse_width);
+	putchar('P'); // TODO remove
+	// uint32_t ret = pio_sm_get_blocking(pio, sm);
+	// printf("%x\n", ret); // TODO remove
 
 	return true;
 }
@@ -56,6 +58,7 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 int main() {
 	stdio_init_all();
 	init_pins();
+	glitcher_prog_offst = pio_add_program(pio, &glitch_trigger_program);
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above

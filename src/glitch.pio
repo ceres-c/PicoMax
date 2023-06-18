@@ -1,8 +1,24 @@
 .program glitch_trigger
 .side_set 1 opt
 
-	set pins, 1 side 0 [7]
-	set pins, 0 side 1
+	pull block		; Get delay
+	mov X, OSR
+	pull block		; Get width
+	mov Y, OSR
+
+	wait 1 PIN 0	; Wait for trigger on input pin 0 (count relative to whatever the input pin is configured as)
+
+delay:
+	jmp X-- delay	; Delay for x cycles
+
+	set PINS, 0 side 1	; Begin glitch (sideset the output trigger pin)
+width:
+	jmp Y-- width	; Width for y cycles
+
+	set PINS, 1 side 0	; End glitch
+
+	; mov ISR, null	; Return
+	; push
 
 % c-sdk {
 
@@ -11,9 +27,9 @@ static inline void glitch_trigger_program_init(PIO pio, uint sm, uint prog_offs,
 
 	pio_sm_config c = glitch_trigger_program_get_default_config(prog_offs);
 
-	sm_config_set_out_pins(&c, pin_max_sel, 1);
-	sm_config_set_in_pins(&c, pin_trig_in);
-	sm_config_set_sideset_pins(&c, pin_trig_out);
+	sm_config_set_out_pins(&c, pin_max_sel, 1); 	// Set output base pin and number of pins
+	sm_config_set_in_pins(&c, pin_trig_in); 		// Set input base pin
+	sm_config_set_sideset_pins(&c, pin_trig_out);	// Set sideset base pin
 
 	// sm_config_set_clkdiv(&c, clkdiv); // TODO is this useful in any way? float clkdiv
 
@@ -35,7 +51,7 @@ static inline void glitch_trigger_program_init(PIO pio, uint sm, uint prog_offs,
 	pio_gpio_init(pio, pin_max_sel);
 
 	// Use GPIO pin muxes to invert the output. It's easier to think of the glitch as 0->1->0 rather than 1->0->1.
-	gpio_set_outover(pin_max_sel, GPIO_OVERRIDE_INVERT); // NOTE: this MUST be here after the inits
+	// gpio_set_outover(pin_max_sel, GPIO_OVERRIDE_INVERT); // NOTE: this MUST be here after the inits
 
 	// hw_set_bits(&pio->input_sync_bypass, 1u << pin_miso); // TODO this disables flip-flops on the input pins for faster inputs, useful?
 
