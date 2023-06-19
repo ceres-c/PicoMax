@@ -36,7 +36,8 @@ void __no_inline_not_in_flash_func(power_on)() {
 
 // This function must be in RAM to have consistent timing. Due to Pi Pico's slow flash, first few
 // executions were taking far longer
-bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
+uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
+	// TODO maybe add a timeout with an external watchdog timer?
 	uint sm = 0;
 	glitch_trigger_program_init(pio, sm, glitcher_prog_offst, trig_out, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
 
@@ -44,11 +45,9 @@ bool __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width,
 	pio_sm_put_blocking(pio, sm, pulse_width);
 	uint32_t ret = pio_sm_get_blocking(pio, sm);
 
-	// TODO check if PIC is still alive
-
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
 
-	return true;
+	return (uint8_t)ret;
 }
 
 int main() {
@@ -67,66 +66,77 @@ int main() {
 	while (true) {
 		uint8_t cmd = getchar();
 		switch(cmd) {
-			case CMD_PING:
-				putchar(RESP_PONG);
+		case CMD_PING:
+			putchar(RESP_PONG);
+			break;
+		case CMD_DELAY:
+			fread(&delay, 1, 4, stdin);
+			// printf("Poweron->glitch delay set to %d\n", delay);
+			putchar(RESP_OK);
+			break;
+		case CMD_WIDTH:
+			fread(&pulse_width, 1, 4, stdin);
+			// printf("Glitch pulse width set to %d\n", pulse_width);
+			putchar(RESP_OK);
+			break;
+		case CMD_TRIG_OUT_EN:
+			trig_out = true;
+			putchar(RESP_OK);
+			// printf("Trigger out on pin %d, state: %d\n", TRIG_OUT_PIN, trig_out);
+			break;
+		case CMD_TRIG_OUT_DIS:
+			trig_out = false;
+			putchar(RESP_OK);
+			// printf("Disabled trigger out on pin %d\n", TRIG_OUT_PIN);
+			break;
+		case CMD_GLITCH_INIT:
+			power_off();
+			power_on();
+			init = true;
+			putchar(RESP_OK);
+			break;
+		case CMD_GLITCH:
+			// gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_PIO0);
+			if (!init) {
+				putchar(RESP_KO);
 				break;
-			case CMD_DELAY:
-				fread(&delay, 1, 4, stdin);
-				// printf("Poweron->glitch delay set to %d\n", delay);
+			}
+			uint8_t ret = glitch(delay, pulse_width, trig_out);
+			switch(ret) {
+			case 0b000:
+				// Both PIC outputs are low, the chip died
+				putchar(RESP_KO);
+				break;
+			case 0b010:
+				// GLITCH!
 				putchar(RESP_OK);
 				break;
-			case CMD_WIDTH:
-				fread(&pulse_width, 1, 4, stdin);
-				// printf("Glitch pulse width set to %d\n", pulse_width);
-				putchar(RESP_OK);
+			case 0b100:
+				// PIC is alive, but glitching failed
+				putchar(RESP_GLITCH_FAIL);
 				break;
-			case CMD_TRIG_OUT_EN:
-				trig_out = true;
-				putchar(RESP_OK);
-				// printf("Trigger out on pin %d, state: %d\n", TRIG_OUT_PIN, trig_out);
+			}
+			break;
+		case CMD_POWERON:
+			if (powered_on) {
+				putchar(RESP_KO);
 				break;
-			case CMD_TRIG_OUT_DIS:
-				trig_out = false;
-				putchar(RESP_OK);
-				// printf("Disabled trigger out on pin %d\n", TRIG_OUT_PIN);
+			}
+			powered_on = true;
+			*SET_GPIO_ATOMIC = MAX_SEL_MASK;
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK;
+			putchar(RESP_OK);
+			break;
+		case CMD_POWEROFF:
+			if (!powered_on) {
+				putchar(RESP_KO);
 				break;
-			case CMD_GLITCH_INIT:
-				power_off();
-				power_on();
-				init = true;
-				putchar(RESP_OK);
-				break;
-			case CMD_GLITCH:
-				// gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_PIO0);
-				if (!init) {
-					putchar(RESP_KO);
-					break;
-				}
-				if (glitch(delay, pulse_width, trig_out)) {
-					putchar(RESP_OK);
-					break;
-				} // Else PIC is dead and the glitch function will write on UART why
-				break;
-			case CMD_POWERON:
-				if (powered_on) {
-					putchar(RESP_KO);
-					break;
-				}
-				powered_on = true;
-				*SET_GPIO_ATOMIC = MAX_SEL_MASK;
-				*CLR_GPIO_ATOMIC = MAX_EN_MASK;
-				putchar(RESP_OK);
-				break;
-			case CMD_POWEROFF:
-				if (!powered_on) {
-					putchar(RESP_KO);
-					break;
-				}
-				powered_on = false;
-				*SET_GPIO_ATOMIC = MAX_EN_MASK;
-				*CLR_GPIO_ATOMIC = MAX_SEL_MASK;
-				putchar(RESP_OK);
-				break;
+			}
+			powered_on = false;
+			*SET_GPIO_ATOMIC = MAX_EN_MASK;
+			*CLR_GPIO_ATOMIC = MAX_SEL_MASK;
+			putchar(RESP_OK);
+			break;
 		}
 	}
 

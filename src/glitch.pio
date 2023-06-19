@@ -1,3 +1,15 @@
+// This PIO program accepts two inputs:
+// - delay: the number of cycles to wait before starting the glitch
+// - pulse_width: the number of cycles to keep the glitch active
+// It will switch the MAX4619 selector to the lower voltage for pulse_width cycles, then switch it
+// back to the higher voltage.
+// It will then wait for the input pin to go low (in our test firmware, this means the loop has
+// ended or the device has browned out), and return the current pin state. As the input pins are
+// contiguous, the return value is a 32-bit integer, of which only the lower 3 bits are relevant.
+// 0th bit should always be 0, as it's the pin we're waiting for to go low.
+// 1st bit is high if the glitch failed
+// 2nd bit is high if the glitch succeeded
+// Of course this depends on the code running on the target device and the wiring.
 .program glitch_trigger
 .side_set 1 opt
 
@@ -19,7 +31,8 @@ width:
 
 	set PINS, 1 side 0	; End glitch
 
-	mov ISR, null	; Return
+	wait 0 PIN 0	; Wait for input pin 0 to go to low (either loop end or brownout)
+	mov ISR, PINS	; Return the current pin state
 	push
 
 % c-sdk {
@@ -43,9 +56,11 @@ static inline void glitch_trigger_program_init(PIO pio, uint sm, uint prog_offs,
 		(1u << pin_trig_out) | (1u << pin_max_sel));
 
 	// Claim pins for PIO
-	pio_gpio_init(pio, pin_trig_in);
-	pio_gpio_init(pio, pin_trig_out);
 	pio_gpio_init(pio, pin_max_sel);
+	pio_gpio_init(pio, pin_trig_in);
+	pio_gpio_init(pio, pin_trig_in + 1);
+	pio_gpio_init(pio, pin_trig_in + 2);
+	pio_gpio_init(pio, pin_trig_out);
 
 	pio_sm_config c = glitch_trigger_program_get_default_config(prog_offs);
 

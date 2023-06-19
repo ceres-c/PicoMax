@@ -13,6 +13,7 @@
 #define RESP_OK				'k'
 #define RESP_KO				'x'
 #define RESP_PONG			'p'
+#define RESP_GLITCH_FAIL	'.'
 #define CMD_POWERON			'+'
 #define CMD_POWEROFF		'-'
 
@@ -29,9 +30,9 @@
 #define PIC_BOD_CANARY_MASK	(1 << PIC_BOD_CANARY_PIN)
 #define PIC_OUT_PIN			0x07 // pin 10
 #define PIC_OUT_MASK		(1 << PIC_OUT_PIN)
-#define PIC_GLITCH_SUCC_PIN	0x08 // pin 11
+#define PIC_GLITCH_SUCC_PIN	0x08 // pin 11 - These MUST be consecutive for the PIO to work
 #define PIC_GLITCH_SUCC_MASK	(1 << PIC_GLITCH_SUCC_PIN)
-#define PIC_GLITCH_FAIL_PIN	0x09 // pin 12
+#define PIC_GLITCH_FAIL_PIN	0x09 // pin 12 - These MUST be consecutive for the PIO to work
 #define PIC_GLITCH_FAIL_MASK	(1 << PIC_GLITCH_FAIL_PIN)
 
 #define GPIO_ATOMIC			((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_OFFSET))
