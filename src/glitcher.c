@@ -89,7 +89,7 @@ int main() {
 			putchar(RESP_OK);
 			// printf("Disabled trigger out on pin %d\n", TRIG_OUT_PIN);
 			break;
-		case CMD_GLITCH_INIT:
+		case CMD_GLITCH_INIT: // TODO is this actually needed?
 			power_off();
 			power_on();
 			init = true;
@@ -108,12 +108,12 @@ int main() {
 				putchar(RESP_KO);
 				break;
 			case 0b010:
-				// GLITCH!
-				putchar(RESP_OK);
-				break;
-			case 0b100:
 				// PIC is alive, but glitching failed
 				putchar(RESP_GLITCH_FAIL);
+				break;
+			case 0b100:
+				// GLITCH!
+				putchar(RESP_OK);
 				break;
 			}
 			break;

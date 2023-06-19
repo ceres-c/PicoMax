@@ -25,10 +25,7 @@ RESP = {
 	'OK'			: b'k',
 	'KO'			: b'x',
 	'PONG'			: b'p',
-	'GLITCH'		: b'!',
 	'GLITCH_FAIL'	: b'.',
-	'GLITCH_DEAD'	: b'F', # Brownout
-	'GLITCH_TIMEOUT': b'T', # WTF?
 }
 
 def success() -> bool:
@@ -83,19 +80,16 @@ def main(args):
 		r = s.read(len(CMD['WIDTH']))
 		s.write(CMD['GLITCH'])
 		r = s.read(len(RESP['OK']))
-		print(r.decode('ascii'), end='', flush=True)
-		if r == RESP['GLITCH']:
-			print('\n[!] GLITCHED!')
-			glitch_r = s.read(100) # Arbitrary amount of bytes
-			print(f'\tGot: {glitch_r}')
-		elif r == RESP['GLITCH_FAIL']:
-			s.read(1) # Get rid of the trailing '\x00'
-		elif r == RESP['GLITCH_DEAD'] or r == RESP['GLITCH_TIMEOUT']:
-			if not glitch_init(s):
-				exit(1)
+		# print(r.decode('ascii'), end='', flush=True)
+		if r == RESP['GLITCH_FAIL']: # Glitch failed
+			print(RESP['GLITCH_FAIL'].decode('ascii'), end='', flush=True)
+		elif r == RESP['KO']: # Target dead
+			print(RESP['KO'].decode('ascii'), end='', flush=True)
+		elif r == RESP['OK']: # Glitched
+			print(f'\n[!] SUCCESS! Settings: delay={d}, width={w}')
+			break
 		else:
-			print(f'[!] Unknown response: {r}')
-			exit(1)
+			print(f'\n[!] Unknown response: {r}')
 
 	end = time.time()
 	print()
