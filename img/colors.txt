@@ -1,0 +1,6 @@
+Yellow: MAX4916 EN
+Pink:   MAX4916 A/B/C selects
+Blue:   Raspberry Pi Pico trigger out
+Green:  MAX4916 out
+
+Also: power supply was at 4V as can be seen

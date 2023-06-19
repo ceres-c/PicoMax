@@ -26,9 +26,7 @@
 #define TRIG_OUT_PIN		0x05 // pin 7
 #define TRIG_OUT_MASK		(1 << TRIG_OUT_PIN)
 
-#define PIC_BOD_CANARY_PIN	0x06 // pin 9
-#define PIC_BOD_CANARY_MASK	(1 << PIC_BOD_CANARY_PIN)
-#define PIC_OUT_PIN			0x07 // pin 10
+#define PIC_OUT_PIN			0x07 // pin 10 // TODO maybe this can be 0x06?
 #define PIC_OUT_MASK		(1 << PIC_OUT_PIN)
 #define PIC_GLITCH_SUCC_PIN	0x08 // pin 11 - These MUST be consecutive for the PIO to work
 #define PIC_GLITCH_SUCC_MASK	(1 << PIC_GLITCH_SUCC_PIN)

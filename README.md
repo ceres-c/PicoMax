@@ -34,32 +34,42 @@ The delay and width are in Raspberry Pi Pico clock cycles. The Pico runs at
 increments.
 
 With my specific MAX4619, switching time is ${\sim}10\ \text{ns}$ (quite close
-to the limit of my oscilloscope, so take this with a grain of salt). A 0-`nop`
-delay (the minimum possible low-high-low time at the output) measures at
-${\sim}60\ \text{ns}$ *with no load*. Each additional `nop` adds
-${\sim}30\ \text{ns}$ to the delay (it's not actually the `nop`, but rather the
-loop exit condition check, but let's ignore that).
+to the limit of my oscilloscope, so take this with a grain of salt). The
+shortest possible 5V-0V-5V cycle requires a rather underwhelming
+${\sim}120\ \text{ns}$ (at 10 pico cycles). Each pico clock cycle takes
+${\sim}8\ \text{ns}$, so the remaining ${\sim}40\ \text{ns}$ are taken by
+hysteresis in the MAX4619. This gives us this ballpark formula for the delay:
 
-Out of the mentioned $60\ \text{ns}$, $10+10$ are switching times, and the
-remaining $40$ are taken by the Pico to execute the loop's head. This gives us
-this ballpark formula for the delay:
-
-$$\text{delay} = 20ns_{\text{switching}} + 40ns_{\text{loop setup}} + \\#\text{nop}\ \cdot\ 30ns_{\text{nop}}$$
+$$\text{delay} = 20ns_{\text{pico switching}} + 40ns_{\text{MAX switching}} + \\#\text{cycles}\ \cdot\ 8ns_{\text{cycles}}$$
 
 Same applies for the glitch width.
 
-## Glitching improvements
-The glitcher seems to be relatively consistent when code is running in ram
-(already enabled, read next section), but probably it could be improved in both
-consistency and accuracy by moving the glitcher code to PIO.
+Given the above timings, it is more effective to switch between 5V and some
+intermediate voltage that will not instantly trigger the brownout detector of
+your target, but still achieve a succesful glitch.
 
-## Personal notes
-I had issues with the first 2-3 glitches right after booting the Pico being
-way off in duration. The same happened (but for only the first glitch) after a
-dis/connect of the USB serial terminal.
-I thought this was a cache issue, but for some reason, setting
-`pico_set_binary_type(glitcher no_flash)` in `CMakeLists.txt` didn't work. I
-had to move the glitcher code to a function of its own and decorate it with
-`__no_inline_not_in_flash_func`. Additionally, the above cmake line had to be
-removed as it was also triggering the same bug, regardless of the decorator (?)
-Don't ask me dude.
+## Succesful glitching setup
+I managed to glitch a loop running on a PIC16F1936 (see MPLAB project with code
+in `target_src`) with the following setup:
+```
+glitch voltage: 3.7V
+glitch width: 20 cycles
+```
+
+I have found the glitch voltage playing around with the power supply knob until
+I got ~20% brownout resets, then tried with multiple glitch widths until I got
+a succesful glitch.
+
+### Scope captures
+In the captures below you can see a succesfull glitch.
+- Channel 1 (yellow) is the input to the A, B and C pin of the MAX4619
+- Channel 2 (magenta) is the PIC pin that will be raised when the glitch fails
+(not shown here)
+- Channel 3 (cyan) is the PIC pin that will be raised when the loop starts
+- Channel 4 (green) is the power supply to the PIC
+![Succesful glitch](img/glitch_success.png)
+![Successful glitch zoomed](img/glitch_success_closeup.png)
+
+For additional information on the wiring see the `hardware` folder, and for
+additional information on the code running on the PIC see the `target_src`
+folder.
