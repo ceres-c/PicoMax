@@ -1,77 +1,118 @@
-// This PIO program accepts two inputs:
-// - delay: the number of cycles to wait before starting the glitch
-// - pulse_width: the number of cycles to keep the glitch active
-// It will switch the MAX4619 selector to the lower voltage for pulse_width cycles, then switch it
-// back to the higher voltage.
-// It will then wait for the input pin to go low (in our test firmware, this means the loop has
-// ended or the device has browned out), and return the current pin state. As the input pins are
-// contiguous, the return value is a 32-bit integer, of which only the lower 3 bits are relevant.
-// 0th bit should always be 0, as it's the pin we're waiting for to go low.
-// 1st bit is high if the glitch failed
-// 2nd bit is high if the glitch succeeded
-// Of course this depends on the code running on the target device and the wiring.
+// TODO document this PIO program
 .program programmer
 .side_set 1 opt
 
-	pull block		; Get delay
-	mov X, OSR
-	pull block		; Get width
-	mov Y, OSR
+	pull block
+	set x, 5					; Preload bit counter with 5
+bitloop:						; Loop 6 times
+	out pins, 1 side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
+	nop			side 0			; Pull the clock pin low at half clock period
+	jmp x-- bitloop				; Jump back if more bits to shift
 
-	; Pin count is relative to whatever the input pin is configured as
-	wait 0 PIN 0	; Wait for input pin 0 to go to low, in case it was high
-	wait 1 PIN 0	; Then wait for it to actually go high
+	; Following 2 instructions will accumulate a total delay of 800 ns, 200 ns short of the protocol-mandated 1 us
+	out x, 1			[7]
+	jmp !x send			[7]
 
-delay:
-	jmp X-- delay	; Delay for x cycles
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 
-	set PINS, 0 side 1	; Begin glitch (sideset the output trigger pin)
-width:
-	jmp Y-- width	; Width for y cycles
+receive:
+	set pins, 1					; TEST
+	jmp end			
 
-	set PINS, 1 side 0	; End glitch
+	; set x, 1
+	; in x, 1
+	; push block					; Signal we are done
 
-	wait 0 PIN 0	; Wait for input pin 0 to go to low (either loop end or brownout)
-	mov ISR, PINS	; Return the current pin state
-	push
+send:
+	; set x, 0
+	; in x, 1
+	; push block					; Signal we are done
+
+	; This used to be the send
+	; in null, 1
+	; push block					; Signal we are done
+
+end:
+	set x, 1		
+	in x, 1			
+	push block						; Signal we are done
+
+; 	; TODO use a set pindirs and do without the second wire
+
+; .program programmer
+; .side_set 1 opt
+
+; 	pull block
+; 	set x, 5					; Preload bit counter with 5
+; bitloop:						; Loop 6 times
+; 	out pins, 1 side 1 [1]		; Shift 1 bit from OSR to the first OUT pin
+; 	nop side 0					; Pull the clock pin low at half clock period
+; 	jmp x-- bitloop				; Jump back if more bits to shift
+
+; 	; Following 2 instructions will accumulate a total delay of 1 us, as mandated by the protocol
+; 	; TODO actually they take 800 ns in total. I am 200 ns short. FUCK
+; 	out x, 1 [7]				; Move in/out discimination bit to the scratch register
+; 	jmp !x send	[7]				; If 0, no receive
+
+; receive:
+; 	; TODO set pindirs to input
+; 	; TODO receive data
+; 	; TODO mov received data to ISR
+
+; 	; TODO remove below code
+; 	; set PINS, 1					; Set high to test this
+; 	set x, 10
+; 	jmp end
+
+; send:
+; 	; TODO send remaining bits
+
+; 	; set PINS, 1					; Set high to test this
+; 	; set x, 30
+; 	mov x, x
+
+; end:
+; 	mov osr, null				; Clear OSR ; TODO why is this needed?
+; 	mov isr, x					; Return 0
+; 	push block					; Signal we are done
 
 % c-sdk {
 
-static inline void programmer_program_init(PIO pio, uint sm, uint prog_offs,
+static inline void programmer_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
 	uint pin_clock, uint pin_data_in, uint pin_data_out) {
 
-	// NOTE: Setting pin directions and values first to avoid cutting power to the target
-	// device by switching the MAX4619 selector
+	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
 
-	// Set pin directions (pin_trigger_out and pin_max_sel are outputs, pin_trigger_in is an input)
+	// Set pin directions (pin_clock and pin_data_out are outputs, pin_data_in is an input)
 	pio_sm_set_pindirs_with_mask(
 		pio, sm,
-		(trig_out_enabled << pin_trig_out) | (1u << pin_max_sel),
-		(trig_out_enabled << pin_trig_out) | (1u << pin_max_sel) | (1u << pin_trig_in));
+		(1u << pin_clock) | (1u << pin_data_out),
+		(1u << pin_clock) | (1u << pin_data_out) | (1u << pin_data_in));
 
-	// Set default pin values (pin_trigger_out is low, pin_max_sel is high)
+	// Set default pin values (everything is low)
 	pio_sm_set_pins_with_mask(
 		pio, sm, 
-		(1u << pin_max_sel),
-		(1u << pin_trig_out) | (1u << pin_max_sel));
+		0,
+		(1u << pin_clock) | (1u << pin_data_out) | (1u << pin_data_in));
 
 	// Claim pins for PIO
-	pio_gpio_init(pio, pin_max_sel);
-	pio_gpio_init(pio, pin_trig_in);
-	pio_gpio_init(pio, pin_trig_in + 1);
-	pio_gpio_init(pio, pin_trig_in + 2);
-	pio_gpio_init(pio, pin_trig_out);
+	pio_gpio_init(pio, pin_clock);
+	pio_gpio_init(pio, pin_data_out);
+	pio_gpio_init(pio, pin_data_in);
 
 	pio_sm_config c = glitch_trigger_program_get_default_config(prog_offs);
 
-	sm_config_set_set_pins(&c, pin_max_sel, 1); 	// Set base pin and number of pins for SET operand
-	sm_config_set_in_pins(&c, pin_trig_in); 		// Set input base pin
-	sm_config_set_sideset_pins(&c, pin_trig_out);	// Set sideset base pin
+	sm_config_set_set_pins(&c, pin_data_out, 1); 	// TODO remove
+	sm_config_set_out_pins(&c, pin_data_out, 1); 	// Set base pin and number of pins for OUT operand
+	sm_config_set_in_pins(&c, pin_data_in); 		// Set input base pin
+	sm_config_set_sideset_pins(&c, pin_clock);		// Set sideset base pin
 
-	// sm_config_set_clkdiv(&c, clkdiv); // TODO is this useful in any way? float clkdiv
-
-	// Use GPIO pin muxes to invert the output. It's easier to think of the glitch as 0->1->0 rather than 1->0->1.
-	// gpio_set_outover(pin_max_sel, GPIO_OVERRIDE_INVERT); // NOTE: this MUST be after the inits
+	sm_config_set_clkdiv(&c, clkdiv);
 
 	// hw_set_bits(&pio->input_sync_bypass, 1u << pin_miso); // TODO this disables flip-flops on the input pins for faster inputs, useful?
 
