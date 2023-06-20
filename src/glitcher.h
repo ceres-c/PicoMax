@@ -17,6 +17,10 @@
 #define CMD_POWERON			'+'
 #define CMD_POWEROFF		'-'
 
+#define PROGRAMMER_CLK 18 // pin 24
+#define PROGRAMMER_DATA_IN 19 // pin 25
+#define PROGRAMMER_DATA_OUT 20 // pin 26
+
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)
 #define MAX_SEL_PIN			0x03 // pin 5
