@@ -52,7 +52,8 @@ your target, but still achieve a succesful glitch.
 I managed to glitch a loop running on a PIC16F1936 (see MPLAB project with code
 in `target_src`) with the following setup:
 ```
-glitch voltage: 3.7V
+power supply: 3.3V
+glitch voltage: 2.25V
 glitch width: 20 cycles
 ```
 
@@ -62,11 +63,12 @@ a succesful glitch.
 
 ### Scope captures
 In the captures below you can see a succesfull glitch.
-- Channel 1 (yellow) is the input to the A, B and C pin of the MAX4619
+- Channel 1 (yellow) is the input to the A, B and C pins of the MAX4619
 - Channel 2 (magenta) is the PIC pin that will be raised when the glitch fails
-(not shown here)
+(event not shown here)
 - Channel 3 (cyan) is the PIC pin that will be raised when the loop starts
 - Channel 4 (green) is the power supply to the PIC
+
 ![Succesful glitch](img/glitch_success.png)
 ![Successful glitch zoomed](img/glitch_success_closeup.png)
 
