@@ -1,6 +1,8 @@
 #include "glitcher.h"
+#include <stdint.h>
 
 uint glitcher_prog_offst = 0;
+uint programmer_program_offset = 0;
 
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
@@ -50,10 +52,22 @@ uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_wid
 	return (uint8_t)ret;
 }
 
+typedef enum {
+  LoadConfiguration = 0x0,
+  IncrementAddres = 0x6,
+  ResetAddress = 0x16,
+} SendCommand;
+void __no_inline_not_in_flash_func(send_command)(SendCommand command) {
+  uint state_machine_id = 0;
+	programmer_program_init(pio1, state_machine_id, programmer_program_offset, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
+  return; 
+}
+
 int main() {
 	stdio_init_all();
 	init_pins();
-	glitcher_prog_offst = pio_add_program(pio, &glitch_trigger_program);
+	glitcher_prog_offst = pio_add_program(pio0, &glitch_trigger_program);
+	programmer_program_offset = pio_add_program(pio1, &programmer_program);
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
