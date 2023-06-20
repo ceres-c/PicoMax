@@ -59,7 +59,11 @@ glitch width: 20 cycles
 
 I have found the glitch voltage playing around with the power supply knob until
 I got ~20% brownout resets, then tried with multiple glitch widths until I got
-a succesful glitch.
+a succesful glitch with this command
+
+```bash
+python3 controller.py -d 100 500 50 -w 10 50 5 -o
+```
 
 ### Scope captures
 In the captures below you can see a succesfull glitch.
