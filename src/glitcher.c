@@ -170,10 +170,14 @@ uint32_t __no_inline_not_in_flash_func(icsp_read)(uint8_t command) {
 
 void read_pic_mem() {
 	enter_icsp();
+	sleep_us(1000);
+	uint32_t data = icsp_read(0x00); // Load configuration
+	printf("Load config: %x\n", data);
+
 	send_command_6bits(PROGRAMMER_CMD_RESET_ADDR); // Reset to 0
 	// icsp_load(0x03, 0xffff);
 	for (int i = 0; i < 10; i++) {
-		uint32_t data = icsp_read(0x05);
+		data = icsp_read(0x05);
 		printf("Read: %x\n", data);
 		send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
 	}
