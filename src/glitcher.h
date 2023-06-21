@@ -5,6 +5,7 @@
 #include "glitch.pio.h"
 #include "programmer.pio.h"
 #include "pic_key.pio.h"
+#include "pic_send_6bits.pio.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
@@ -49,8 +50,10 @@ const PIO glitcher_pio = pio0;
 const PIO programmer_pio = pio1;
 
 #define PROGRAMMER_CMD_LOAD_CONFIG		0x00
+#define PROGRAMMER_CMD_READ_PROGMEM		0x04
 #define PROGRAMMER_CMD_INCREMENT_ADDR	0x06
 #define PROGRAMMER_CMD_RESET_ADDR		0x16
 
-#define PROGRAMMER_RECEIVE_BITMASK		0b1000000	// Set this bit in the command uint32_t to indicate the programmer should switch
-											// to receive mode. If the bit is not set, the following 14-bits word will be sent
+#define PIC_PROG_PIO_RECV_BITMASK	0b1000000	// Set this bit in the command uint32_t to indicate the programmer should switch
+												// to receive mode. If the bit is not set, the programmer will send 16 more bits
+												// (14-bit word + 2 bit start/stop bits)

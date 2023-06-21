@@ -1,0 +1,62 @@
+// TODO document this PIO program
+// TODO must change to LSB
+
+; This program performs a send or a send/receive operation
+.program pic_6bits
+.side_set 1 opt
+	; The command is prepared by the host as
+	;   send: <start bit><16 bits word><end bit>0<6 bits command>
+	;   receive: <25 empty bits>1<6 bits command>
+
+
+	in null, 32						; Always start with clean in, even if we never input 32 full bits
+
+	pull block
+	set x, 5						; Preload bit counter with 5
+bitloop:							; Loop 6 times
+	out pins, 1 side 1	[1]			; Shift 1 bit from OSR to the first OUT pin
+	nop			side 0				; Pull the clock pin low at half clock period // TODO get rid of this an all other nops
+	jmp x-- bitloop					; Jump back if more bits to shift
+
+	push block						; Return data
+
+% c-sdk {
+
+static inline void pic_6bits_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
+	uint pin_clock, uint pin_data) {
+
+	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
+
+	// Set pin directions (pin_clock is always an output and pin_data is initially an outputs)
+	pio_sm_set_pindirs_with_mask(
+		pio, sm,
+		(1u << pin_clock) | (1u << pin_data),
+		(1u << pin_clock) | (1u << pin_data));
+
+	// Set default pin values (everything is low)
+	pio_sm_set_pins_with_mask(
+		pio, sm, 
+		0,
+		(1u << pin_clock) | (1u << pin_data));
+
+	// Claim pins for PIO
+	pio_gpio_init(pio, pin_clock);
+	pio_gpio_init(pio, pin_data);
+
+	pio_sm_config c = pic_6bits_program_get_default_config(prog_offs);
+
+	sm_config_set_set_pins(&c, pin_data, 1); 		// Used to set the pindir in the PIO asm code
+	sm_config_set_out_pins(&c, pin_data, 1); 		// Set base pin and number of pins for OUT operand
+	sm_config_set_in_pins(&c, pin_data); 			// Set input base pin // TODO no ins
+	sm_config_set_sideset_pins(&c, pin_clock);		// Set sideset base pin
+
+	sm_config_set_clkdiv(&c, clkdiv);
+
+	// hw_set_bits(&pio->input_sync_bypass, 1u << pin_miso); // TODO this disables flip-flops on the input pins for faster inputs, useful?
+
+	// Initialize the state machine
+	pio_sm_init(pio, sm, prog_offs, &c);
+	pio_sm_set_enabled(pio, sm, true);
+}
+
+%}

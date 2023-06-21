@@ -1,5 +1,5 @@
 // This program sends a 32 bit word to the target device in a single continuous stream of bits
-.program pic_key
+.program pic_key // TODO maybe rename to init_programming_mode
 .side_set 1 opt
 
 	pull block
