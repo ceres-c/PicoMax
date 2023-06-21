@@ -47,7 +47,7 @@
 #define XOR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_XOR_OFFSET))
 
 const PIO glitcher_pio = pio0;
-const PIO programmer_pio = pio1;
+const PIO icsp_pio = pio1;
 
 #define PROGRAMMER_CMD_LOAD_CONFIG		0x00
 #define PROGRAMMER_CMD_READ_PROGMEM		0x04

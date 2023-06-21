@@ -55,47 +55,47 @@ uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_wid
 	return (uint8_t)ret;
 }
 
-uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
-	uint programmer_program_offset = pio_add_program(programmer_pio, &programmer_program);
+uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
+	uint programmer_program_offset = pio_add_program(icsp_pio, &programmer_program);
 	uint programmer_sm = 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	programmer_program_init(programmer_pio, programmer_sm, programmer_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+	programmer_program_init(icsp_pio, programmer_sm, programmer_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
 
-	pio_sm_put_blocking(programmer_pio, programmer_sm, command);
-	uint32_t ret = pio_sm_get_blocking(programmer_pio, programmer_sm);
+	pio_sm_put_blocking(icsp_pio, programmer_sm, command);
+	uint32_t ret = pio_sm_get_blocking(icsp_pio, programmer_sm);
 
-	pio_remove_program(programmer_pio, &programmer_program, programmer_program_offset);
+	pio_remove_program(icsp_pio, &programmer_program, programmer_program_offset);
 
 	return ret;
 }
 
-uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
-	uint pic_6bits_program_offset = pio_add_program(programmer_pio, &pic_6bits_program);
+uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
+	uint pic_6bits_program_offset = pio_add_program(icsp_pio, &pic_6bits_program);
 	uint pic_6bits_sm = 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	pic_6bits_program_init(programmer_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+	pic_6bits_program_init(icsp_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
 
-	pio_sm_put_blocking(programmer_pio, pic_6bits_sm, command);
-	uint32_t ret = pio_sm_get_blocking(programmer_pio, pic_6bits_sm);
+	pio_sm_put_blocking(icsp_pio, pic_6bits_sm, command);
+	uint32_t ret = pio_sm_get_blocking(icsp_pio, pic_6bits_sm);
 
-	pio_remove_program(programmer_pio, &pic_6bits_program, pic_6bits_program_offset);
+	pio_remove_program(icsp_pio, &pic_6bits_program, pic_6bits_program_offset);
 
 	return ret;
 }
 
 void __no_inline_not_in_flash_func(send_key)() {
-	uint pic_key_program_offset = pio_add_program(programmer_pio, &pic_key_program);
+	uint pic_key_program_offset = pio_add_program(icsp_pio, &pic_key_program);
 	uint pic_key_sm	= 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	pic_key_program_init(programmer_pio, pic_key_sm, pic_key_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+	pic_key_program_init(icsp_pio, pic_key_sm, pic_key_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
 
-	pio_sm_put_blocking(programmer_pio, pic_key_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
-	pio_sm_get_blocking(programmer_pio, pic_key_sm); // Discard returned value
+	pio_sm_put_blocking(icsp_pio, pic_key_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
+	pio_sm_get_blocking(icsp_pio, pic_key_sm); // Discard returned value
 
-	pio_remove_program(programmer_pio, &pic_key_program, pic_key_program_offset);
+	pio_remove_program(icsp_pio, &pic_key_program, pic_key_program_offset);
 
 	return;
 }
