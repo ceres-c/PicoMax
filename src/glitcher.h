@@ -45,8 +45,8 @@
 #define CLR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_CLR_OFFSET))
 #define XOR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_XOR_OFFSET))
 
-PIO glitcher_pio = pio0;
-PIO programmer_pio = pio1;
+const PIO glitcher_pio = pio0;
+const PIO programmer_pio = pio1;
 
 typedef enum {
 	LoadConfiguration = 0x0,

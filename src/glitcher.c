@@ -4,8 +4,8 @@
 uint glitcher_prog_offst = 0;
 uint programmer_program_offset = 0;
 
-uint glitcher_sm = 0;
-uint programmer_sm = 0;
+const uint glitcher_sm = 0;
+const uint programmer_sm = 0;
 
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);

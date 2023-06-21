@@ -2,6 +2,26 @@
 .program programmer
 .side_set 1 opt
 
+	; IDEA:
+	; Pull 32 bits
+	; Clock out first 6 bits (command)
+	; OUT remaining bit to scratch register X (wait 10*100ns cycles to obtain the 1us delay)
+	; If X is 1, receive
+	;   receive:
+	;     change pin direction to input
+	;     shift in 16 bits to ISR register
+	;     push block
+	; If X is 1, send
+	;   send:
+	;     shift out 16 bits from OSR register (what about start/stop bits?)
+	;	 push block 0 or something
+
+	; The command is prepared by the host as
+	;   send: <start bit><16 bits word><end bit>0<6 bits command>
+	;   receive: <25 empty bits>1<6 bits command>
+
+	; NOTE: I can use non-optional sidesets to wait 10 cycles when needed
+
 	pull block
 	set x, 5					; Preload bit counter with 5
 bitloop:						; Loop 6 times
@@ -13,22 +33,16 @@ bitloop:						; Loop 6 times
 	out x, 1			[7]
 	jmp !x send			[7]
 
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-
 receive:
 	set pins, 1					; TEST
-	jmp end			
+	jmp end
 
 	; set x, 1
 	; in x, 1
 	; push block					; Signal we are done
 
 send:
+	set pins, 0					; TEST
 	; set x, 0
 	; in x, 1
 	; push block					; Signal we are done
@@ -38,11 +52,24 @@ send:
 	; push block					; Signal we are done
 
 end:
+	mov pins, x
 	set x, 1		
 	in x, 1			
 	push block						; Signal we are done
 
-; 	; TODO use a set pindirs and do without the second wire
+; ; 	; TODO use a set pindirs and do without the second wire
+
+
+
+
+
+
+
+
+
+
+
+
 
 ; .program programmer
 ; .side_set 1 opt
@@ -105,7 +132,7 @@ static inline void programmer_program_init(PIO pio, uint sm, uint prog_offs, flo
 	pio_gpio_init(pio, pin_data_out);
 	pio_gpio_init(pio, pin_data_in);
 
-	pio_sm_config c = glitch_trigger_program_get_default_config(prog_offs);
+	pio_sm_config c = programmer_program_get_default_config(prog_offs);
 
 	sm_config_set_set_pins(&c, pin_data_out, 1); 	// TODO remove
 	sm_config_set_out_pins(&c, pin_data_out, 1); 	// Set base pin and number of pins for OUT operand
