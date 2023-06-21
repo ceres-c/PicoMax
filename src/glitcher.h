@@ -4,7 +4,7 @@
 #include "hardware/pio.h"
 #include "glitch.pio.h"
 #include "programmer.pio.h"
-#include "pic_key.pio.h"
+#include "pic_enter_icsp.pio.h"
 #include "pic_send_6bits.pio.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
