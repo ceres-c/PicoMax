@@ -21,8 +21,7 @@
 #define CMD_SENDCMD			'L'
 
 #define PROGRAMMER_CLK		0x12 // pin 24
-#define PROGRAMMER_DATA_IN	0x13 // pin 25
-#define PROGRAMMER_DATA_OUT 0x14 // pin 26
+#define PROGRAMMER_DATA		0x13 // pin 25
 
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)
@@ -48,11 +47,9 @@
 const PIO glitcher_pio = pio0;
 const PIO programmer_pio = pio1;
 
-typedef enum {
-	LoadConfiguration = 0x0,
-	IncrementAddres = 0x6,
-	ResetAddress = 0x16,
-} SendCommand;
+#define PROGRAMMER_CMD_LOAD_CONFIG		0x00
+#define PROGRAMMER_CMD_INCREMENT_ADDR	0x06
+#define PROGRAMMER_CMD_RESET_ADDR		0x16
 
-#define PROGRAMMER_RECEIVE_CMD	0b1000000	// Set this bit in the command uint32_t to indicate the programmer should switch
+#define PROGRAMMER_RECEIVE_BITMASK		0b1000000	// Set this bit in the command uint32_t to indicate the programmer should switch
 											// to receive mode. If the bit is not set, the following 14-bits word will be sent

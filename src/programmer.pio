@@ -1,142 +1,71 @@
 // TODO document this PIO program
+// TODO must change to LSB
 .program programmer
 .side_set 1 opt
-
-	; IDEA:
-	; Pull 32 bits
-	; Clock out first 6 bits (command)
-	; OUT remaining bit to scratch register X (wait 10*100ns cycles to obtain the 1us delay)
-	; If X is 1, receive
-	;   receive:
-	;     change pin direction to input
-	;     shift in 16 bits to ISR register
-	;     push block
-	; If X is 1, send
-	;   send:
-	;     shift out 16 bits from OSR register (what about start/stop bits?)
-	;	 push block 0 or something
-
 	; The command is prepared by the host as
 	;   send: <start bit><16 bits word><end bit>0<6 bits command>
 	;   receive: <25 empty bits>1<6 bits command>
 
-	; NOTE: I can use non-optional sidesets to wait 10 cycles when needed
+
+	in null, 32						; Always start with clean in, even if we never input 32 full bits
 
 	pull block
-	set x, 5					; Preload bit counter with 5
-bitloop:						; Loop 6 times
-	out pins, 1 side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
-	nop			side 0			; Pull the clock pin low at half clock period
-	jmp x-- bitloop				; Jump back if more bits to shift
+	set x, 5						; Preload bit counter with 5
+bitloop:							; Loop 6 times
+	out pins, 1 side 1	[1]			; Shift 1 bit from OSR to the first OUT pin
+	nop			side 0				; Pull the clock pin low at half clock period
+	jmp x-- bitloop					; Jump back if more bits to shift
 
-	; Following 2 instructions will accumulate a total delay of 800 ns, 200 ns short of the protocol-mandated 1 us
-	out x, 1			[7]
-	jmp !x send			[7]
+	; Following 3 instructions will accumulate a total delay of 1us, as mandated by the protocol
+	set x, 15			[7]			; Preload bit counter with 15
+	out y, 1			[7]
+	jmp !y send			[1]			; Increase here if PIC does not respond
 
 receive:
-	set pins, 1					; TEST
+	set pindirs, 0					; Set the only pin to input (hopefully this will set it?)
+bitloop_receive:
+	nop			side 1	[1]			; Raise clock
+	in isr, 1	side 0				; Receive 1 bit
+	jmp x-- bitloop_receive
+
 	jmp end
 
-	; set x, 1
-	; in x, 1
-	; push block					; Signal we are done
-
 send:
-	set pins, 0					; TEST
-	; set x, 0
-	; in x, 1
-	; push block					; Signal we are done
-
-	; This used to be the send
-	; in null, 1
-	; push block					; Signal we are done
+	out pins, 1 side 1	[1]			; Shift 1 bit from OSR to the first OUT pin
+	nop			side 0				; Pull the clock pin low at half clock period
+	jmp x-- send					; Jump back if more bits to shift
 
 end:
-	mov pins, x
-	set x, 1		
-	in x, 1			
-	push block						; Signal we are done
-
-; ; 	; TODO use a set pindirs and do without the second wire
-
-
-
-
-
-
-
-
-
-
-
-
-
-; .program programmer
-; .side_set 1 opt
-
-; 	pull block
-; 	set x, 5					; Preload bit counter with 5
-; bitloop:						; Loop 6 times
-; 	out pins, 1 side 1 [1]		; Shift 1 bit from OSR to the first OUT pin
-; 	nop side 0					; Pull the clock pin low at half clock period
-; 	jmp x-- bitloop				; Jump back if more bits to shift
-
-; 	; Following 2 instructions will accumulate a total delay of 1 us, as mandated by the protocol
-; 	; TODO actually they take 800 ns in total. I am 200 ns short. FUCK
-; 	out x, 1 [7]				; Move in/out discimination bit to the scratch register
-; 	jmp !x send	[7]				; If 0, no receive
-
-; receive:
-; 	; TODO set pindirs to input
-; 	; TODO receive data
-; 	; TODO mov received data to ISR
-
-; 	; TODO remove below code
-; 	; set PINS, 1					; Set high to test this
-; 	set x, 10
-; 	jmp end
-
-; send:
-; 	; TODO send remaining bits
-
-; 	; set PINS, 1					; Set high to test this
-; 	; set x, 30
-; 	mov x, x
-
-; end:
-; 	mov osr, null				; Clear OSR ; TODO why is this needed?
-; 	mov isr, x					; Return 0
-; 	push block					; Signal we are done
+	push block						; Return data
 
 % c-sdk {
 
 static inline void programmer_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
-	uint pin_clock, uint pin_data_in, uint pin_data_out) {
+	uint pin_clock, uint pin_data) {
 
 	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
 
-	// Set pin directions (pin_clock and pin_data_out are outputs, pin_data_in is an input)
+	// Set pin directions (pin_clock is always an output and pin_data is initially an outputs)
 	pio_sm_set_pindirs_with_mask(
 		pio, sm,
-		(1u << pin_clock) | (1u << pin_data_out),
-		(1u << pin_clock) | (1u << pin_data_out) | (1u << pin_data_in));
+		(1u << pin_clock) | (1u << pin_data),
+		(1u << pin_clock) | (1u << pin_data));
 
 	// Set default pin values (everything is low)
 	pio_sm_set_pins_with_mask(
 		pio, sm, 
 		0,
-		(1u << pin_clock) | (1u << pin_data_out) | (1u << pin_data_in));
+		(1u << pin_clock) | (1u << pin_data));
 
 	// Claim pins for PIO
 	pio_gpio_init(pio, pin_clock);
-	pio_gpio_init(pio, pin_data_out);
-	pio_gpio_init(pio, pin_data_in);
+	pio_gpio_init(pio, pin_data);
 
 	pio_sm_config c = programmer_program_get_default_config(prog_offs);
 
-	sm_config_set_set_pins(&c, pin_data_out, 1); 	// TODO remove
-	sm_config_set_out_pins(&c, pin_data_out, 1); 	// Set base pin and number of pins for OUT operand
-	sm_config_set_in_pins(&c, pin_data_in); 		// Set input base pin
+	sm_config_set_set_pins(&c, pin_data, 1); 		// Used to set the pindir in the PIO asm code
+	sm_config_set_out_pins(&c, pin_data, 1); 		// Set base pin and number of pins for OUT operand
+	sm_config_set_in_pins(&c, pin_data); 			// Set input base pin
 	sm_config_set_sideset_pins(&c, pin_clock);		// Set sideset base pin
 
 	sm_config_set_clkdiv(&c, clkdiv);

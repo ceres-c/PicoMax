@@ -56,9 +56,9 @@ uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_wid
 }
 
 
-void __no_inline_not_in_flash_func(send_command)(SendCommand command) {
-	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns half period
-	programmer_program_init(programmer_pio, programmer_sm, programmer_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA_IN, PROGRAMMER_DATA_OUT);
+void __no_inline_not_in_flash_func(send_command)(uint32_t command) {
+	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	programmer_program_init(programmer_pio, programmer_sm, programmer_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
 
 	putchar('a');
 	pio_sm_put_blocking(programmer_pio, programmer_sm, command);
@@ -88,11 +88,11 @@ int main() {
 		uint8_t cmd = getchar();
 		switch(cmd) {
 		case CMD_SENDCMD: // TODO change the letter + move this below
-			send_command(ResetAddress);
+			send_command(PROGRAMMER_CMD_RESET_ADDR | 0b1111110000000);
 			putchar('C');
 			break;
 		case 'l':
-			send_command(ResetAddress | PROGRAMMER_RECEIVE_CMD); // Testing a receive command
+			send_command(PROGRAMMER_CMD_RESET_ADDR | PROGRAMMER_RECEIVE_BITMASK); // Testing a receive command
 			putchar('C');
 			break;
 		case CMD_PING:
