@@ -1,77 +1,74 @@
-// This PIO program accepts two inputs:
-// - delay: the number of cycles to wait before starting the glitch
-// - pulse_width: the number of cycles to keep the glitch active
-// It will switch the MAX4619 selector to the lower voltage for pulse_width cycles, then switch it
-// back to the higher voltage.
-// It will then wait for the input pin to go low (in our test firmware, this means the loop has
-// ended or the device has browned out), and return the current pin state. As the input pins are
-// contiguous, the return value is a 32-bit integer, of which only the lower 3 bits are relevant.
-// 0th bit should always be 0, as it's the pin we're waiting for to go low.
-// 1st bit is high if the glitch failed
-// 2nd bit is high if the glitch succeeded
-// Of course this depends on the code running on the target device and the wiring.
+// TODO document this PIO program
+// TODO must change to LSB
 .program programmer
 .side_set 1 opt
+	; The command is prepared by the host as
+	;   send: <start bit><16 bits word><end bit>0<6 bits command>
+	;   receive: <25 empty bits>1<6 bits command>
 
-	pull block		; Get delay
-	mov X, OSR
-	pull block		; Get width
-	mov Y, OSR
 
-	; Pin count is relative to whatever the input pin is configured as
-	wait 0 PIN 0	; Wait for input pin 0 to go to low, in case it was high
-	wait 1 PIN 0	; Then wait for it to actually go high
+	in null, 32						; Always start with clean in, even if we never input 32 full bits
 
-delay:
-	jmp X-- delay	; Delay for x cycles
+	pull block
+	set x, 5						; Preload bit counter with 5
+bitloop:							; Loop 6 times
+	out pins, 1 side 1	[1]			; Shift 1 bit from OSR to the first OUT pin
+	nop			side 0				; Pull the clock pin low at half clock period
+	jmp x-- bitloop					; Jump back if more bits to shift
 
-	set PINS, 0 side 1	; Begin glitch (sideset the output trigger pin)
-width:
-	jmp Y-- width	; Width for y cycles
+	; Following 3 instructions will accumulate a total delay of 1us, as mandated by the protocol
+	set x, 15			[7]			; Preload bit counter with 15
+	out y, 1			[7]
+	jmp !y send			[1]			; Increase here if PIC does not respond
 
-	set PINS, 1 side 0	; End glitch
+receive:
+	set pindirs, 0					; Set the only pin to input (hopefully this will set it?)
+bitloop_receive:
+	nop			side 1	[1]			; Raise clock
+	in isr, 1	side 0				; Receive 1 bit
+	jmp x-- bitloop_receive
 
-	wait 0 PIN 0	; Wait for input pin 0 to go to low (either loop end or brownout)
-	mov ISR, PINS	; Return the current pin state
-	push
+	jmp end
+
+send:
+	out pins, 1 side 1	[1]			; Shift 1 bit from OSR to the first OUT pin
+	nop			side 0				; Pull the clock pin low at half clock period
+	jmp x-- send					; Jump back if more bits to shift
+
+end:
+	push block						; Return data
 
 % c-sdk {
 
-static inline void programmer_program_init(PIO pio, uint sm, uint prog_offs,
-	uint pin_clock, uint pin_data_in, uint pin_data_out) {
+static inline void programmer_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
+	uint pin_clock, uint pin_data) {
 
-	// NOTE: Setting pin directions and values first to avoid cutting power to the target
-	// device by switching the MAX4619 selector
+	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
 
-	// Set pin directions (pin_trigger_out and pin_max_sel are outputs, pin_trigger_in is an input)
+	// Set pin directions (pin_clock is always an output and pin_data is initially an outputs)
 	pio_sm_set_pindirs_with_mask(
 		pio, sm,
-		(trig_out_enabled << pin_trig_out) | (1u << pin_max_sel),
-		(trig_out_enabled << pin_trig_out) | (1u << pin_max_sel) | (1u << pin_trig_in));
+		(1u << pin_clock) | (1u << pin_data),
+		(1u << pin_clock) | (1u << pin_data));
 
-	// Set default pin values (pin_trigger_out is low, pin_max_sel is high)
+	// Set default pin values (everything is low)
 	pio_sm_set_pins_with_mask(
 		pio, sm, 
-		(1u << pin_max_sel),
-		(1u << pin_trig_out) | (1u << pin_max_sel));
+		0,
+		(1u << pin_clock) | (1u << pin_data));
 
 	// Claim pins for PIO
-	pio_gpio_init(pio, pin_max_sel);
-	pio_gpio_init(pio, pin_trig_in);
-	pio_gpio_init(pio, pin_trig_in + 1);
-	pio_gpio_init(pio, pin_trig_in + 2);
-	pio_gpio_init(pio, pin_trig_out);
+	pio_gpio_init(pio, pin_clock);
+	pio_gpio_init(pio, pin_data);
 
-	pio_sm_config c = glitch_trigger_program_get_default_config(prog_offs);
+	pio_sm_config c = programmer_program_get_default_config(prog_offs);
 
-	sm_config_set_set_pins(&c, pin_max_sel, 1); 	// Set base pin and number of pins for SET operand
-	sm_config_set_in_pins(&c, pin_trig_in); 		// Set input base pin
-	sm_config_set_sideset_pins(&c, pin_trig_out);	// Set sideset base pin
+	sm_config_set_set_pins(&c, pin_data, 1); 		// Used to set the pindir in the PIO asm code
+	sm_config_set_out_pins(&c, pin_data, 1); 		// Set base pin and number of pins for OUT operand
+	sm_config_set_in_pins(&c, pin_data); 			// Set input base pin
+	sm_config_set_sideset_pins(&c, pin_clock);		// Set sideset base pin
 
-	// sm_config_set_clkdiv(&c, clkdiv); // TODO is this useful in any way? float clkdiv
-
-	// Use GPIO pin muxes to invert the output. It's easier to think of the glitch as 0->1->0 rather than 1->0->1.
-	// gpio_set_outover(pin_max_sel, GPIO_OVERRIDE_INVERT); // NOTE: this MUST be after the inits
+	sm_config_set_clkdiv(&c, clkdiv);
 
 	// hw_set_bits(&pio->input_sync_bypass, 1u << pin_miso); // TODO this disables flip-flops on the input pins for faster inputs, useful?
 

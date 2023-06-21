@@ -4,6 +4,9 @@
 uint glitcher_prog_offst = 0;
 uint programmer_program_offset = 0;
 
+const uint glitcher_sm = 0;
+const uint programmer_sm = 0;
+
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // This will be handed over to PIO when we start glitching
@@ -40,34 +43,38 @@ void __no_inline_not_in_flash_func(power_on)() {
 // executions were taking far longer
 uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
 	// TODO maybe add a timeout with an external watchdog timer?
-	uint sm = 0;
-	glitch_trigger_program_init(pio, sm, glitcher_prog_offst, trig_out, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
+	uint sm = 0; // TODO remove and change to glitcher_sm variable
+	glitch_trigger_program_init(glitcher_pio, sm, glitcher_prog_offst, trig_out, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
 
-	pio_sm_put_blocking(pio, sm, delay);
-	pio_sm_put_blocking(pio, sm, pulse_width);
-	uint32_t ret = pio_sm_get_blocking(pio, sm);
+	pio_sm_put_blocking(glitcher_pio, sm, delay);
+	pio_sm_put_blocking(glitcher_pio, sm, pulse_width);
+	uint32_t ret = pio_sm_get_blocking(glitcher_pio, sm);
 
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
 
 	return (uint8_t)ret;
 }
 
-typedef enum {
-  LoadConfiguration = 0x0,
-  IncrementAddres = 0x6,
-  ResetAddress = 0x16,
-} SendCommand;
-void __no_inline_not_in_flash_func(send_command)(SendCommand command) {
-  uint state_machine_id = 0;
-	programmer_program_init(pio1, state_machine_id, programmer_program_offset, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
-  return; 
+
+void __no_inline_not_in_flash_func(send_command)(uint32_t command) {
+	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	programmer_program_init(programmer_pio, programmer_sm, programmer_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+
+	putchar('a');
+	pio_sm_put_blocking(programmer_pio, programmer_sm, command);
+	putchar('b');
+	uint8_t ret = pio_sm_get_blocking(programmer_pio, programmer_sm); // Discard returned value for the time being, then switch based on the command
+	putchar('c');
+	printf("Command returned %d\n", ret);
+
+	return;
 }
 
 int main() {
 	stdio_init_all();
 	init_pins();
-	glitcher_prog_offst = pio_add_program(pio0, &glitch_trigger_program);
-	programmer_program_offset = pio_add_program(pio1, &programmer_program);
+	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program);
+	programmer_program_offset = pio_add_program(programmer_pio, &programmer_program);
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
@@ -80,6 +87,14 @@ int main() {
 	while (true) {
 		uint8_t cmd = getchar();
 		switch(cmd) {
+		case CMD_SENDCMD: // TODO change the letter + move this below
+			send_command(PROGRAMMER_CMD_RESET_ADDR | 0b1111110000000);
+			putchar('C');
+			break;
+		case 'l':
+			send_command(PROGRAMMER_CMD_RESET_ADDR | PROGRAMMER_RECEIVE_BITMASK); // Testing a receive command
+			putchar('C');
+			break;
 		case CMD_PING:
 			putchar(RESP_PONG);
 			break;
@@ -110,7 +125,6 @@ int main() {
 			putchar(RESP_OK);
 			break;
 		case CMD_GLITCH:
-			// gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_PIO0);
 			if (!init) {
 				putchar(RESP_KO);
 				break;

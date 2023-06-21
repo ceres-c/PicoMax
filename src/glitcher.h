@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/clocks.h"
 #include "hardware/pio.h"
 #include "glitch.pio.h"
+#include "programmer.pio.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
@@ -16,6 +18,10 @@
 #define RESP_GLITCH_FAIL	'.'
 #define CMD_POWERON			'+'
 #define CMD_POWEROFF		'-'
+#define CMD_SENDCMD			'L'
+
+#define PROGRAMMER_CLK		0x12 // pin 24
+#define PROGRAMMER_DATA		0x13 // pin 25
 
 #define PROGRAMMER_CLK 18 // pin 24
 #define PROGRAMMER_DATA_IN 19 // pin 25
@@ -42,4 +48,12 @@
 #define CLR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_CLR_OFFSET))
 #define XOR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_XOR_OFFSET))
 
-PIO pio = pio0;
+const PIO glitcher_pio = pio0;
+const PIO programmer_pio = pio1;
+
+#define PROGRAMMER_CMD_LOAD_CONFIG		0x00
+#define PROGRAMMER_CMD_INCREMENT_ADDR	0x06
+#define PROGRAMMER_CMD_RESET_ADDR		0x16
+
+#define PROGRAMMER_RECEIVE_BITMASK		0b1000000	// Set this bit in the command uint32_t to indicate the programmer should switch
+											// to receive mode. If the bit is not set, the following 14-bits word will be sent
