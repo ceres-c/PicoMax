@@ -7,6 +7,7 @@
 #include "pic_enter_icsp.pio.h"
 #include "pic_send_6bits.pio.h"
 #include "icsp_load.pio.h"
+#include "icsp_read.pio.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value

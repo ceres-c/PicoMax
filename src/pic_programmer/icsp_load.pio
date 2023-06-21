@@ -6,7 +6,7 @@
 .side_set 1 opt
 	; set pins 1 ; TODO remove debug
 
-	in null, 32						; Always start with clean in, even if we never input 32 full bits
+	; in null, 32						; Always start with clean in, even if we never input 32 full bits
 
 	pull block
 	set x, 5						; Preload bit counter with 5
@@ -19,13 +19,13 @@ bitloop:							; Loop 6 times
 	; Following 3 instructions will accumulate a total delay of 1us, as mandated by the protocol
 	nop					[7]			; If bit 7 is 1, jump to send
 	nop					[7]
-	set x, 15			[1]			; Preload bit counter with 15
+	set y, 15			[1]			; Preload bit counter with 15
 	; NOTE: Increase delay in the previous instruction if timing too tight for the PIC to repond
 
-send:
+bitloop_2:
 	out pins, 1 side 1	[1]			; Shift 1 bit from OSR to the first OUT pin
 	nop			side 0				; Pull the clock pin low at half clock period ; TODO remove nop
-	jmp x-- send					; Jump back if more bits to shift
+	jmp y-- bitloop_2					; Jump back if more bits to shift
 
 	; set pins 0 ; TODO remove debug
 	push block						; Return data

@@ -4,11 +4,6 @@
 ; This program performs a send or a send/receive operation
 .program pic_6bits
 .side_set 1 opt
-	; The command is prepared by the host as
-	;   send: <start bit><16 bits word><end bit>0<6 bits command>
-	;   receive: <25 empty bits>1<6 bits command>
-
-
 	in null, 32						; Always start with clean in, even if we never input 32 full bits
 
 	pull block
