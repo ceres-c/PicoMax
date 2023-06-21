@@ -3,9 +3,10 @@
 .side_set 1 opt
 
 	pull block
+	set x, 31
 bitloop:
 	out pins, 1			side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
-	jmp !OSRE bitloop	side 0	[1]		; Loop until OSR is empty
+	jmp X-- bitloop		side 0	[1]		; Loop until OSR is empty
 
 	; Return something
 	in null, 32			side 1	[1]		; Raise clock for final stop bit (0)
