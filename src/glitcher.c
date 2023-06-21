@@ -60,7 +60,7 @@ uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
 	uint programmer_sm = 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	programmer_program_init(icsp_pio, programmer_sm, programmer_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+	programmer_program_init(icsp_pio, programmer_sm, programmer_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, programmer_sm, command);
 	uint32_t ret = pio_sm_get_blocking(icsp_pio, programmer_sm);
@@ -75,7 +75,7 @@ uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
 	uint pic_6bits_sm = 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	pic_6bits_program_init(icsp_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+	pic_6bits_program_init(icsp_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, pic_6bits_sm, command);
 	uint32_t ret = pio_sm_get_blocking(icsp_pio, pic_6bits_sm);
@@ -90,7 +90,7 @@ void __no_inline_not_in_flash_func(send_key)() {
 	uint pic_key_sm	= 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	pic_key_program_init(icsp_pio, pic_key_sm, pic_key_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+	pic_key_program_init(icsp_pio, pic_key_sm, pic_key_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, pic_key_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
 	pio_sm_get_blocking(icsp_pio, pic_key_sm); // Discard returned value
@@ -103,11 +103,11 @@ void __no_inline_not_in_flash_func(send_key)() {
 void read_pic_mem() {
 	send_key();
 	send_command_6bits(PROGRAMMER_CMD_RESET_ADDR); // Reset to 0
-	uint32_t recv = send_command_word(PROGRAMMER_CMD_READ_PROGMEM | PIC_PROG_PIO_RECV_BITMASK);
-	printf("Read 1: %x\n", recv);
-	send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
-	recv = send_command_word(PROGRAMMER_CMD_READ_PROGMEM | PIC_PROG_PIO_RECV_BITMASK);
-	printf("Read 2: %x\n", recv);
+	// uint32_t recv = send_command_word(PROGRAMMER_CMD_READ_PROGMEM | PIC_PROG_PIO_RECV_BITMASK);
+	// printf("Read 1: %x\n", recv);
+	// send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
+	// recv = send_command_word(PROGRAMMER_CMD_READ_PROGMEM | PIC_PROG_PIO_RECV_BITMASK);
+	// printf("Read 2: %x\n", recv);
 }
 
 int main() {

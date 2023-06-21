@@ -20,7 +20,7 @@ void send_key() {
 	uint pic_key_sm	= 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	pic_key_program_init(icsp_pio, pic_key_sm, pic_key_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+	pic_key_program_init(icsp_pio, pic_key_sm, pic_key_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, pic_key_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
 	pio_sm_get_blocking(icsp_pio, pic_key_sm); // Discard returned value

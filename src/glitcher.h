@@ -22,8 +22,8 @@
 #define CMD_POWEROFF		'-'
 #define CMD_SENDCMD			'L'
 
-#define PROGRAMMER_CLK		0x12 // pin 24
-#define PROGRAMMER_DATA		0x13 // pin 25
+#define ICSPCLK				0x12 // pin 24
+#define ICSPDAT				0x13 // pin 25
 
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)
