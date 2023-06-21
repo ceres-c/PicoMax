@@ -4,6 +4,7 @@
 #include "hardware/pio.h"
 #include "glitch.pio.h"
 #include "programmer.pio.h"
+#include "pic_key.pio.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
@@ -22,10 +23,6 @@
 
 #define PROGRAMMER_CLK		0x12 // pin 24
 #define PROGRAMMER_DATA		0x13 // pin 25
-
-#define PROGRAMMER_CLK 18 // pin 24
-#define PROGRAMMER_DATA_IN 19 // pin 25
-#define PROGRAMMER_DATA_OUT 20 // pin 26
 
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)

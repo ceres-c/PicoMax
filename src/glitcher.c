@@ -1,11 +1,11 @@
 #include "glitcher.h"
-#include <stdint.h>
+#include <stdint.h> // TODO remove if not needed
 
 uint glitcher_prog_offst = 0;
-uint programmer_program_offset = 0;
+// uint programmer_program_offset = 0; // TODO remove
 
 const uint glitcher_sm = 0;
-const uint programmer_sm = 0;
+// const uint programmer_sm = 0; // TODO remove
 
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
@@ -57,6 +57,9 @@ uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_wid
 
 
 void __no_inline_not_in_flash_func(send_command)(uint32_t command) {
+	uint programmer_program_offset = pio_add_program(programmer_pio, &programmer_program);
+	uint programmer_sm = 0;
+
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
 	programmer_program_init(programmer_pio, programmer_sm, programmer_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
 
@@ -67,6 +70,27 @@ void __no_inline_not_in_flash_func(send_command)(uint32_t command) {
 	putchar('c');
 	printf("Command returned %d\n", ret);
 
+	pio_remove_program(programmer_pio, &programmer_program, programmer_program_offset);
+
+	return;
+}
+
+void __no_inline_not_in_flash_func(send_key)() {
+	uint pic_key_program_offset = pio_add_program(programmer_pio, &pic_key_program);
+	uint pic_key_sm	= 0;
+
+	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	pic_key_program_init(programmer_pio, pic_key_sm, pic_key_program_offset, clkdiv, PROGRAMMER_CLK, PROGRAMMER_DATA);
+
+	putchar('x');
+	pio_sm_put_blocking(programmer_pio, pic_key_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
+	putchar('y');
+	uint8_t ret = pio_sm_get_blocking(programmer_pio, pic_key_sm); // Discard returned value for the time being, then switch based on the command
+	putchar('z');
+	printf("Command returned %d\n", ret);
+
+	pio_remove_program(programmer_pio, &pic_key_program, pic_key_program_offset);
+
 	return;
 }
 
@@ -74,7 +98,6 @@ int main() {
 	stdio_init_all();
 	init_pins();
 	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program);
-	programmer_program_offset = pio_add_program(programmer_pio, &programmer_program);
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
@@ -93,6 +116,10 @@ int main() {
 			break;
 		case 'l':
 			send_command(PROGRAMMER_CMD_RESET_ADDR | PROGRAMMER_RECEIVE_BITMASK); // Testing a receive command
+			putchar('C');
+			break;
+		case 'i': // Init command sending the key to the PIC
+			send_key();
 			putchar('C');
 			break;
 		case CMD_PING:
