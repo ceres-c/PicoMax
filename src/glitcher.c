@@ -60,6 +60,10 @@ uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
 	uint programmer_sm = 0;
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+
+	pio_sm_drain_tx_fifo(icsp_pio, programmer_sm);
+	pio_sm_clear_fifos(icsp_pio, programmer_sm);
+
 	programmer_program_init(icsp_pio, programmer_sm, programmer_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, programmer_sm, command);
@@ -67,20 +71,7 @@ uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
 
 	pio_remove_program(icsp_pio, &programmer_program, programmer_program_offset);
 
-	return ret;
-}
-
-uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
-	uint pic_6bits_program_offset = pio_add_program(icsp_pio, &pic_6bits_program);
-	uint pic_6bits_sm = 0;
-
-	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
-	pic_6bits_program_init(icsp_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, ICSPCLK, ICSPDAT);
-
-	pio_sm_put_blocking(icsp_pio, pic_6bits_sm, command);
-	uint32_t ret = pio_sm_get_blocking(icsp_pio, pic_6bits_sm);
-
-	pio_remove_program(icsp_pio, &pic_6bits_program, pic_6bits_program_offset);
+	pio_sm_clear_fifos(icsp_pio, programmer_sm);
 
 	return ret;
 }
@@ -88,6 +79,9 @@ uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
 void __no_inline_not_in_flash_func(enter_icsp)() {
 	uint pic_enter_icsp_program_offset = pio_add_program(icsp_pio, &pic_enter_icsp_program);
 	uint pic_enter_icsp_sm	= 0;
+
+	pio_sm_drain_tx_fifo(icsp_pio, pic_enter_icsp_sm);
+	pio_sm_clear_fifos(icsp_pio, pic_enter_icsp_sm);
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
 	pic_enter_icsp_program_init(icsp_pio, pic_enter_icsp_sm, pic_enter_icsp_program_offset, clkdiv, ICSPCLK, ICSPDAT);
@@ -97,16 +91,65 @@ void __no_inline_not_in_flash_func(enter_icsp)() {
 
 	pio_remove_program(icsp_pio, &pic_enter_icsp_program, pic_enter_icsp_program_offset);
 
+	pio_sm_clear_fifos(icsp_pio, pic_enter_icsp_sm);
+
 	return;
 }
 
+uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
+	uint pic_6bits_program_offset = pio_add_program(icsp_pio, &pic_6bits_program);
+	uint pic_6bits_sm = 0;
+
+	pio_sm_drain_tx_fifo(icsp_pio, pic_6bits_sm);
+	pio_sm_clear_fifos(icsp_pio, pic_6bits_sm);
+
+	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	pic_6bits_program_init(icsp_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, ICSPCLK, ICSPDAT);
+
+	pio_sm_put_blocking(icsp_pio, pic_6bits_sm, command);
+	uint32_t ret = pio_sm_get_blocking(icsp_pio, pic_6bits_sm);
+
+	pio_remove_program(icsp_pio, &pic_6bits_program, pic_6bits_program_offset);
+
+	pio_sm_clear_fifos(icsp_pio, pic_6bits_sm);
+
+	return ret;
+}
+
+uint32_t __no_inline_not_in_flash_func(icsp_load)(uint8_t command, uint16_t data) {
+
+	uint32_t payload = 0;
+	payload |= data << 6;
+	payload |= command;
+
+	uint icsp_load_program_offset = pio_add_program(icsp_pio, &icsp_load_program);
+	uint icsp_load_sm = 0;
+
+	pio_sm_drain_tx_fifo(icsp_pio, icsp_load_sm);
+	pio_sm_clear_fifos(icsp_pio, icsp_load_sm);
+
+	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	icsp_load_program_init(icsp_pio, icsp_load_sm, icsp_load_program_offset, clkdiv, ICSPCLK, ICSPDAT);
+
+	pio_sm_put_blocking(icsp_pio, icsp_load_sm, payload);
+	uint32_t ret = pio_sm_get_blocking(icsp_pio, icsp_load_sm);
+
+	pio_remove_program(icsp_pio, &icsp_load_program, icsp_load_program_offset);
+
+	pio_sm_clear_fifos(icsp_pio, icsp_load_sm);
+
+	return ret;
+}
+
 void read_pic_mem() {
-	enter_icsp();
-	send_command_6bits(PROGRAMMER_CMD_RESET_ADDR); // Reset to 0
-	// uint32_t recv = send_command_word(PROGRAMMER_CMD_READ_PROGMEM | PIC_PROG_PIO_RECV_BITMASK);
+	// enter_icsp();
+	// send_command_6bits(PROGRAMMER_CMD_RESET_ADDR); // Reset to 0
+	icsp_load(0x03, 0xffff);
+	// send_command_6bits(PROGRAMMER_CMD_RESET_ADDR); // Reset to 0
+	// uint32_t recv = send_command_word(PROGRAMMER_CMD_RESET_ADDR | PIC_PROG_PIO_RECV_BITMASK);
 	// printf("Read 1: %x\n", recv);
-	// send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
-	// recv = send_command_word(PROGRAMMER_CMD_READ_PROGMEM | PIC_PROG_PIO_RECV_BITMASK);
+	// // send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
+	// recv = send_command_word(PROGRAMMER_CMD_RESET_ADDR | PIC_PROG_PIO_RECV_BITMASK);
 	// printf("Read 2: %x\n", recv);
 }
 

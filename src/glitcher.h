@@ -6,6 +6,7 @@
 #include "programmer.pio.h"
 #include "pic_enter_icsp.pio.h"
 #include "pic_send_6bits.pio.h"
+#include "icsp_load.pio.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
@@ -50,6 +51,7 @@ const PIO glitcher_pio = pio0;
 const PIO icsp_pio = pio1;
 
 #define PROGRAMMER_CMD_LOAD_CONFIG		0x00
+#define PROGRAMMER_CMD_LOAD_DATA_MEM	0X03
 #define PROGRAMMER_CMD_READ_PROGMEM		0x04
 #define PROGRAMMER_CMD_INCREMENT_ADDR	0x06
 #define PROGRAMMER_CMD_RESET_ADDR		0x16
