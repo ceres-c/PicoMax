@@ -2,10 +2,8 @@
 #include <stdint.h> // TODO remove if not needed
 
 uint glitcher_prog_offst = 0;
-// uint programmer_program_offset = 0; // TODO remove
 
 const uint glitcher_sm = 0;
-// const uint programmer_sm = 0; // TODO remove
 
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
@@ -65,7 +63,9 @@ int main() {
 	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program);
 
 	icsp_t icsp = {
-		.clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f, // 100 ns (half period) / 2 // TODO all these comments are wrong, timing is much more than 100ns now
+		// The standard-mandated 100ns half-period seems to be too short for this setup
+		// to work reliably. 200ns looks good
+		.clkdiv = (clock_get_hz(clk_sys) / 1e7f), // 100ns per clock cycle
 		.pio = glitcher_pio
 	};
 
