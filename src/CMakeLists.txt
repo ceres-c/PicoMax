@@ -21,6 +21,7 @@ endif()
 
 project(glitcher C CXX ASM)
 
+
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
@@ -35,6 +36,7 @@ endif()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(glitcher glitcher.c )
+add_subdirectory(icsp)
 
 pico_set_program_name(glitcher "glitcher")
 pico_set_program_version(glitcher "0.1")
@@ -43,16 +45,12 @@ pico_enable_stdio_usb(glitcher 1)
 pico_enable_stdio_uart(glitcher 0)
 
 pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/glitch.pio)
-# pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/programmer.pio)
-pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_enter.pio)
-pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_imperative.pio)
-pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_load.pio)
-pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_read.pio)
 
 # Add the standard library to the build
 target_link_libraries(glitcher
   pico_stdlib
   hardware_pio
+  icsp
 )
 
 # Add the standard include files to the build

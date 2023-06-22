@@ -8,6 +8,29 @@
 #include "icsp_load.pio.h"
 #include "icsp_read.pio.h"
 
+#include "../pins.h"
+
+#define ICSP_WORD_SIZE				14
+#define ICSP_WORD_MASK				((1 << ICSP_WORD_SIZE) - 1)
+
+#define ICSP_KEY					0b01001101010000110100100001010000 // "MCHP" taken from DS41397B-page 18
+
+#define ICSP_CMD_LOAD_CONFIG		0x00
+#define ICSP_CMD_LOAD_DATA_MEM		0X03
+#define ICSP_CMD_READ_PROGMEM		0x04
+#define ICSP_CMD_INCREMENT_ADDR		0x06
+#define ICSP_CMD_RESET_ADDR			0x16
+
+typedef struct icsp_s {
+	PIO pio;
+	uint16_t clkdiv;
+} icsp_t;
+
+void enter_icsp(icsp_t* icsp);
+uint32_t send_command_6bits(icsp_t* icsp, uint32_t command);
+uint32_t icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
+uint32_t icsp_read(icsp_t* icsp, uint8_t command);
+
 // PIO init inlines
 static inline void icsp_enter_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv, uint pin_clock, uint pin_data) {
 	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device

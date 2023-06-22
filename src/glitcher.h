@@ -6,7 +6,9 @@
 #include "hardware/pio.h"
 #include "glitch.pio.h"
 
-#include "pic_programmer/icsp.h"
+#include "pins.h"
+
+#include "icsp/icsp.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
@@ -22,13 +24,6 @@
 #define CMD_POWERON			'+'
 #define CMD_POWEROFF		'-'
 #define CMD_SENDCMD			'L'
-
-#define ICSPCLK				0x12 // pin 24
-#define ICSPDAT				0x13 // pin 25
-#define nMCLR				0x14 // pin 26
-#define nMCLR_MASK			(1 << nMCLR)
-#define ICSP_WORD_SIZE		14
-#define ICSP_WORD_MASK		((1 << ICSP_WORD_SIZE) - 1)
 
 #define MAX_EN_PIN			0x02 // Rpi pico pin 4
 #define MAX_EN_MASK			(1 << MAX_EN_PIN)
@@ -53,11 +48,5 @@
 
 const PIO glitcher_pio = pio0;
 const PIO icsp_pio = pio1;
-
-#define PROGRAMMER_CMD_LOAD_CONFIG		0x00
-#define PROGRAMMER_CMD_LOAD_DATA_MEM	0X03
-#define PROGRAMMER_CMD_READ_PROGMEM		0x04
-#define PROGRAMMER_CMD_INCREMENT_ADDR	0x06
-#define PROGRAMMER_CMD_RESET_ADDR		0x16
 
 #endif // _GLITCHER_H
