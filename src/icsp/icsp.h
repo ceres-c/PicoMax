@@ -3,12 +3,12 @@
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 
+#include "../pins.h"
+
 #include "icsp_enter.pio.h"
 #include "icsp_imperative.pio.h"
 #include "icsp_load.pio.h"
 #include "icsp_read.pio.h"
-
-#include "../pins.h"
 
 #define ICSP_WORD_SIZE				14
 #define ICSP_WORD_MASK				((1 << ICSP_WORD_SIZE) - 1)
@@ -16,19 +16,27 @@
 #define ICSP_KEY					0b01001101010000110100100001010000 // "MCHP" taken from DS41397B-page 18
 
 #define ICSP_CMD_LOAD_CONFIG		0x00
+#define ICSP_CMD_LOAD_PROG_MEM		0x02
 #define ICSP_CMD_LOAD_DATA_MEM		0X03
-#define ICSP_CMD_READ_PROGMEM		0x04
+#define ICSP_CMD_READ_PROG_MEM		0x04
+#define ICSP_CMD_READ_DATA_MEM		0x05
 #define ICSP_CMD_INCREMENT_ADDR		0x06
 #define ICSP_CMD_RESET_ADDR			0x16
+#define ICSP_CMD_BEGIN_INT_TMR		0x08
+#define ICSP_CMD_BEGIN_EXT_TMR		0x18
+#define ICSP_CMD_END_EXT_TMR		0x0A
+#define ICSP_CMD_BULK_ERASE_PROG	0x09
+#define ICSP_CMD_BULK_ERASE_DATA	0x0B
+#define ICSP_CMD_ROW_ERASE_PROG		0x11
 
 typedef struct icsp_s {
 	PIO pio;
 	uint16_t clkdiv;
 } icsp_t;
 
-void enter_icsp(icsp_t* icsp);
-uint32_t send_command_6bits(icsp_t* icsp, uint32_t command);
-uint32_t icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
+void icsp_enter(icsp_t* icsp);
+void icsp_imperative(icsp_t* icsp, uint32_t command);
+void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
 uint32_t icsp_read(icsp_t* icsp, uint8_t command);
 
 // PIO init inlines

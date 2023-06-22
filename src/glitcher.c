@@ -68,17 +68,17 @@ void read_pic_mem() {
 	sleep_us(500);
 	*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
 
-	enter_icsp(&icsp);
+	icsp_enter(&icsp);
 	sleep_us(1000);
-	uint32_t data = icsp_read(&icsp, 0x00); // Load configuration
+	uint32_t data = icsp_read(&icsp, ICSP_CMD_LOAD_CONFIG);
 	printf("Load config: %x\n", data);
 
-	send_command_6bits(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+	icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
 	// icsp_load(0x03, 0xffff);
 	for (int i = 0; i < 10; i++) {
-		data = icsp_read(&icsp, 0x04);
+		data = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
 		printf("Read: %x\n", data);
-		send_command_6bits(&icsp, ICSP_CMD_INCREMENT_ADDR);
+		icsp_imperative(&icsp, ICSP_CMD_INCREMENT_ADDR);
 	}
 
 	*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
