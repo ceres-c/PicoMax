@@ -10,17 +10,20 @@ const uint glitcher_sm = 0;
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // This will be handed over to PIO when we start glitching
+	gpio_set_function(nMCLR, GPIO_FUNC_SIO);
 
 	gpio_set_dir(MAX_EN_PIN, GPIO_OUT);
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
+	gpio_set_dir(nMCLR, GPIO_OUT);
 
 	gpio_pull_up(MAX_EN_PIN); // MAX4619 EN is active low
 	gpio_pull_up(MAX_SEL_PIN); // Default selected voltage to the highest of the two
+	gpio_pull_down(nMCLR);
 
 	gpio_set_slew_rate(MAX_EN_PIN, GPIO_SLEW_RATE_FAST); // SPEED
 	gpio_set_slew_rate(MAX_SEL_PIN, GPIO_SLEW_RATE_FAST);
 
-	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // MAX4619 enable is active low, so disable it
+	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // MAX4619 enable is active low, so disable it
 }
 
 void __no_inline_not_in_flash_func(power_off)() {
@@ -169,6 +172,11 @@ uint32_t __no_inline_not_in_flash_func(icsp_read)(uint8_t command) {
 }
 
 void read_pic_mem() {
+	*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+	*SET_GPIO_ATOMIC = MAX_SEL_MASK | nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+	sleep_us(500);
+	*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
+
 	enter_icsp();
 	sleep_us(1000);
 	uint32_t data = icsp_read(0x00); // Load configuration
@@ -187,6 +195,9 @@ void read_pic_mem() {
 	// // send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
 	// recv = send_command_word(PROGRAMMER_CMD_RESET_ADDR | PIC_PROG_PIO_RECV_BITMASK);
 	// printf("Read 2: %x\n", recv);
+
+	*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+	*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
 }
 
 int main() {
