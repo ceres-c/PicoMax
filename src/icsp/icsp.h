@@ -12,6 +12,8 @@
 
 #define ICSP_WORD_SIZE				14
 #define ICSP_WORD_MASK				((1 << ICSP_WORD_SIZE) - 1)
+#define ICSP_BYTES_PER_WORD			2 // ceil(ICSP_WORD_SIZE / 8)
+typedef uint16_t icsp_word_t;
 
 #define ICSP_KEY					0b01001101010000110100100001010000 // "MCHP" taken from DS41397B-page 18
 
@@ -34,10 +36,12 @@ typedef struct icsp_s {
 	uint16_t clkdiv;
 } icsp_t;
 
+void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
+
 void icsp_enter(icsp_t* icsp);
 void icsp_imperative(icsp_t* icsp, uint32_t command);
 void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
-uint32_t icsp_read(icsp_t* icsp, uint8_t command);
+uint16_t icsp_read(icsp_t* icsp, uint8_t command);
 
 // PIO init inlines
 static inline void icsp_enter_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv, uint pin_clock, uint pin_data) {

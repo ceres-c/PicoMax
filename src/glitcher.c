@@ -58,37 +58,16 @@ uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_wid
 	return (uint8_t)ret;
 }
 
-void read_pic_mem() {
-	icsp_t icsp;
-	icsp.clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2 // TODO all these comments are wrong, timing is much more than 100ns now
-	icsp.pio = glitcher_pio;
-
-	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
-	*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
-	sleep_us(500);
-	*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
-
-	icsp_enter(&icsp);
-	sleep_us(1000);
-	uint32_t data = icsp_read(&icsp, ICSP_CMD_LOAD_CONFIG);
-	printf("Load config: %x\n", data);
-
-	icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
-	// icsp_load(0x03, 0xffff);
-	for (int i = 0; i < 10; i++) {
-		data = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
-		printf("Read: %x\n", data);
-		icsp_imperative(&icsp, ICSP_CMD_INCREMENT_ADDR);
-	}
-
-	*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
-	*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
-}
-
 int main() {
 	stdio_init_all();
+	stdio_set_translate_crlf(&stdio_usb, false); // TODO remove if not needed
 	init_pins();
 	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program);
+
+	icsp_t icsp = {
+		.clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f, // 100 ns (half period) / 2 // TODO all these comments are wrong, timing is much more than 100ns now
+		.pio = glitcher_pio
+	};
 
 	// uint32_t delay = 0;
 	uint32_t delay = 50; // TODO remove and uncomment above
@@ -101,9 +80,35 @@ int main() {
 	while (true) {
 		uint8_t cmd = getchar();
 		switch(cmd) {
-		case 'r': // Read data from pic
-			read_pic_mem();
-			putchar('C');
+		case CMD_READ_PROG:
+			// uint32_t addr = 1, size = 10;
+			// TODO why no worky?
+			uint32_t addr = 0, size = 0;
+			fread(&addr, 1, 4, stdin); // In words
+			fread(&size, 1, 4, stdin); // In words, again
+			if ((size * ICSP_BYTES_PER_WORD) > 0xFFFFF) {
+				// Trying to allocate more than 1Mb. Honestly didn't try if ti could work, but let's just not
+				putchar(RESP_KO);
+				break;
+			}
+			uint8_t *data = calloc(size, ICSP_BYTES_PER_WORD);
+			putchar(RESP_OK);
+
+			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			sleep_us(500);
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
+
+			read_prog_mem(&icsp, addr, size, data);
+
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			putchar(RESP_OK);
+
+			fwrite(data, ICSP_BYTES_PER_WORD, size, stdout);
+			fflush(stdout);
+			free(data);
+
 			break;
 		case CMD_PING:
 			putchar(RESP_PONG);

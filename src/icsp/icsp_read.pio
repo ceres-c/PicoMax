@@ -3,8 +3,6 @@
 ; This program sends a 6 bit command and gets a 16 bit word from the target. The word comes from the target
 .program icsp_read
 .side_set 1 opt
-	; in null, 32						; Always start with clean in, even if we never input 32 full bits
-
 	pull block
 	set x, 5						; Preload bit counter with 5
 bitloop:							; Loop 6 times

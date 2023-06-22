@@ -1,7 +1,9 @@
 #ifndef _GLITCHER_H
 #define _GLITCHER_H
 #include <stdio.h>
+#include <stdlib.h> // For malloc
 #include "pico/stdlib.h"
+#include "pico/stdio_usb.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 
@@ -16,13 +18,14 @@
 #define CMD_TRIG_OUT_EN		'O'
 #define CMD_TRIG_OUT_DIS	'o'
 #define CMD_PING			'P'
+#define CMD_POWERON			'+'
+#define CMD_POWEROFF		'-'
+#define CMD_READ_DATA		'R'
+#define CMD_READ_PROG		'r'
 #define RESP_OK				'k'
 #define RESP_KO				'x'
 #define RESP_PONG			'p'
 #define RESP_GLITCH_FAIL	'.'
-#define CMD_POWERON			'+'
-#define CMD_POWEROFF		'-'
-#define CMD_SENDCMD			'L'
 
 #define GPIO_ATOMIC			((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_OFFSET))
 #define SET_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_SET_OFFSET))

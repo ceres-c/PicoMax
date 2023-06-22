@@ -2,8 +2,6 @@
 
 import argparse
 import struct
-import subprocess
-import threading
 import time
 
 import serial

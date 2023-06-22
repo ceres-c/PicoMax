@@ -1,8 +1,6 @@
 ; This program performs a send or a send/receive operation TODO update comment here
 .program icsp_imperative
 .side_set 1 opt
-	in null, 32						; Always start with clean in, even if we never input 32 full bits
-
 	pull block
 	set x, 5						; Preload bit counter with 5
 bitloop:							; Loop 6 times

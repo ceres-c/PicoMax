@@ -3,10 +3,6 @@
 ; This program sends a 6 bit command and a 16 bit word to the target. The word is stored in the target
 .program icsp_load ; TODO maybe rename to sendrecv
 .side_set 1 opt
-	; set pins 1 ; TODO remove debug
-
-	; in null, 32						; Always start with clean in, even if we never input 32 full bits
-
 	pull block
 	set x, 5						; Preload bit counter with 5
 bitloop:							; Loop 6 times
@@ -26,5 +22,4 @@ bitloop_2:
 	nop			side 0				; Pull the clock pin low at half clock period ; TODO remove nop
 	jmp y-- bitloop_2					; Jump back if more bits to shift
 
-	; set pins 0 ; TODO remove debug
 	push block						; Return data
