@@ -8,11 +8,6 @@
 
 #include "pic_programmer/icsp.h"
 
-// #include "icsp_enter.pio.h"
-#include "icsp_imperative.pio.h" // TODO remove all of these
-#include "icsp_load.pio.h"
-#include "icsp_read.pio.h"
-
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
 #define CMD_GLITCH_INIT		'g'
