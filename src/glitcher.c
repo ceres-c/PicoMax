@@ -62,7 +62,7 @@ uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
 	uint programmer_program_offset = pio_add_program(icsp_pio, &programmer_program);
 	uint programmer_sm = 0;
 
-	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2
 
 	pio_sm_drain_tx_fifo(icsp_pio, programmer_sm);
 	pio_sm_clear_fifos(icsp_pio, programmer_sm);
@@ -87,7 +87,7 @@ void __no_inline_not_in_flash_func(enter_icsp)() {
 	pio_sm_drain_tx_fifo(icsp_pio, pic_enter_icsp_sm);
 	pio_sm_clear_fifos(icsp_pio, pic_enter_icsp_sm);
 
-	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2
 	pic_enter_icsp_program_init(icsp_pio, pic_enter_icsp_sm, pic_enter_icsp_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, pic_enter_icsp_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
@@ -109,7 +109,7 @@ uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
 	pio_sm_drain_tx_fifo(icsp_pio, pic_6bits_sm);
 	pio_sm_clear_fifos(icsp_pio, pic_6bits_sm);
 
-	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2
 	pic_6bits_program_init(icsp_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, pic_6bits_sm, command);
@@ -126,7 +126,7 @@ uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
 uint32_t __no_inline_not_in_flash_func(icsp_load)(uint8_t command, uint16_t data) {
 
 	uint32_t payload = 0;
-	payload |= data << 6;
+	payload |= data << (6 + 1); // 6 bits of command + 1 data start bit (0)
 	payload |= command;
 
 	uint icsp_load_program_offset = pio_add_program(icsp_pio, &icsp_load_program);
@@ -135,7 +135,7 @@ uint32_t __no_inline_not_in_flash_func(icsp_load)(uint8_t command, uint16_t data
 	pio_sm_drain_tx_fifo(icsp_pio, icsp_load_sm);
 	pio_sm_clear_fifos(icsp_pio, icsp_load_sm);
 
-	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2 // TODO all these comments are wrong, timing is much more than 100ns now
 	icsp_load_program_init(icsp_pio, icsp_load_sm, icsp_load_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, icsp_load_sm, payload);
@@ -157,7 +157,7 @@ uint32_t __no_inline_not_in_flash_func(icsp_read)(uint8_t command) {
 	pio_sm_drain_tx_fifo(icsp_pio, icsp_read_sm);
 	pio_sm_clear_fifos(icsp_pio, icsp_read_sm);
 
-	float clkdiv = (clock_get_hz(clk_sys) / 1e7f) / 2.0f; // 100 ns (half period) / 2
+	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2
 	icsp_read_program_init(icsp_pio, icsp_read_sm, icsp_read_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp_pio, icsp_read_sm, command);
@@ -172,8 +172,8 @@ uint32_t __no_inline_not_in_flash_func(icsp_read)(uint8_t command) {
 }
 
 void read_pic_mem() {
+	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
 	*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
-	*SET_GPIO_ATOMIC = MAX_SEL_MASK | nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
 	sleep_us(500);
 	*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
 
