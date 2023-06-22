@@ -168,7 +168,10 @@ uint32_t __no_inline_not_in_flash_func(icsp_read)(uint8_t command) {
 
 	pio_sm_clear_fifos(icsp_pio, icsp_read_sm);
 
-	return ret >> 1; // Remove start bit
+	ret >>= 17; // Take upper 16 bits and remove trailing stop bit
+	ret &= ICSP_WORD_MASK; // Remove spurious last high bit (technically stop bit should be a 0, but we are missing some pull downs, I guess)
+
+	return ret;
 }
 
 void read_pic_mem() {
@@ -185,7 +188,7 @@ void read_pic_mem() {
 	send_command_6bits(PROGRAMMER_CMD_RESET_ADDR); // Reset to 0
 	// icsp_load(0x03, 0xffff);
 	for (int i = 0; i < 10; i++) {
-		data = icsp_read(0x05);
+		data = icsp_read(0x04);
 		printf("Read: %x\n", data);
 		send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
 	}
