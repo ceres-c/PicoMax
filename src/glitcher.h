@@ -1,11 +1,15 @@
+#ifndef _GLITCHER_H
+#define _GLITCHER_H
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 #include "glitch.pio.h"
-#include "programmer.pio.h"
-#include "icsp_enter.pio.h"
-#include "icsp_imperative.pio.h"
+
+#include "pic_programmer/icsp.h"
+
+// #include "icsp_enter.pio.h"
+#include "icsp_imperative.pio.h" // TODO remove all of these
 #include "icsp_load.pio.h"
 #include "icsp_read.pio.h"
 
@@ -61,6 +65,4 @@ const PIO icsp_pio = pio1;
 #define PROGRAMMER_CMD_INCREMENT_ADDR	0x06
 #define PROGRAMMER_CMD_RESET_ADDR		0x16
 
-#define PIC_PROG_PIO_RECV_BITMASK	0b1000000	// Set this bit in the command uint32_t to indicate the programmer should switch
-												// to receive mode. If the bit is not set, the programmer will send 16 more bits
-												// (14-bit word + 2 bit start/stop bits)
+#endif // _GLITCHER_H

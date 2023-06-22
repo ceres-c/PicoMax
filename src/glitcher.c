@@ -58,28 +58,6 @@ uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_wid
 	return (uint8_t)ret;
 }
 
-uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
-	uint programmer_program_offset = pio_add_program(icsp_pio, &programmer_program);
-	uint programmer_sm = 0;
-
-	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2
-
-	pio_sm_drain_tx_fifo(icsp_pio, programmer_sm);
-	pio_sm_clear_fifos(icsp_pio, programmer_sm);
-
-	programmer_program_init(icsp_pio, programmer_sm, programmer_program_offset, clkdiv, ICSPCLK, ICSPDAT);
-
-	pio_sm_put_blocking(icsp_pio, programmer_sm, command);
-	uint32_t ret = pio_sm_get_blocking(icsp_pio, programmer_sm);
-
-	pio_sm_set_enabled(icsp_pio, programmer_sm, false);
-	pio_remove_program(icsp_pio, &programmer_program, programmer_program_offset);
-
-	pio_sm_clear_fifos(icsp_pio, programmer_sm);
-
-	return ret;
-}
-
 void __no_inline_not_in_flash_func(enter_icsp)() {
 	uint icsp_enter_program_offset = pio_add_program(icsp_pio, &icsp_enter_program);
 	uint icsp_enter_sm	= 0;
@@ -192,12 +170,6 @@ void read_pic_mem() {
 		printf("Read: %x\n", data);
 		send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
 	}
-	// send_command_6bits(PROGRAMMER_CMD_RESET_ADDR); // Reset to 0
-	// uint32_t recv = send_command_word(PROGRAMMER_CMD_RESET_ADDR | PIC_PROG_PIO_RECV_BITMASK);
-	// printf("Read 1: %x\n", recv);
-	// // send_command_6bits(PROGRAMMER_CMD_INCREMENT_ADDR);
-	// recv = send_command_word(PROGRAMMER_CMD_RESET_ADDR | PIC_PROG_PIO_RECV_BITMASK);
-	// printf("Read 2: %x\n", recv);
 
 	*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
 	*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
@@ -219,14 +191,6 @@ int main() {
 	while (true) {
 		uint8_t cmd = getchar();
 		switch(cmd) {
-		case CMD_SENDCMD: // TODO change the letter + move this below
-			send_command_word(PROGRAMMER_CMD_RESET_ADDR | 0b1111110000000);
-			putchar('C');
-			break;
-		case 'l':
-			send_command_word(PROGRAMMER_CMD_RESET_ADDR | PIC_PROG_PIO_RECV_BITMASK); // Testing a receive command
-			putchar('C');
-			break;
 		case 'r': // Read data from pic
 			read_pic_mem();
 			putchar('C');
