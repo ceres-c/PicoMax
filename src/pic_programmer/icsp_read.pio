@@ -22,10 +22,9 @@ bitloop:							; Loop 6 times
 	set pindirs, 0					; Set the only pin to input (hopefully this will set it?)
 bitloop_receive:
 	nop			side 1	[1]			; Raise clock
-	in isr, 1	side 0				; Receive 1 bit
+	in pins, 1	side 0				; Receive 1 bit
 	jmp x-- bitloop_receive
 
-end:
 	push block						; Return data
 
 % c-sdk {

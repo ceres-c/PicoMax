@@ -168,7 +168,7 @@ uint32_t __no_inline_not_in_flash_func(icsp_read)(uint8_t command) {
 
 	pio_sm_clear_fifos(icsp_pio, icsp_read_sm);
 
-	return ret;
+	return ret >> 1; // Remove start bit
 }
 
 void read_pic_mem() {
