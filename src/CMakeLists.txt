@@ -44,8 +44,8 @@ pico_enable_stdio_uart(glitcher 0)
 
 pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/glitch.pio)
 # pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/programmer.pio)
-pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/pic_enter_icsp.pio)
-pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/pic_send_6bits.pio)
+pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_enter.pio)
+pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_imperative.pio)
 pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_load.pio)
 pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/pic_programmer/icsp_read.pio)
 

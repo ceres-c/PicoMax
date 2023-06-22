@@ -1,5 +1,5 @@
 // This program sends a 32 bit word to the target device in a single continuous stream of bits
-.program pic_enter_icsp // TODO maybe rename to init_programming_mode
+.program icsp_enter // TODO maybe rename to init_programming_mode
 .side_set 1 opt
 
 	pull block
@@ -14,7 +14,7 @@ bitloop:
 
 % c-sdk {
 
-static inline void pic_enter_icsp_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
+static inline void icsp_enter_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
 	uint pin_clock, uint pin_data) {
 
 	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
@@ -35,7 +35,7 @@ static inline void pic_enter_icsp_program_init(PIO pio, uint sm, uint prog_offs,
 	pio_gpio_init(pio, pin_clock);
 	pio_gpio_init(pio, pin_data);
 
-	pio_sm_config c = pic_enter_icsp_program_get_default_config(prog_offs);
+	pio_sm_config c = icsp_enter_program_get_default_config(prog_offs);
 
 	sm_config_set_out_pins(&c, pin_data, 1); 		// Set base pin and number of pins for OUT operand
 	sm_config_set_sideset_pins(&c, pin_clock);		// Set sideset base pin

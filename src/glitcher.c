@@ -81,44 +81,44 @@ uint32_t __no_inline_not_in_flash_func(send_command_word)(uint32_t command) {
 }
 
 void __no_inline_not_in_flash_func(enter_icsp)() {
-	uint pic_enter_icsp_program_offset = pio_add_program(icsp_pio, &pic_enter_icsp_program);
-	uint pic_enter_icsp_sm	= 0;
+	uint icsp_enter_program_offset = pio_add_program(icsp_pio, &icsp_enter_program);
+	uint icsp_enter_sm	= 0;
 
-	pio_sm_drain_tx_fifo(icsp_pio, pic_enter_icsp_sm);
-	pio_sm_clear_fifos(icsp_pio, pic_enter_icsp_sm);
+	pio_sm_drain_tx_fifo(icsp_pio, icsp_enter_sm);
+	pio_sm_clear_fifos(icsp_pio, icsp_enter_sm);
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2
-	pic_enter_icsp_program_init(icsp_pio, pic_enter_icsp_sm, pic_enter_icsp_program_offset, clkdiv, ICSPCLK, ICSPDAT);
+	icsp_enter_program_init(icsp_pio, icsp_enter_sm, icsp_enter_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
-	pio_sm_put_blocking(icsp_pio, pic_enter_icsp_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
-	pio_sm_get_blocking(icsp_pio, pic_enter_icsp_sm); // Discard returned value
+	pio_sm_put_blocking(icsp_pio, icsp_enter_sm, 0b01001101010000110100100001010000); // "MCHP" taken from DS41397B-page 18
+	pio_sm_get_blocking(icsp_pio, icsp_enter_sm); // Discard returned value
 
-	pio_sm_set_enabled(icsp_pio, pic_enter_icsp_sm, false);
-	pio_remove_program(icsp_pio, &pic_enter_icsp_program, pic_enter_icsp_program_offset);
+	pio_sm_set_enabled(icsp_pio, icsp_enter_sm, false);
+	pio_remove_program(icsp_pio, &icsp_enter_program, icsp_enter_program_offset);
 
 
-	pio_sm_clear_fifos(icsp_pio, pic_enter_icsp_sm);
+	pio_sm_clear_fifos(icsp_pio, icsp_enter_sm);
 
 	return;
 }
 
 uint32_t __no_inline_not_in_flash_func(send_command_6bits)(uint32_t command) {
-	uint pic_6bits_program_offset = pio_add_program(icsp_pio, &pic_6bits_program);
-	uint pic_6bits_sm = 0;
+	uint icsp_imperative_program_offset = pio_add_program(icsp_pio, &icsp_imperative_program);
+	uint icsp_imperative_sm = 0;
 
-	pio_sm_drain_tx_fifo(icsp_pio, pic_6bits_sm);
-	pio_sm_clear_fifos(icsp_pio, pic_6bits_sm);
+	pio_sm_drain_tx_fifo(icsp_pio, icsp_imperative_sm);
+	pio_sm_clear_fifos(icsp_pio, icsp_imperative_sm);
 
 	float clkdiv = (clock_get_hz(clk_sys) / 1e6f) / 8.0f; // 100 ns (half period) / 2
-	pic_6bits_program_init(icsp_pio, pic_6bits_sm, pic_6bits_program_offset, clkdiv, ICSPCLK, ICSPDAT);
+	icsp_imperative_program_init(icsp_pio, icsp_imperative_sm, icsp_imperative_program_offset, clkdiv, ICSPCLK, ICSPDAT);
 
-	pio_sm_put_blocking(icsp_pio, pic_6bits_sm, command);
-	uint32_t ret = pio_sm_get_blocking(icsp_pio, pic_6bits_sm);
+	pio_sm_put_blocking(icsp_pio, icsp_imperative_sm, command);
+	uint32_t ret = pio_sm_get_blocking(icsp_pio, icsp_imperative_sm);
 
-	pio_sm_set_enabled(icsp_pio, pic_6bits_sm, false);
-	pio_remove_program(icsp_pio, &pic_6bits_program, pic_6bits_program_offset);
+	pio_sm_set_enabled(icsp_pio, icsp_imperative_sm, false);
+	pio_remove_program(icsp_pio, &icsp_imperative_program, icsp_imperative_program_offset);
 
-	pio_sm_clear_fifos(icsp_pio, pic_6bits_sm);
+	pio_sm_clear_fifos(icsp_pio, icsp_imperative_sm);
 
 	return ret;
 }

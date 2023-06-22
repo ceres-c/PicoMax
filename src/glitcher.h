@@ -4,8 +4,8 @@
 #include "hardware/pio.h"
 #include "glitch.pio.h"
 #include "programmer.pio.h"
-#include "pic_enter_icsp.pio.h"
-#include "pic_send_6bits.pio.h"
+#include "icsp_enter.pio.h"
+#include "icsp_imperative.pio.h"
 #include "icsp_load.pio.h"
 #include "icsp_read.pio.h"
 

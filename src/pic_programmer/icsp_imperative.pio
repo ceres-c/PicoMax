@@ -2,7 +2,7 @@
 // TODO must change to LSB
 
 ; This program performs a send or a send/receive operation
-.program pic_6bits
+.program icsp_imperative
 .side_set 1 opt
 	in null, 32						; Always start with clean in, even if we never input 32 full bits
 
@@ -17,7 +17,7 @@ bitloop:							; Loop 6 times
 
 % c-sdk {
 
-static inline void pic_6bits_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
+static inline void icsp_imperative_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv,
 	uint pin_clock, uint pin_data) {
 
 	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
@@ -38,7 +38,7 @@ static inline void pic_6bits_program_init(PIO pio, uint sm, uint prog_offs, floa
 	pio_gpio_init(pio, pin_clock);
 	pio_gpio_init(pio, pin_data);
 
-	pio_sm_config c = pic_6bits_program_get_default_config(prog_offs);
+	pio_sm_config c = icsp_imperative_program_get_default_config(prog_offs);
 
 	sm_config_set_set_pins(&c, pin_data, 1); 		// Used to set the pindir in the PIO asm code
 	sm_config_set_out_pins(&c, pin_data, 1); 		// Set base pin and number of pins for OUT operand
