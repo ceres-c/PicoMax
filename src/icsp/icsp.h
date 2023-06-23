@@ -75,38 +75,39 @@ uint16_t icsp_read(icsp_t* icsp, uint8_t command);
 
 // PIO init
 // TODO pass icsp_t as argument
-static inline void icsp_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv, uint pin_clock, uint pin_data) {
+// static inline void icsp_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv, uint pin_clock, uint pin_data) {
+static inline void icsp_program_init(icsp_t *icsp, uint pin_clock, uint pin_data) {
 	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
 	// Set pin directions (pin_clock is always an output and pin_data is initially an outputs)
 	pio_sm_set_pindirs_with_mask(
-		pio, sm,
+		icsp->pio, icsp->sm,
 		(1u << pin_clock) | (1u << pin_data),
 		(1u << pin_clock) | (1u << pin_data));
 
 	// Set default pin values (everything is low)
 	pio_sm_set_pins_with_mask(
-		pio, sm,
+		icsp->pio, icsp->sm,
 		0,
 		(1u << pin_clock) | (1u << pin_data));
 
 	// Claim pins for PIO
-	pio_gpio_init(pio, pin_clock);
-	pio_gpio_init(pio, pin_data);
+	pio_gpio_init(icsp->pio, pin_clock);
+	pio_gpio_init(icsp->pio, pin_data);
 
-	pio_sm_config c = icsp_program_get_default_config(prog_offs);
+	pio_sm_config c = icsp_program_get_default_config(icsp->prog_offs);
 
 	sm_config_set_set_pins(&c, pin_data, 1); 		// Used to set the pindir in the PIO asm code
 	sm_config_set_out_pins(&c, pin_data, 1); 		// Set base pin and number of pins for OUT operand
 	sm_config_set_in_pins(&c, pin_data); 			// Set input base pin
 	sm_config_set_sideset_pins(&c, pin_clock);		// Set sideset base pin
 
-	sm_config_set_clkdiv(&c, clkdiv);
+	sm_config_set_clkdiv(&c, icsp->clkdiv);
 
 	// Initialize the state machine
-	pio_sm_init(pio, sm, prog_offs, &c);
-	pio_sm_set_enabled(pio, sm, true);
+	pio_sm_init(icsp->pio, icsp->sm, icsp->prog_offs, &c);
+	pio_sm_set_enabled(icsp->pio, icsp->sm, true);
 }
 
-bool icsp_init(PIO pio, icsp_t *icsp);
+bool icsp_init(icsp_t *icsp, PIO pio);
 
 #endif // _ICSP_H

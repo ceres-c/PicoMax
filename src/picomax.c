@@ -38,7 +38,7 @@ int main() {
 	}
 
 	icsp_t icsp;
-	if (!icsp_init(icsp_pio, &icsp)) {
+	if (!icsp_init(&icsp, icsp_pio)) {
 		printf("Failed to initialize ICSP\n");
 		return 1;
 	}

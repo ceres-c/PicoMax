@@ -54,7 +54,7 @@ void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
 }
 
 void icsp_enter(icsp_t* icsp) {
-	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 32);
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
@@ -69,7 +69,7 @@ void icsp_enter(icsp_t* icsp) {
 }
 
 void icsp_imperative(icsp_t* icsp, uint8_t command) {
-	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
@@ -85,7 +85,7 @@ void icsp_imperative(icsp_t* icsp, uint8_t command) {
 
 
 void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
-	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
@@ -98,7 +98,7 @@ void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
 }
 
 uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
-	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
@@ -116,7 +116,7 @@ uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
 	return (uint16_t)ret;
 }
 
-bool icsp_init(PIO pio, icsp_t *icsp) {
+bool icsp_init(icsp_t *icsp, PIO pio) {
 	if (!pio_can_add_program(pio, &icsp_program)) {
 		return false;
 	}
