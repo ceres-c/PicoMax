@@ -85,6 +85,31 @@ void NEW_icsp_imperative(icsp_t* icsp, uint prog_offs, uint32_t command) {
 	pio_sm_clear_fifos(icsp->pio, icsp_sm);
 }
 
+uint16_t NEW_icsp_read(icsp_t* icsp, uint prog_offs, uint8_t command) {
+	uint icsp_sm	= 0; // TODO move to icsp_t structure
+
+	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
+	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+
+	icsp_program_init(icsp->pio, icsp_sm, prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 15);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, command);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+
+	uint32_t ret = pio_sm_get_blocking(icsp->pio, icsp_sm);
+
+	pio_sm_set_enabled(icsp->pio, icsp_sm, false);
+
+	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+
+	ret >>= 17; // Take upper 16 bits and remove trailing stop bit
+	ret &= ICSP_WORD_MASK; // Remove spurious last high bit
+	// NOTE: technically stop bit should be a 0, but we are missing some pull downs, I guess
+
+	return (uint16_t)ret;
+}
 
 
 

@@ -1,4 +1,6 @@
-; This program takes 4 inputs, in this sequence
+; This program allows to talk with PIC devices (designed and tested with 14 bit devices like PIC16F1936 in mind)
+;
+; Inputs are:
 ;	1) Number of bits to send in the first pulse - 1 (accommodates for both standard commands and icsp enter key)
 ;	   NOTE: It will send ONE BIT MORE
 ;	2) Number of bits to send in the second pulse - 1 (can be 0 or more)
@@ -6,6 +8,10 @@
 ;	3) Up to 32 bits to send in the first pulse
 ;	4) Up to 31 bit to send in the second pulse after waiting 10 clock cycles (mandated by standard).
 ;	   The bottom most bit is used to set send/receive mode: 1 is send
+;
+; Returns:
+;	- For non-receive commands: 0
+;	- For receive commands: 32 bit value that must be cleaned by the consumer (bit shifts and removing start/stop)
 ;
 ; Examples
 ;	- To send the icsp enter key you can put [32, 0, <key>, 0]
@@ -21,35 +27,35 @@
 	pull block							; Pull numer of additional bits to send/receive
 	mov Y, OSR
 	pull block							; Pull the first pulse
-bitloop:
+first_loop:
 	out pins, 1			side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
 	; Note: this out might execute 33 times for the icsp enter key, but we only have 32 bits.
 	; This is fine as the last bit of the key is a zero.
-	jmp X-- bitloop		side 0	[1]		; Loop until OSR is empty
+	jmp X-- first_loop	side 0	[1]		; Loop until OSR is empty
 
 	pull block							; Pull additional data (always pull to clean FIFO)
 	jmp !Y end_nosend					; If second pulse is 0 bits, we're done
 
-	; Decide if send or receive and wait to reach 1us time before further sending/receiving
-	out X, 1					[7] ; TODO fix delay here
-	jmp !X receive
+	; Decide if send or receive and wait slightly more than the standard-mandated 1us time before further send/recv
+	out X, 1
+	jmp !X receive				[5]
 
 send_loop:
 	out pins, 1 		side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
 	jmp Y-- send_loop	side 0	[1]		; Jump back if more bits to shift
 
-	in null, 32			side 1			; Raise clock for final stop bit (0)
+	; in null, 32 ; TODO remove?
 	jmp end
-	; jmp end				side 1	[1]	; TODO maybe replace with this
 
 receive:
-	set pindirs, 0		side 1	[1]		; Set the data pin as input and clock first bit
+	set pindirs, 0						; Set the data pin as input
 recv_loop:
-	in pins, 1			side 0	[1]		; Receive 1 bit
-	jmp x-- recv_loop	side 1	[1]
+	nop					side 1	[1]
+	in pins, 1			side 0			; Receive 1 bit
+	jmp Y-- recv_loop
 
 end:
-	push block			side 0			; Finally, pull down clock for final stop bit (0)
+	push block			side 0			; Pull down clock for final stop bit if coming from receive loop, otherwise it's
 
 end_nosend:
 	in null, 32 ; TODO can I remove this? The register should be empty anyways

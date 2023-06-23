@@ -91,9 +91,13 @@ int main() {
 
 
 			uint icsp_prog_offs = pio_add_program(icsp.pio, &icsp_program);
+			uint16_t data_out;
 			NEW_icsp_enter(&icsp, icsp_prog_offs);
+			data_out = NEW_icsp_read(&icsp, icsp_prog_offs, ICSP_CMD_READ_PROG_MEM);
+			printf("0x%x\n", data_out);
 			NEW_icsp_imperative(&icsp, icsp_prog_offs, ICSP_CMD_INCREMENT_ADDR);
-			NEW_icsp_imperative(&icsp, icsp_prog_offs, ICSP_CMD_INCREMENT_ADDR);
+			data_out = NEW_icsp_read(&icsp, icsp_prog_offs, ICSP_CMD_READ_PROG_MEM);
+			printf("0x%x\n", data_out);
 			pio_remove_program(icsp.pio, &icsp_program, icsp_prog_offs);
 
 

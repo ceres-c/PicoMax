@@ -59,7 +59,7 @@ void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids);
 
 void NEW_icsp_enter(icsp_t* icsp, uint prog_offs);
 void NEW_icsp_imperative(icsp_t* icsp, uint prog_offs, uint32_t command);
-
+uint16_t NEW_icsp_read(icsp_t* icsp, uint prog_offs, uint8_t command);
 
 void icsp_enter(icsp_t* icsp);
 void icsp_imperative(icsp_t* icsp, uint32_t command);
