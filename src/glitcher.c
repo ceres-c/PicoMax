@@ -64,6 +64,7 @@ int main() {
 
 	icsp_t icsp = {
 		.pio = icsp_pio,
+		.sm = 0,
 		// The standard-mandated 100ns half-period seems to be too short for this setup
 		// to work reliably. 200ns looks good
 		.prog_offs = pio_add_program(icsp.pio, &icsp_program),

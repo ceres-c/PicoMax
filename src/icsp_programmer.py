@@ -15,6 +15,7 @@ CMD = {
 	'READ_PROG'		: b'r',
 	'WRITE_DATA'	: b'W',
 	'WRITE_PROG'	: b'w',
+	'ERASE_PROG'	: b'E',
 }
 RESP = {
 	'OK'			: b'k',
@@ -64,6 +65,16 @@ def pic_write_program(s: serial.Serial, addr: int, data: bytes, timeout: int) ->
 
 	s.timeout = timeout # Reset timeout
 
+def pic_erase_program_bulk(s: serial.Serial, timeout: int) -> None:
+	s.write(CMD['ERASE_PROG'])
+
+	s.timeout = MEM_OP_TIMEOUT
+	r = s.read(len(RESP['OK']))
+	if r != RESP['OK']:
+		raise Exception(f'[!] The programmer could not erase the chip. Got:\n{r}\nAborting.')
+
+	s.timeout = timeout # Reset timeout
+
 def main(args):
 
 	try: 
@@ -89,10 +100,11 @@ def main(args):
 		hexdump.hexdump(dump)
 	elif args.write_program:
 		print('[?] Have you erased the PIC program memory first? Otherwise, the write will silently fail.')
-		# TODO does row erase work? Is bulk erase needed?
-		addr = args.write_program[0]
-		data = b'\x22\x22'
+		addr, data = args.write_program
+		data = struct.pack('<h', data)
 		pic_write_program(s, addr, data, args.timeout)
+	elif args.erase_program_bulk:
+		pic_erase_program_bulk(s, args.timeout)
 	
 	print('[+] Done.')
 
@@ -113,7 +125,9 @@ Note: max is not inclusive, i.e. the range is [start_address size)''')
 '''read the PIC program memory [start_page page_number] (in 14-bit words)
 Note: max is not inclusive, i.e. the range is [start_page page_number)''')
 	# TODO write-data
-	parser.add_argument('--write-program', type=lambda x: int(x,0), nargs=1, default=None, # TODO somehow pass data to write
-						help='write the PIC program memory [start_page] (in 14-bit words)')
+	parser.add_argument('--write-program', type=lambda x: int(x,0), nargs=2, default=None,
+						help='write the PIC program memory [start_page data] (start_page in 14-bit words, data as a 16 bits hex number)')
+	parser.add_argument('--erase-program-bulk', action='store_true', default=False,
+						help='erase the PIC program memory')
 	args = parser.parse_args()
 	main(args)

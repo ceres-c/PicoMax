@@ -1,5 +1,4 @@
 #include "icsp.h"
-#include <stdio.h> // For printf TODO remove
 
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 	icsp_enter(icsp);
@@ -57,84 +56,76 @@ void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
 }
 
 void icsp_enter(icsp_t* icsp) {
-	uint icsp_sm	= 0; // TODO move to icsp_t structure
+	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 
-	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
-	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 32);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, ICSP_KEY);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
 
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 32);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, ICSP_KEY);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+	pio_sm_get_blocking(icsp->pio, icsp->sm); // Discard returned value, but make this function blocking
 
-	pio_sm_get_blocking(icsp->pio, icsp_sm); // Discard returned value, but make this function blocking
+	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 
-	pio_sm_set_enabled(icsp->pio, icsp_sm, false);
-
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 }
 
 void icsp_imperative(icsp_t* icsp, uint8_t command) {
-	uint icsp_sm	= 0; // TODO move to icsp_t structure
+	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 
-	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
-	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, command);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
 
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, command);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+	pio_sm_get_blocking(icsp->pio, icsp->sm); // Discard returned value, but make this function blocking
 
-	pio_sm_get_blocking(icsp->pio, icsp_sm); // Discard returned value, but make this function blocking
+	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 
-	pio_sm_set_enabled(icsp->pio, icsp_sm, false);
-
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 }
 
 
 void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
-	uint icsp_sm	= 0; // TODO move to icsp_t structure
+	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 
-	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
-	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
+	pio_sm_put_blocking(icsp->pio, icsp->sm, command);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, (data << 2) | 1); // Add start bit and mark as send command
 
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
-	pio_sm_put_blocking(icsp->pio, icsp_sm, command);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, (data << 2) | 1); // Add start bit and mark as send command
+	pio_sm_get_blocking(icsp->pio, icsp->sm); // Discard returned value, but make this function blocking
 
-	pio_sm_get_blocking(icsp->pio, icsp_sm); // Discard returned value, but make this function blocking
+	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 
-	pio_sm_set_enabled(icsp->pio, icsp_sm, false);
-
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 }
 
 uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
-	uint icsp_sm	= 0; // TODO move to icsp_t structure
+	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 
-	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
-	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
+	pio_sm_put_blocking(icsp->pio, icsp->sm, command);
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
 
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
-	pio_sm_put_blocking(icsp->pio, icsp_sm, command);
-	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+	uint32_t ret = pio_sm_get_blocking(icsp->pio, icsp->sm);
 
-	uint32_t ret = pio_sm_get_blocking(icsp->pio, icsp_sm);
+	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 
-	pio_sm_set_enabled(icsp->pio, icsp_sm, false);
-
-	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 
 	ret >>= 17; // Take upper 16 bits and remove trailing stop bit
 	ret &= ICSP_WORD_MASK; // Remove spurious last high bit

@@ -1,5 +1,6 @@
 #ifndef _ICSP_H
 #define _ICSP_H
+#include <stdint.h>
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 
@@ -45,9 +46,11 @@ typedef uint16_t icsp_word_t;
 typedef struct icsp_s {
 	PIO pio;
 	uint prog_offs;
+	uint sm;
 	uint16_t clkdiv;
 } icsp_t;
 
+// Wrappers around common functionality
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
 void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids);
