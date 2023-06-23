@@ -35,7 +35,7 @@ endif()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(picomax picomax.c )
+add_executable(picomax picomax.c glitch.c)
 add_subdirectory(icsp)
 
 pico_set_program_name(picomax "picomax")

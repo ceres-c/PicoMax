@@ -1,9 +1,5 @@
 #include "picomax.h"
 
-uint glitcher_prog_offst = 0;
-
-const uint glitcher_sm = 0;
-
 static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // This will be handed over to PIO when we start glitching
@@ -23,44 +19,16 @@ static void init_pins() {
 	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // MAX4619 enable is active low, so disable it
 }
 
-void __no_inline_not_in_flash_func(power_off)() {
-	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
-	// Right now we have:
-	// EN=high, SEL=high
-	// (output disabled, highest voltage selected)
-	sleep_ms(50); // Chosed by fair dice roll
-}
-
-void __no_inline_not_in_flash_func(power_on)() {
-	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
-	*CLR_GPIO_ATOMIC = MAX_EN_MASK; // Then enable MAX4619
-	// Right now we have:
-	// EN=low, SEL=high
-	// (output enabled, highest voltage selected)
-}
-
-// This function must be in RAM to have consistent timing. Due to Pi Pico's slow flash, first few
-// executions were taking far longer
-uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_width, bool trig_out) {
-	// TODO maybe add a timeout with an external watchdog timer?
-	uint sm = 0; // TODO remove and change to glitcher_sm variable
-	glitch_trigger_program_init(glitcher_pio, sm, glitcher_prog_offst, trig_out, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
-
-	pio_sm_put_blocking(glitcher_pio, sm, delay);
-	pio_sm_put_blocking(glitcher_pio, sm, pulse_width);
-	uint32_t ret = pio_sm_get_blocking(glitcher_pio, sm);
-
-	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
-
-	return (uint8_t)ret;
-}
-
 int main() {
 	stdio_init_all();
 	stdio_set_translate_crlf(&stdio_usb, false);
 	init_pins();
 
-	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program); // TODO make local
+	glitch_t glitch = {
+		.pio = glitcher_pio,
+		.sm = 0,
+		.prog_offs = pio_add_program(glitcher_pio, &glitch_trigger_program),
+	};
 
 	icsp_t icsp = {
 		.pio = icsp_pio,
@@ -71,8 +39,7 @@ int main() {
 		.clkdiv = (clock_get_hz(clk_sys) / 1e7f),
 	};
 
-	// uint32_t delay = 0;
-	uint32_t delay = 50; // TODO remove and uncomment above
+	uint32_t delay = 0;
 	uint32_t pulse_width = 0;
 	// bool trig_in = false;
 	bool trig_out = false;
@@ -172,8 +139,8 @@ int main() {
 			putchar(RESP_OK);
 			break;
 		case CMD_GLITCH_INIT: // TODO is this actually needed?
-			power_off();
-			power_on();
+			glitch_power_off();
+			glitch_power_on();
 			init = true;
 			putchar(RESP_OK);
 			break;
@@ -182,7 +149,7 @@ int main() {
 				putchar(RESP_KO);
 				break;
 			}
-			uint8_t ret = glitch(delay, pulse_width, trig_out);
+			uint8_t ret = do_glitch(&glitch, delay, pulse_width, trig_out);
 			switch(ret) {
 			case 0b000:
 				// Both PIC outputs are low, the chip died

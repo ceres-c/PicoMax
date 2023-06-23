@@ -7,8 +7,8 @@
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
 
-#include "glitch.pio.h"
 #include "icsp/icsp.h"
+#include "glitch.h"
 #include "pins.h"
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
