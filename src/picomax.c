@@ -1,5 +1,4 @@
-#include "glitcher.h"
-#include <stdint.h> // TODO remove if not needed
+#include "picomax.h"
 
 uint glitcher_prog_offst = 0;
 

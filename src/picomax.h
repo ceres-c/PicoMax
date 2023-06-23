@@ -1,5 +1,5 @@
-#ifndef _GLITCHER_H
-#define _GLITCHER_H
+#ifndef _PICOMAX_H
+#define _PICOMAX_H
 #include <stdio.h>
 #include <stdlib.h> // For malloc
 #include "pico/stdlib.h"
@@ -34,4 +34,4 @@
 const PIO glitcher_pio = pio0;
 const PIO icsp_pio = pio1;
 
-#endif // _GLITCHER_H
+#endif // _PICOMAX_H

@@ -11,10 +11,10 @@ cmake ..
 make
 ```
 
-After a successful build, you'll have the `glitcher.uf2` file in the build
+After a successful build, you'll have the `picomax.uf2` file in the build
 directory that can be flashed:
 ```bash
-picotool load glitcher.uf2 && picotool reboot
+picotool load -F picomax.uf2 && picotool reboot
 ```
 
 ### Glitcher commands

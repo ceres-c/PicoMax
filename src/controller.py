@@ -52,7 +52,7 @@ def main(args):
 	if r != RESP['PONG']:
 		print(f'[!] Could not ping the glitcher. Got:\n{r}\nAborting.')
 		exit(1)
-	print('[+] Glitcher available.')
+	print('[+] PicoMax available.')
 
 	if args.output_trigger:
 		s.write(CMD['TRIG_OUT_EN'])

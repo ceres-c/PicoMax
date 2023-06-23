@@ -19,7 +19,7 @@ if (PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0")
   message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.4.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
 
-project(glitcher C CXX ASM)
+project(picomax C CXX ASM)
 
 
 # Initialise the Raspberry Pi Pico SDK
@@ -27,36 +27,36 @@ pico_sdk_init()
 
 # Check build env
 if (NOT TARGET tinyusb_device)
-  message(FATAL_ERROR "not building glitcher because TinyUSB submodule is not initialized in the SDK")
+  message(FATAL_ERROR "not building picomax because TinyUSB submodule is not initialized in the SDK")
 endif()
 if(NOT PICO_ON_DEVICE)
-  message(WARNING "Not building glitcher for Pico target. Are you sure you want to do this?")
+  message(WARNING "Not building picomax for Pico target. Are you sure you want to do this?")
 endif()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(glitcher glitcher.c )
+add_executable(picomax picomax.c )
 add_subdirectory(icsp)
 
-pico_set_program_name(glitcher "glitcher")
-pico_set_program_version(glitcher "0.1")
+pico_set_program_name(picomax "picomax")
+pico_set_program_version(picomax "0.1")
 
-pico_enable_stdio_usb(glitcher 1)
-pico_enable_stdio_uart(glitcher 0)
+pico_enable_stdio_usb(picomax 1)
+pico_enable_stdio_uart(picomax 0)
 
-pico_generate_pio_header(glitcher ${CMAKE_CURRENT_LIST_DIR}/glitch.pio)
+pico_generate_pio_header(picomax ${CMAKE_CURRENT_LIST_DIR}/glitch.pio)
 
 # Add the standard library to the build
-target_link_libraries(glitcher
+target_link_libraries(picomax
   pico_stdlib
   hardware_pio
   icsp
 )
 
 # Add the standard include files to the build
-target_include_directories(glitcher PRIVATE
+target_include_directories(picomax PRIVATE
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_LIST_DIR}/.. # for our common lwipopts or any other standard includes, if required
 )
 
-pico_add_extra_outputs(glitcher)
+pico_add_extra_outputs(picomax)

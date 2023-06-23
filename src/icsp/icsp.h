@@ -1,6 +1,5 @@
 #ifndef _ICSP_H
 #define _ICSP_H
-#include <stdint.h>
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 
