@@ -121,7 +121,7 @@ int main() {
 			// uint16_t new_data = 0;
 			// fread(&new_data, 1, 2, stdin);
 			uint32_t write_addr = 0; // TODO restore above
-			uint16_t new_data = 0x3fff;
+			uint16_t new_data = 0x1234;
 
 			// TODO move this to a function
 			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)

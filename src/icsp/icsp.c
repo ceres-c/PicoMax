@@ -30,11 +30,11 @@ void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
 	printf("Writing %x to %x\n", src, addr); // TODO remove
 	icsp_load(icsp, ICSP_CMD_LOAD_PROG_MEM, src);
 
-	icsp_imperative(icsp, ICSP_CMD_BEGIN_INT_TIMED);
-	sleep_us(ICSP_TDIS_TYP);
-	// icsp_imperative(icsp, ICSP_CMD_BEGIN_EXT_TIMED);
-	// sleep_us(ICSP_TPEXT_MIN);
-	// icsp_imperative(icsp, ICSP_CMD_END_EXT_TIMED);
+	// icsp_imperative(icsp, ICSP_CMD_BEGIN_INT_TIMED);
+	// sleep_us(ICSP_TDIS_TYP);
+	icsp_imperative(icsp, ICSP_CMD_BEGIN_EXT_TIMED);
+	sleep_us(ICSP_TPEXT_MIN);
+	icsp_imperative(icsp, ICSP_CMD_END_EXT_TIMED);
 
 }
 
