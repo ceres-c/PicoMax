@@ -2,7 +2,6 @@
 
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 	icsp_enter(icsp);
-	// sleep_us(1000); // TODO is this needed? In pickle they had it but my PIC seems to work without it
 
 	int pc = 0;
 
@@ -22,7 +21,6 @@ void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
 	icsp_enter(icsp);
-	// sleep_us(1000); // TODO is this needed? In pickle they had it but my PIC seems to work without it
 
 	int pc = 0;
 
@@ -71,6 +69,7 @@ void icsp_enter(icsp_t* icsp) {
 	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 
 	pio_sm_clear_fifos(icsp->pio, icsp->sm);
+	// sleep_us(1000); // Is this needed? In pickle they had it but my PIC seems to work without it
 }
 
 void icsp_imperative(icsp_t* icsp, uint8_t command) {

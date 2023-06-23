@@ -28,7 +28,7 @@ void __no_inline_not_in_flash_func(power_off)() {
 	// Right now we have:
 	// EN=high, SEL=high
 	// (output disabled, highest voltage selected)
-	sleep_ms(50); // TODO maybe reduce this?
+	sleep_ms(50); // Chosed by fair dice roll
 }
 
 void __no_inline_not_in_flash_func(power_on)() {
@@ -57,8 +57,9 @@ uint8_t __no_inline_not_in_flash_func(glitch)(uint32_t delay, uint32_t pulse_wid
 
 int main() {
 	stdio_init_all();
-	stdio_set_translate_crlf(&stdio_usb, false); // TODO remove if not needed
+	stdio_set_translate_crlf(&stdio_usb, false);
 	init_pins();
+
 	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program); // TODO make local
 
 	icsp_t icsp = {
