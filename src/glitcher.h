@@ -22,6 +22,10 @@
 #define CMD_POWEROFF		'-'
 #define CMD_READ_DATA		'R'
 #define CMD_READ_PROG		'r'
+#define CMD_WRITE_DATA		'W'
+#define CMD_WRITE_PROG		'w'
+#define CMD_ERASE_BULK		'E'
+
 #define RESP_OK				'k'
 #define RESP_KO				'x'
 #define RESP_PONG			'p'

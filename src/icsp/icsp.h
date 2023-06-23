@@ -10,6 +10,9 @@
 #include "icsp_load.pio.h"
 #include "icsp_read.pio.h"
 
+// All the characteristics (word size), commands and timings are relative to the PIC16F1936 chip
+// and taken from the Memory Programming Specification DS41397B
+
 #define ICSP_WORD_SIZE				14
 #define ICSP_WORD_MASK				((1 << ICSP_WORD_SIZE) - 1)
 #define ICSP_BYTES_PER_WORD			2 // ceil(ICSP_WORD_SIZE / 8)
@@ -24,12 +27,23 @@ typedef uint16_t icsp_word_t;
 #define ICSP_CMD_READ_DATA_MEM		0x05
 #define ICSP_CMD_INCREMENT_ADDR		0x06
 #define ICSP_CMD_RESET_ADDR			0x16
-#define ICSP_CMD_BEGIN_INT_TMR		0x08
-#define ICSP_CMD_BEGIN_EXT_TMR		0x18
-#define ICSP_CMD_END_EXT_TMR		0x0A
+#define ICSP_CMD_BEGIN_INT_TIMED	0x08
+#define ICSP_CMD_BEGIN_EXT_TIMED	0x18
+#define ICSP_CMD_END_EXT_TIMED		0x0A
 #define ICSP_CMD_BULK_ERASE_PROG	0x09
 #define ICSP_CMD_BULK_ERASE_DATA	0x0B
 #define ICSP_CMD_ROW_ERASE_PROG		0x11
+
+#define ICSP_BULK_ERASE_PROG_MEM_UISERID_TARGET	0x8000
+
+// All times are in microseconds
+#define ICSP_TENTH					250
+#define ICSP_TPEXT_MIN				1000	// 1ms
+#define ICSP_TDIS_MIN				300
+#define ICSP_TDIS_TYP				10000	// 10ms (got from pickle code)
+#define ICSP_TERAB_MAX				5000	// 5ms
+
+#define ICSP_TENTS					100 // THIS IS ACTUALLY NANOSECONDS
 
 typedef struct icsp_s {
 	PIO pio;
@@ -37,6 +51,8 @@ typedef struct icsp_s {
 } icsp_t;
 
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
+void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
+void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids);
 
 void icsp_enter(icsp_t* icsp);
 void icsp_imperative(icsp_t* icsp, uint32_t command);

@@ -14,8 +14,8 @@ static void init_pins() {
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(nMCLR, GPIO_OUT);
 
-	gpio_pull_up(MAX_EN_PIN); // MAX4619 EN is active low
-	gpio_pull_up(MAX_SEL_PIN); // Default selected voltage to the highest of the two
+	gpio_pull_up(MAX_EN_PIN);	// MAX4619 EN is active low
+	gpio_pull_up(MAX_SEL_PIN);	// Default selected voltage to the highest of the two
 	gpio_pull_down(nMCLR);
 
 	gpio_set_slew_rate(MAX_EN_PIN, GPIO_SLEW_RATE_FAST); // SPEED
@@ -80,11 +80,12 @@ int main() {
 	while (true) {
 		uint8_t cmd = getchar();
 		switch(cmd) {
+		// TODO CMD_READ_DATA
 		case CMD_READ_PROG:
-			// uint32_t addr = 1, size = 10;
+			// uint32_t read_addr = 1, size = 10;
 			// TODO why no worky?
-			uint32_t addr = 0, size = 0;
-			fread(&addr, 1, 4, stdin); // In words
+			uint32_t read_addr = 0, size = 0;
+			fread(&read_addr, 1, 4, stdin); // In words
 			fread(&size, 1, 4, stdin); // In words, again
 			if ((size * ICSP_BYTES_PER_WORD) > 0xFFFFF) {
 				// Trying to allocate more than 1Mb. Honestly didn't try if ti could work, but let's just not
@@ -96,10 +97,11 @@ int main() {
 
 			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
 			*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
-			sleep_us(500);
+			sleep_us(500); // TODO use sleep_ns(ICSP_TENTS);
 			*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
+			sleep_us(ICSP_TENTH);
 
-			read_prog_mem(&icsp, addr, size, data);
+			read_prog_mem(&icsp, read_addr, size, data);
 
 			*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
@@ -108,6 +110,45 @@ int main() {
 			fwrite(data, ICSP_BYTES_PER_WORD, size, stdout);
 			fflush(stdout);
 			free(data);
+
+			break;
+		// TODO CMD_WRITE_DATA
+		case CMD_WRITE_PROG:
+			// TODO actual implementation, this is writing a single word at address zero
+
+			// uint32_t write_addr = 0;
+			// fread(&write_addr, 1, 4, stdin); // In words
+			// uint16_t new_data = 0;
+			// fread(&new_data, 1, 2, stdin);
+			uint32_t write_addr = 0; // TODO restore above
+			uint16_t new_data = 0x3fff;
+
+			// TODO move this to a function
+			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			sleep_us(500); // TODO use sleep_ns(ICSP_TENTS);
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
+			sleep_us(ICSP_TENTH);
+
+			write_prog_mem(&icsp, write_addr, new_data);
+
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			putchar(RESP_OK);
+
+			break;
+		case CMD_ERASE_BULK:
+			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			sleep_us(1); // Closest I can get to ICSP_TENTS (which is in ns)
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
+			sleep_us(ICSP_TENTH);
+
+			row_erase_bulk_prog(&icsp, false); // Do not erase user IDs
+
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			putchar(RESP_OK);
 
 			break;
 		case CMD_PING:
