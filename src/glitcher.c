@@ -60,12 +60,13 @@ int main() {
 	stdio_init_all();
 	stdio_set_translate_crlf(&stdio_usb, false); // TODO remove if not needed
 	init_pins();
-	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program);
+	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program); // TODO make local
 
 	icsp_t icsp = {
 		.pio = icsp_pio,
 		// The standard-mandated 100ns half-period seems to be too short for this setup
 		// to work reliably. 200ns looks good
+		.prog_offs = pio_add_program(icsp.pio, &icsp_program),
 		.clkdiv = (clock_get_hz(clk_sys) / 1e7f),
 	};
 
@@ -90,23 +91,22 @@ int main() {
 			sleep_us(ICSP_TENTH);
 
 
-			uint icsp_prog_offs = pio_add_program(icsp.pio, &icsp_program);
 			uint16_t data_out;
-			NEW_icsp_enter(&icsp, icsp_prog_offs);
+			icsp_enter(&icsp);
 
-			data_out = NEW_icsp_read(&icsp, icsp_prog_offs, ICSP_CMD_READ_PROG_MEM);
+			data_out = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
 			printf("0x%x\n", data_out);
 
-			NEW_icsp_load(&icsp, icsp_prog_offs, ICSP_CMD_LOAD_PROG_MEM, 0x1111);
-			NEW_icsp_imperative(&icsp, icsp_prog_offs, ICSP_CMD_BEGIN_EXT_TIMED);
+			icsp_load(&icsp, ICSP_CMD_LOAD_PROG_MEM, 0x1111);
+			icsp_imperative(&icsp, ICSP_CMD_BEGIN_EXT_TIMED);
 			sleep_us(ICSP_TPEXT_MIN);
-			NEW_icsp_imperative(&icsp, icsp_prog_offs, ICSP_CMD_END_EXT_TIMED);
+			icsp_imperative(&icsp, ICSP_CMD_END_EXT_TIMED);
 			sleep_us(ICSP_TDIS_MIN);
 
-			// NEW_icsp_imperative(&icsp, icsp_prog_offs, ICSP_CMD_INCREMENT_ADDR);
-			data_out = NEW_icsp_read(&icsp, icsp_prog_offs, ICSP_CMD_READ_PROG_MEM);
+			// icsp_imperative(&icsp, ICSP_CMD_INCREMENT_ADDR);
+			data_out = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
 			printf("0x%x\n", data_out);
-			pio_remove_program(icsp.pio, &icsp_program, icsp_prog_offs);
+			pio_remove_program(icsp.pio, &icsp_program, icsp.prog_offs);
 
 
 			*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
@@ -115,8 +115,6 @@ int main() {
 			break;
 
 		case CMD_READ_PROG:
-			// uint32_t read_addr = 1, size = 10;
-			// TODO why no worky?
 			uint32_t read_addr = 0, size = 0;
 			fread(&read_addr, 1, 4, stdin); // In words
 			fread(&size, 1, 4, stdin); // In words, again
@@ -176,7 +174,7 @@ int main() {
 			*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
 			sleep_us(ICSP_TENTH);
 
-			row_erase_bulk_prog(&icsp, false); // Do not erase user IDs
+			bulk_erase_prog(&icsp, false); // Do not erase user IDs
 
 			*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)

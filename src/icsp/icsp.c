@@ -45,7 +45,7 @@ void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
 
 }
 
-void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids) {
+void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
 	icsp_enter(icsp);
 
 	if (erase_user_ids) // According to DS41397B, to erase user IDs the current address must be 0x8000 <= addr <= 0x8008
@@ -56,13 +56,13 @@ void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids) {
 	sleep_us(ICSP_TERAB_MAX);
 }
 
-void NEW_icsp_enter(icsp_t* icsp, uint prog_offs) {
+void icsp_enter(icsp_t* icsp) {
 	uint icsp_sm	= 0; // TODO move to icsp_t structure
 
 	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
 	pio_sm_clear_fifos(icsp->pio, icsp_sm);
 
-	icsp_program_init(icsp->pio, icsp_sm, prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 32);
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
@@ -76,13 +76,13 @@ void NEW_icsp_enter(icsp_t* icsp, uint prog_offs) {
 	pio_sm_clear_fifos(icsp->pio, icsp_sm);
 }
 
-void NEW_icsp_imperative(icsp_t* icsp, uint prog_offs, uint8_t command) {
+void icsp_imperative(icsp_t* icsp, uint8_t command) {
 	uint icsp_sm	= 0; // TODO move to icsp_t structure
 
 	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
 	pio_sm_clear_fifos(icsp->pio, icsp_sm);
 
-	icsp_program_init(icsp->pio, icsp_sm, prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
@@ -97,13 +97,13 @@ void NEW_icsp_imperative(icsp_t* icsp, uint prog_offs, uint8_t command) {
 }
 
 
-void NEW_icsp_load(icsp_t* icsp, uint prog_offs, uint8_t command, uint16_t data) {
+void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
 	uint icsp_sm	= 0; // TODO move to icsp_t structure
 
 	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
 	pio_sm_clear_fifos(icsp->pio, icsp_sm);
 
-	icsp_program_init(icsp->pio, icsp_sm, prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
@@ -117,13 +117,13 @@ void NEW_icsp_load(icsp_t* icsp, uint prog_offs, uint8_t command, uint16_t data)
 	pio_sm_clear_fifos(icsp->pio, icsp_sm);
 }
 
-uint16_t NEW_icsp_read(icsp_t* icsp, uint prog_offs, uint8_t command) {
+uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
 	uint icsp_sm	= 0; // TODO move to icsp_t structure
 
 	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
 	pio_sm_clear_fifos(icsp->pio, icsp_sm);
 
-	icsp_program_init(icsp->pio, icsp_sm, prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+	icsp_program_init(icsp->pio, icsp_sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
 	pio_sm_put_blocking(icsp->pio, icsp_sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1

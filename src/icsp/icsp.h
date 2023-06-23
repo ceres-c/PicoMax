@@ -44,18 +44,19 @@ typedef uint16_t icsp_word_t;
 
 typedef struct icsp_s {
 	PIO pio;
+	uint prog_offs;
 	uint16_t clkdiv;
 } icsp_t;
 
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
-void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids);
+void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids);
 
 // Bare operations
-void NEW_icsp_enter(icsp_t* icsp, uint prog_offs);
-void NEW_icsp_imperative(icsp_t* icsp, uint prog_offs, uint8_t command);
-void NEW_icsp_load(icsp_t* icsp, uint prog_offs, uint8_t command, uint16_t data);
-uint16_t NEW_icsp_read(icsp_t* icsp, uint prog_offs, uint8_t command);
+void icsp_enter(icsp_t* icsp);
+void icsp_imperative(icsp_t* icsp, uint8_t command);
+void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
+uint16_t icsp_read(icsp_t* icsp, uint8_t command);
 
 // PIO init
 static inline void icsp_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv, uint pin_clock, uint pin_data) {
