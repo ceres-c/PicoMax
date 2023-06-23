@@ -5,6 +5,8 @@
 
 #include "../pins.h"
 
+#include "icsp.pio.h"
+
 #include "icsp_enter.pio.h"
 #include "icsp_imperative.pio.h"
 #include "icsp_load.pio.h"
@@ -53,6 +55,11 @@ typedef struct icsp_s {
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
 void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids);
+
+
+void NEW_icsp_enter(icsp_t* icsp, uint prog_offs);
+void NEW_icsp_imperative(icsp_t* icsp, uint prog_offs, uint32_t command);
+
 
 void icsp_enter(icsp_t* icsp);
 void icsp_imperative(icsp_t* icsp, uint32_t command);
@@ -192,5 +199,41 @@ static inline void icsp_read_program_init(PIO pio, uint sm, uint prog_offs, floa
 	pio_sm_init(pio, sm, prog_offs, &c);
 	pio_sm_set_enabled(pio, sm, true);
 }
+
+
+
+static inline void icsp_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv, uint pin_clock, uint pin_data) {
+	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
+	// Set pin directions (pin_clock is always an output and pin_data is initially an outputs)
+	pio_sm_set_pindirs_with_mask(
+		pio, sm,
+		(1u << pin_clock) | (1u << pin_data),
+		(1u << pin_clock) | (1u << pin_data));
+
+	// Set default pin values (everything is low)
+	pio_sm_set_pins_with_mask(
+		pio, sm,
+		0,
+		(1u << pin_clock) | (1u << pin_data));
+
+	// Claim pins for PIO
+	pio_gpio_init(pio, pin_clock);
+	pio_gpio_init(pio, pin_data);
+
+	pio_sm_config c = icsp_program_get_default_config(prog_offs);
+
+	sm_config_set_set_pins(&c, pin_data, 1); 		// Used to set the pindir in the PIO asm code
+	sm_config_set_out_pins(&c, pin_data, 1); 		// Set base pin and number of pins for OUT operand
+	sm_config_set_in_pins(&c, pin_data); 			// Set input base pin
+	sm_config_set_sideset_pins(&c, pin_clock);		// Set sideset base pin
+
+	sm_config_set_clkdiv(&c, clkdiv);
+
+	// Initialize the state machine
+	pio_sm_init(pio, sm, prog_offs, &c);
+	pio_sm_set_enabled(pio, sm, true);
+}
+
+
 
 #endif // _ICSP_H

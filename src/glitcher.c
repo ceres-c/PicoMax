@@ -63,10 +63,10 @@ int main() {
 	glitcher_prog_offst = pio_add_program(glitcher_pio, &glitch_trigger_program);
 
 	icsp_t icsp = {
+		.pio = icsp_pio,
 		// The standard-mandated 100ns half-period seems to be too short for this setup
 		// to work reliably. 200ns looks good
 		.clkdiv = (clock_get_hz(clk_sys) / 1e7f), // 100ns per clock cycle
-		.pio = glitcher_pio
 	};
 
 	// uint32_t delay = 0;
@@ -81,6 +81,27 @@ int main() {
 		uint8_t cmd = getchar();
 		switch(cmd) {
 		// TODO CMD_READ_DATA
+
+		case 'N': // NEW ICSP test
+			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			sleep_us(500); // TODO use sleep_ns(ICSP_TENTS);
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // Clear MCLR to enable programming
+			sleep_us(ICSP_TENTH);
+
+
+			uint icsp_prog_offs = pio_add_program(icsp.pio, &icsp_program);
+			NEW_icsp_enter(&icsp, icsp_prog_offs);
+			NEW_icsp_imperative(&icsp, icsp_prog_offs, ICSP_CMD_INCREMENT_ADDR);
+			NEW_icsp_imperative(&icsp, icsp_prog_offs, ICSP_CMD_INCREMENT_ADDR);
+			pio_remove_program(icsp.pio, &icsp_program, icsp_prog_offs);
+
+
+			*CLR_GPIO_ATOMIC = nMCLR_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // TODO remove all MAX-related stuff (we will get here after the glitch)
+			putchar(RESP_OK);
+			break;
+
 		case CMD_READ_PROG:
 			// uint32_t read_addr = 1, size = 10;
 			// TODO why no worky?

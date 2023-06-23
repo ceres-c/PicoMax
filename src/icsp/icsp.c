@@ -45,6 +45,59 @@ void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
 
 }
 
+void NEW_icsp_enter(icsp_t* icsp, uint prog_offs) {
+	uint icsp_sm	= 0; // TODO move to icsp_t structure
+
+	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
+	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+
+	icsp_program_init(icsp->pio, icsp_sm, prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 32);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, ICSP_KEY);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+
+	pio_sm_get_blocking(icsp->pio, icsp_sm); // Discard returned value, but make this function blocking
+
+	pio_sm_set_enabled(icsp->pio, icsp_sm, false);
+
+	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+}
+
+void NEW_icsp_imperative(icsp_t* icsp, uint prog_offs, uint32_t command) {
+	uint icsp_sm	= 0; // TODO move to icsp_t structure
+
+	pio_sm_drain_tx_fifo(icsp->pio, icsp_sm);
+	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+
+	icsp_program_init(icsp->pio, icsp_sm, prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
+
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 5);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, command);
+	pio_sm_put_blocking(icsp->pio, icsp_sm, 0);
+
+	pio_sm_get_blocking(icsp->pio, icsp_sm); // Discard returned value, but make this function blocking
+
+	pio_sm_set_enabled(icsp->pio, icsp_sm, false);
+
+	pio_sm_clear_fifos(icsp->pio, icsp_sm);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids) {
 	icsp_enter(icsp);
 

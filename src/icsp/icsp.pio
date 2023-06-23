@@ -1,0 +1,56 @@
+; This program takes 4 inputs, in this sequence
+;	1) Number of bits to send in the first pulse - 1 (accommodates for both standard commands and icsp enter key)
+;	   NOTE: It will send ONE BIT MORE
+;	2) Number of bits to send in the second pulse - 1 (can be 0 or more)
+;	   NOTE: If > 0, it will send ONE BIT MORE
+;	3) Up to 32 bits to send in the first pulse
+;	4) Up to 31 bit to send in the second pulse after waiting 10 clock cycles (mandated by standard).
+;	   The bottom most bit is used to set send/receive mode: 1 is send
+;
+; Examples
+;	- To send the icsp enter key you can put [32, 0, <key>, 0]
+;	- To send a load command with 14 bits you can put [5, 15, COMMAND, DATA << 2 | 1]
+;	- To send a read command and receive 14 bits you can put [5, 15, COMMAND, 0]
+;	- To send an imperative command you can put [5, 0, COMMAND, 0]
+
+.program icsp
+.side_set 1 opt
+
+	pull block							; Pull the number of bits to send in the first part of the comm
+	mov X, OSR
+	pull block							; Pull numer of additional bits to send/receive
+	mov Y, OSR
+	pull block							; Pull the first pulse
+bitloop:
+	out pins, 1			side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
+	; Note: this out might execute 33 times for the icsp enter key, but we only have 32 bits.
+	; This is fine as the last bit of the key is a zero.
+	jmp X-- bitloop		side 0	[1]		; Loop until OSR is empty
+
+	pull block							; Pull additional data (always pull to clean FIFO)
+	jmp !Y end_nosend					; If second pulse is 0 bits, we're done
+
+	; Decide if send or receive and wait to reach 1us time before further sending/receiving
+	out X, 1					[7] ; TODO fix delay here
+	jmp !X receive
+
+send_loop:
+	out pins, 1 		side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
+	jmp Y-- send_loop	side 0	[1]		; Jump back if more bits to shift
+
+	in null, 32			side 1			; Raise clock for final stop bit (0)
+	jmp end
+	; jmp end				side 1	[1]	; TODO maybe replace with this
+
+receive:
+	set pindirs, 0		side 1	[1]		; Set the data pin as input and clock first bit
+recv_loop:
+	in pins, 1			side 0	[1]		; Receive 1 bit
+	jmp x-- recv_loop	side 1	[1]
+
+end:
+	push block			side 0			; Finally, pull down clock for final stop bit (0)
+
+end_nosend:
+	in null, 32 ; TODO can I remove this? The register should be empty anyways
+	push block
