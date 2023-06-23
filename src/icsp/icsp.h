@@ -2,6 +2,7 @@
 #define _ICSP_H
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
+#include "hardware/clocks.h"
 
 #include "../pins.h"
 
@@ -9,7 +10,6 @@
 
 // All the characteristics (word size), commands and timings are relative to the PIC16F1936 chip
 // and taken from the Memory Programming Specification DS41397B
-
 #define ICSP_WORD_SIZE				14
 #define ICSP_WORD_MASK				((1 << ICSP_WORD_SIZE) - 1)
 #define ICSP_BYTES_PER_WORD			2 // ceil(ICSP_WORD_SIZE / 8)
@@ -74,6 +74,7 @@ void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
 uint16_t icsp_read(icsp_t* icsp, uint8_t command);
 
 // PIO init
+// TODO pass icsp_t as argument
 static inline void icsp_program_init(PIO pio, uint sm, uint prog_offs, float clkdiv, uint pin_clock, uint pin_data) {
 	// NOTE: Setting pin directions and values first to avoid sending garbage to the target device
 	// Set pin directions (pin_clock is always an output and pin_data is initially an outputs)
@@ -105,4 +106,7 @@ static inline void icsp_program_init(PIO pio, uint sm, uint prog_offs, float clk
 	pio_sm_init(pio, sm, prog_offs, &c);
 	pio_sm_set_enabled(pio, sm, true);
 }
+
+bool icsp_init(PIO pio, icsp_t *icsp);
+
 #endif // _ICSP_H

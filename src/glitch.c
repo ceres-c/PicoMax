@@ -28,3 +28,13 @@ uint8_t __no_inline_not_in_flash_func(do_glitch)(glitch_t *glitch, uint32_t dela
 
 	return (uint8_t)ret;
 }
+
+bool glitch_init(PIO pio, glitch_t *glitch) {
+	if (!pio_can_add_program(pio, &glitch_trigger_program)) {
+		return false;
+	}
+	glitch->pio = pio;
+	glitch->sm = 0;
+	glitch->prog_offs = pio_add_program(pio, &glitch_trigger_program);
+	return true;
+}

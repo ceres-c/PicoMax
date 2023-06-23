@@ -20,31 +20,28 @@ static void init_pins() {
 }
 
 int main() {
-	stdio_init_all();
-	stdio_set_translate_crlf(&stdio_usb, false);
-	init_pins();
-
-	glitch_t glitch = {
-		.pio = glitcher_pio,
-		.sm = 0,
-		.prog_offs = pio_add_program(glitcher_pio, &glitch_trigger_program),
-	};
-
-	icsp_t icsp = {
-		.pio = icsp_pio,
-		.sm = 0,
-		.prog_offs = pio_add_program(icsp.pio, &icsp_program),
-		// The standard-mandated 100ns half-period seems to be too short for this setup
-		// to work reliably. 200ns looks good
-		.clkdiv = (clock_get_hz(clk_sys) / 1e7f),
-	};
-
 	uint32_t delay = 0;
 	uint32_t pulse_width = 0;
 	// bool trig_in = false;
 	bool trig_out = false;
 	bool powered_on = false;
 	bool init = false;
+
+	stdio_init_all();
+	stdio_set_translate_crlf(&stdio_usb, false);
+	init_pins();
+
+	glitch_t glitch;
+	if (!glitch_init(glitcher_pio, &glitch)) {
+		printf("Failed to initialize glitcher\n");
+		return 1;
+	}
+
+	icsp_t icsp;
+	if (!icsp_init(icsp_pio, &icsp)) {
+		printf("Failed to initialize ICSP\n");
+		return 1;
+	}
 
 	while (true) {
 		uint8_t cmd = getchar();

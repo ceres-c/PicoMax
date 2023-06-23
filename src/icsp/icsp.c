@@ -54,9 +54,6 @@ void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
 }
 
 void icsp_enter(icsp_t* icsp) {
-	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
-	pio_sm_clear_fifos(icsp->pio, icsp->sm);
-
 	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 32);
@@ -68,14 +65,10 @@ void icsp_enter(icsp_t* icsp) {
 
 	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 
-	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 	// sleep_us(1000); // Is this needed? In pickle they had it but my PIC seems to work without it
 }
 
 void icsp_imperative(icsp_t* icsp, uint8_t command) {
-	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
-	pio_sm_clear_fifos(icsp->pio, icsp->sm);
-
 	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
@@ -92,9 +85,6 @@ void icsp_imperative(icsp_t* icsp, uint8_t command) {
 
 
 void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
-	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
-	pio_sm_clear_fifos(icsp->pio, icsp->sm);
-
 	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
@@ -105,14 +95,9 @@ void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
 	pio_sm_get_blocking(icsp->pio, icsp->sm); // Discard returned value, but make this function blocking
 
 	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
-
-	pio_sm_clear_fifos(icsp->pio, icsp->sm);
 }
 
 uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
-	pio_sm_drain_tx_fifo(icsp->pio, icsp->sm);
-	pio_sm_clear_fifos(icsp->pio, icsp->sm);
-
 	icsp_program_init(icsp->pio, icsp->sm, icsp->prog_offs, icsp->clkdiv, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
@@ -124,11 +109,20 @@ uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
 
 	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 
-	pio_sm_clear_fifos(icsp->pio, icsp->sm);
-
 	ret >>= 17; // Take upper 16 bits and remove trailing stop bit
 	ret &= ICSP_WORD_MASK; // Remove spurious last high bit
 	// NOTE: technically stop bit should be a 0, but we are missing some pull downs, I guess
 
 	return (uint16_t)ret;
+}
+
+bool icsp_init(PIO pio, icsp_t *icsp) {
+	if (!pio_can_add_program(pio, &icsp_program)) {
+		return false;
+	}
+	icsp->pio = pio;
+	icsp->sm = 0;
+	icsp->prog_offs = pio_add_program(pio, &icsp_program);
+	// The standard-mandated 100ns half-period seems to be too short for this setup to work reliably. 200ns looks good
+	icsp->clkdiv = (clock_get_hz(clk_sys) / 1e7f);
 }

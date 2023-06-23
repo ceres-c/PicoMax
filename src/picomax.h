@@ -4,7 +4,6 @@
 #include <stdlib.h> // For malloc
 #include "pico/stdlib.h"
 #include "pico/stdio_usb.h"
-#include "hardware/clocks.h"
 #include "hardware/pio.h"
 
 #include "icsp/icsp.h"
