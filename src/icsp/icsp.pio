@@ -15,8 +15,8 @@
 ;
 ; Examples
 ;	- To send the icsp enter key you can put [32, 0, <key>, 0]
-;	- To send a load command with 14 bits you can put [5, 15, COMMAND, DATA << 2 | 1]
-;	- To send a read command and receive 14 bits you can put [5, 15, COMMAND, 0]
+;	- To send a load command with 14 bits you can put [5, 15, COMMAND, DATA << 2 | 1] (14 + 2 start/stop - 1)
+;	- To send a read command and receive 14 bits you can put [5, 15, COMMAND, 0]      (14 + 2 start/stop - 1)
 ;	- To send an imperative command you can put [5, 0, COMMAND, 0]
 
 .program icsp
@@ -44,7 +44,7 @@ send_loop:
 	out pins, 1 		side 1	[1]		; Shift 1 bit from OSR to the first OUT pin
 	jmp Y-- send_loop	side 0	[1]		; Jump back if more bits to shift
 
-	; in null, 32 ; TODO remove?
+	in null, 32 ; TODO remove?
 	jmp end
 
 receive:
