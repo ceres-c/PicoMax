@@ -88,8 +88,10 @@ def main(args):
 		dump = pic_read_program(s, addr, size, args.timeout)
 		hexdump.hexdump(dump)
 	elif args.write_program:
+		print('[?] Have you erased the PIC program memory first? Otherwise, the write will silently fail.')
+		# TODO does row erase work? Is bulk erase needed?
 		addr = args.write_program[0]
-		data = b'\xff\xff'
+		data = b'\x22\x22'
 		pic_write_program(s, addr, data, args.timeout)
 	
 	print('[+] Done.')

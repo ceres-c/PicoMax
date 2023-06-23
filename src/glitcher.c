@@ -114,14 +114,13 @@ int main() {
 			break;
 		// TODO CMD_WRITE_DATA
 		case CMD_WRITE_PROG:
-			// TODO actual implementation, this is writing a single word at address zero
+			uint32_t write_addr = 0;
+			fread(&write_addr, 1, 4, stdin); // In words
+			uint16_t new_data = 0;
+			fread(&new_data, 1, 2, stdin);
+			new_data &= ICSP_WORD_MASK; // Only 14 bits are allowed
 
-			// uint32_t write_addr = 0;
-			// fread(&write_addr, 1, 4, stdin); // In words
-			// uint16_t new_data = 0;
-			// fread(&new_data, 1, 2, stdin);
-			uint32_t write_addr = 0; // TODO restore above
-			uint16_t new_data = 0x1234;
+			// TODO check for max address?
 
 			// TODO move this to a function
 			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // TODO remove all MAX-related stuff (we will get here after the glitch)
