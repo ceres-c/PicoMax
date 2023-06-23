@@ -3,29 +3,37 @@
 
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 	icsp_enter(icsp);
-
 	// sleep_us(1000); // TODO is this needed? In pickle they had it but my PIC seems to work without it
 
-	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+	int pc = 0;
 
-	for (int i = 0; i < addr; i++)
+	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+	if (addr >= ICSP_CONFIG_MEM_ADDR) {
+		icsp_load(icsp, ICSP_CMD_LOAD_CONFIG, 0); // Idk which word to load here, pickle does 0, let's go with that
+		pc =+ ICSP_CONFIG_MEM_ADDR;
+	}
+
+	for (pc; pc < addr; pc++)
 		icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
-	for (int i = 0; i < size; i++) {
-		*((icsp_word_t*)(dst + i * ICSP_BYTES_PER_WORD)) = icsp_read(icsp, ICSP_CMD_READ_PROG_MEM);
+	for (int j = 0; j < size; j++) {
+		*((icsp_word_t*)(dst + j * ICSP_BYTES_PER_WORD)) = icsp_read(icsp, ICSP_CMD_READ_PROG_MEM);
 		icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
 	}
 }
 
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
-	icsp_enter(icsp); // TODO move all of these to caller
-
+	icsp_enter(icsp);
 	// sleep_us(1000); // TODO is this needed? In pickle they had it but my PIC seems to work without it
-	// uint32_t data = icsp_read(icsp, ICSP_CMD_LOAD_CONFIG);
-	// printf("Load config: %x\n", data);
 
-	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0 // TODO try with this
+	int pc = 0;
 
-	for (int i = 0; i < addr; i++)
+	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+	if (addr >= ICSP_CONFIG_MEM_ADDR) {
+		icsp_load(icsp, ICSP_CMD_LOAD_CONFIG, 0); // Idk which word to load here, pickle does 0, let's go with that
+		pc =+ ICSP_CONFIG_MEM_ADDR;
+	}
+
+	for (pc; pc < addr; pc++)
 		icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
 	icsp_load(icsp, ICSP_CMD_LOAD_PROG_MEM, src);
 
@@ -41,7 +49,7 @@ void row_erase_bulk_prog(icsp_t *icsp, bool erase_user_ids) {
 	icsp_enter(icsp);
 
 	if (erase_user_ids) // According to DS41397B, to erase user IDs the current address must be 0x8000 <= addr <= 0x8008
-		for (int i = 0; i < ICSP_BULK_ERASE_PROG_MEM_UISERID_TARGET; i++)
+		for (int i = 0; i < ICSP_CONFIG_MEM_ADDR; i++)
 			icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
 
 	icsp_imperative(icsp, ICSP_CMD_BULK_ERASE_PROG);

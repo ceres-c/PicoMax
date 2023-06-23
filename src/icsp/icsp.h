@@ -34,7 +34,7 @@ typedef uint16_t icsp_word_t;
 #define ICSP_CMD_BULK_ERASE_DATA	0x0B
 #define ICSP_CMD_ROW_ERASE_PROG		0x11
 
-#define ICSP_BULK_ERASE_PROG_MEM_UISERID_TARGET	0x8000
+#define ICSP_CONFIG_MEM_ADDR		0x8000
 
 // All times are in microseconds
 #define ICSP_TENTH					250
