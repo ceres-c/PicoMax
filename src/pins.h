@@ -1,6 +1,8 @@
 #ifndef _PINS_H
 #define _PINS_H
 
+// If you need to rewire the board, change here
+
 #define ICSPCLK				0x12 // pin 24
 #define ICSPDAT				0x13 // pin 25
 #define nMCLR				0x14 // pin 26
@@ -21,5 +23,11 @@
 #define PIC_GLITCH_SUCC_MASK	(1 << PIC_GLITCH_SUCC_PIN)
 #define PIC_GLITCH_FAIL_PIN	0x09 // pin 12 - These MUST be consecutive for the PIO to work
 #define PIC_GLITCH_FAIL_MASK	(1 << PIC_GLITCH_FAIL_PIN)
+
+// Registers for the SIO
+#define GPIO_ATOMIC			((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_OFFSET))
+#define SET_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_SET_OFFSET))
+#define CLR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_CLR_OFFSET))
+#define XOR_GPIO_ATOMIC		((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_XOR_OFFSET))
 
 #endif // _PINS_H
