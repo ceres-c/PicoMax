@@ -66,7 +66,7 @@ int main() {
 		.pio = icsp_pio,
 		// The standard-mandated 100ns half-period seems to be too short for this setup
 		// to work reliably. 200ns looks good
-		.clkdiv = (clock_get_hz(clk_sys) / 1e7f), // 100ns per clock cycle
+		.clkdiv = (clock_get_hz(clk_sys) / 1e7f),
 	};
 
 	// uint32_t delay = 0;

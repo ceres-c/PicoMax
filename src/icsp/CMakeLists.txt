@@ -1,10 +1,6 @@
 # Use INTERFACE as reccommended by Pico SDK devs
 add_library(icsp INTERFACE)
 
-pico_generate_pio_header(icsp ${CMAKE_CURRENT_LIST_DIR}/icsp_enter.pio)
-pico_generate_pio_header(icsp ${CMAKE_CURRENT_LIST_DIR}/icsp_imperative.pio)
-pico_generate_pio_header(icsp ${CMAKE_CURRENT_LIST_DIR}/icsp_load.pio)
-pico_generate_pio_header(icsp ${CMAKE_CURRENT_LIST_DIR}/icsp_read.pio)
 pico_generate_pio_header(icsp ${CMAKE_CURRENT_LIST_DIR}/icsp.pio)
 
 target_sources(icsp INTERFACE
