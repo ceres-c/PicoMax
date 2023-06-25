@@ -11,18 +11,50 @@ typedef struct glitch_s {
 	PIO pio;
 	uint prog_offs;
 	uint sm;
+	bool on_rising;
+	uint32_t delay;
+	uint32_t pulse_width;
+	bool trig_out;
 } glitch_t;
 
-// All these function are in RAM to be fast.
+static inline void glitch_power_on(bool prog_mode) {
+	if (prog_mode) {
+		// Enable pull down on nMCLR
+		gpio_pull_down(nMCLR);
+	} else {
+		// Disable pull down on nMCLR
+		gpio_disable_pulls(nMCLR);
+	}
+
+	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
+	*CLR_GPIO_ATOMIC = MAX_EN_MASK; // Then enable MAX4619
+	// Right now we have:
+	// EN=low, SEL=high
+	// (output enabled, highest voltage selected)
+}
+
+static inline void glitch_power_off() {
+	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
+	// Right now we have:
+	// EN=high, SEL=high
+	// (output disabled, highest voltage selected)
+	sleep_ms(50); // Chosed by fair dice roll
+}
+
+static inline void enable_prog_mode() {
+	gpio_pull_down(nMCLR);
+}
+
+// TODO implement these and don't return from the PIO glitch program anymore
+bool target_dead();
+bool glitch_success();
+
+// This function is in RAM to be fast.
 // Due to Pi Pico's slow flash, first few executions after cache evict take far longer
-void __no_inline_not_in_flash_func(glitch_power_on)();
-void __no_inline_not_in_flash_func(glitch_power_off)();
-uint8_t __no_inline_not_in_flash_func(do_glitch)(glitch_t *glitch, uint32_t delay, uint32_t pulse_width, bool trig_out);
+uint8_t __no_inline_not_in_flash_func(do_glitch)(glitch_t *glitch);
 
 static inline void glitch_trigger_program_init(PIO pio, uint sm, uint prog_offs,
 	bool trig_out_enabled, uint pin_max_sel, uint pin_trig_in, uint pin_trig_out) {
-	// TODO allow for glitch inversion with mux
-
 	// NOTE: Setting pin directions and values first to avoid cutting power to the target
 	// device by switching the MAX4619 selector
 
@@ -50,13 +82,6 @@ static inline void glitch_trigger_program_init(PIO pio, uint sm, uint prog_offs,
 	sm_config_set_set_pins(&c, pin_max_sel, 1); 	// Set base pin and number of pins for SET operand
 	sm_config_set_in_pins(&c, pin_trig_in); 		// Set input base pin
 	sm_config_set_sideset_pins(&c, pin_trig_out);	// Set sideset base pin
-
-	// sm_config_set_clkdiv(&c, clkdiv); // TODO is this useful in any way? float clkdiv
-
-	// Use GPIO pin muxes to invert the output. It's easier to think of the glitch as 0->1->0 rather than 1->0->1.
-	// gpio_set_outover(pin_max_sel, GPIO_OVERRIDE_INVERT); // NOTE: this MUST be after the inits
-
-	// hw_set_bits(&pio->input_sync_bypass, 1u << pin_miso); // TODO this disables flip-flops on the input pins for faster inputs, useful?
 
 	// Initialize the state machine
 	pio_sm_init(pio, sm, prog_offs, &c);

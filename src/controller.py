@@ -7,23 +7,22 @@ import time
 import serial
 
 CMD = {
-	'DELAY'			: b'D',
-	'WIDTH'			: b'W',
-	'GLITCH_INIT'	: b'g',
-	'GLITCH'		: b'G',
-	'TRIG_OUT_EN'	: b'O',
-	'TRIG_OUT_DIS'	: b'o',
-	'TRIG_IN_EN'	: b'I',
-	'TRIG_IN_DIS'	: b'i',
-	'PING'			: b'P',
-	'POWERON'		: b'+',
-	'POWEROFF'		: b'-',
+	'DELAY'				: b'D',
+	'WIDTH'				: b'W',
+	'GLITCH'			: b'G',
+	'TRIG_OUT_EN'		: b'O',
+	'TRIG_OUT_DIS'		: b'o',
+	'TRIG_IN_RISING'	: b'I',
+	'TRIG_IN_FALLING'	: b'i',
+	'PING'				: b'P',
+	'POWERON'			: b'+',
+	'POWEROFF'			: b'-',
 }
 RESP = {
-	'OK'			: b'k',
-	'KO'			: b'x',
-	'PONG'			: b'p',
-	'GLITCH_FAIL'	: b'.',
+	'OK'				: b'k',
+	'KO'				: b'x',
+	'PONG'				: b'p',
+	'GLITCH_FAIL'		: b'.',
 }
 
 def success() -> bool:
@@ -32,14 +31,18 @@ def success() -> bool:
 
 def main(args):
 
-	def glitch_init(s: serial.Serial) -> bool:
-		s.write(CMD['GLITCH_INIT'])
+	def reboot_target(s: serial.Serial) -> bool:
+		s.write(CMD['POWEROFF'])
 		r = s.read(len(RESP['OK']))
 		if r != RESP['OK']:
-			print(f'[!] Could not initialize glitcher. Got:\n{r}\nAborting.')
+			print(f'[!] Could not power off the target. Got:\n{r}\nAborting.')
+			return False
+		s.write(CMD['POWERON'])
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
+			print(f'[!] Could not power on the target. Got:\n{r}\nAborting.')
 			return False
 		return True
-
 
 	try: 
 		s = serial.Serial(port=args.port, baudrate=args.baud, timeout=args.timeout)
@@ -61,8 +64,15 @@ def main(args):
 			print(f'[!] Could not enable output trigger. Got:\n{r}\nAborting.')
 			exit(1)
 		print('[+] Output trigger enabled.')
+
+	if args.input_trigger_rise:
+		s.write(CMD['TRIG_IN_RISING'])
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
+			print(f'[!] Could not set trigger input to rising edge. Got:\n{r}\nAborting.')
+			exit(1)
 	
-	if not glitch_init(s):
+	if not reboot_target(s):
 		exit(1)
 
 	start = time.time()
@@ -83,6 +93,8 @@ def main(args):
 			print(RESP['GLITCH_FAIL'].decode('ascii'), end='', flush=True)
 		elif r == RESP['KO']: # Target dead
 			print(RESP['KO'].decode('ascii'), end='', flush=True)
+			if not reboot_target(s):
+				break
 		elif r == RESP['OK']: # Glitched
 			print(f'\n[!] SUCCESS! Settings: delay={d}, width={w}')
 			break
@@ -105,6 +117,8 @@ if __name__ == "__main__":
 						help='serial timeout (default: 0.1s)')
 	parser.add_argument('-o', '--output-trigger', action='store_true',
 		     			help='enable output trigger (default: False)')
+	parser.add_argument('-r', '--input-trigger-rise', action='store_true',
+						help='trigger glitch on rising edge (default: falling edge)')
 	parser.add_argument('-d', '--delay', type=int, nargs=3, default=[1,100,1],
 						help=
 '''delay for the pulse [min max step] (default: 1 100 1 glitcher clock cycles)

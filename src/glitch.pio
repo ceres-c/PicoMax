@@ -1,4 +1,5 @@
-; This PIO program accepts two inputs:
+; This PIO program accepts three inputs:
+; - type: 0 for triggering on a falling edge, 1 for triggering on a rising edge
 ; - delay: the number of cycles to wait before starting the glitch
 ; - pulse_width: the number of cycles to keep the glitch active
 ; It will switch the MAX4619 selector to the lower voltage for pulse_width cycles, then switch it
@@ -6,49 +7,42 @@
 .program glitch_trigger
 .side_set 1 opt
 
-	pull block
+	pull block		; Get input trigger type
 	mov Y, OSR
 
 	pull block		; Get delay
 	mov X, OSR
-	pull block		; Get width
-	; Wait to move OSR in Y
+	pull block		; Get width, wait to move OSR to Y
 
 	jmp !Y one_zero
 
 zero_one:
-	; Trigger on raising edge
+	; Trigger on rising edge
 	mov Y, OSR
 
-	wait 0 PIN 0	; Wait for input pin 0 to go to low, in case it was high
-	wait 1 PIN 0	; Then wait for it to actually go high
+	wait 0 PIN 0		; Wait for input pin 0 to go to low, in case it was high
+	wait 1 PIN 0		; Then wait for it to actually go high
 
-delay_zo:
-	jmp X-- delay_zo	; Delay for x cycles
-
-	set PINS, 0 side 1	; Begin glitch (sideset the output trigger pin)
-width_zo:
-	jmp Y-- width_zo	; Width for y cycles
-
-	set PINS, 1 side 0	; End glitch
-
-	jmp end
+	jmp delay
 
 one_zero:
 	; Trigger on falling edge
 	mov Y, OSR
 
-	wait 1 PIN 0	; Wait for input pin 0 to go to high, in case it was low
-	wait 0 PIN 0	; Then wait for it to actually go low
+	wait 1 PIN 0		; Wait for input pin 0 to go to high, in case it was low
+	wait 0 PIN 0		; Then wait for it to actually go low
 
-delay_oz:
-	jmp X-- delay_oz	; Delay for x cycles
+	nop					; Adjust for the other branch having an additional jump
+
+delay:
+	jmp X-- delay	; Delay for x cycles
 
 	set PINS, 0 side 1	; Begin glitch (sideset the output trigger pin)
-width_oz:
-	jmp Y-- width_oz	; Width for y cycles
+width:
+	jmp Y-- width	; Width for y cycles
 
 	set PINS, 1 side 0	; End glitch
 
-end:
+	wait 0 PIN 0	; Wait for input pin 0 to go to low (either loop end or brownout)
+	mov ISR, PINS	; Return the current pin state
 	push

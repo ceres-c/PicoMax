@@ -20,12 +20,7 @@ static void init_pins() {
 }
 
 int main() {
-	uint32_t delay = 0;
-	uint32_t pulse_width = 0;
-	// bool trig_in = false;
-	bool trig_out = false;
 	bool powered_on = false;
-	bool init = false;
 
 	stdio_init_all();
 	stdio_set_translate_crlf(&stdio_usb, false);
@@ -120,33 +115,32 @@ int main() {
 			putchar(RESP_PONG);
 			break;
 		case CMD_DELAY:
-			fread(&delay, 1, 4, stdin);
+			fread(&glitch.delay, 1, 4, stdin);
 			putchar(RESP_OK);
 			break;
 		case CMD_WIDTH:
-			fread(&pulse_width, 1, 4, stdin);
+			fread(&glitch.pulse_width, 1, 4, stdin);
 			putchar(RESP_OK);
 			break;
 		case CMD_TRIG_OUT_EN:
-			trig_out = true;
+			glitch.trig_out = true;
 			putchar(RESP_OK);
 			break;
 		case CMD_TRIG_OUT_DIS:
-			trig_out = false;
+			glitch.trig_out = false;
 			putchar(RESP_OK);
 			break;
-		case CMD_GLITCH_INIT: // TODO is this actually needed?
-			glitch_power_off();
-			glitch_power_on();
-			init = true;
+		case CMD_TRIG_IN_RISING:
+			glitch.on_rising = true;
+			putchar(RESP_OK);
+			break;
+		case CMD_TRIG_IN_FALLING:
+			glitch.on_rising = false;
 			putchar(RESP_OK);
 			break;
 		case CMD_GLITCH:
-			if (!init) {
-				putchar(RESP_KO);
-				break;
-			}
-			uint8_t ret = do_glitch(&glitch, delay, pulse_width, trig_out);
+			// enable_prog_mode(); // TODO decomment when glitching code readout
+			uint8_t ret = do_glitch(&glitch);
 			switch(ret) {
 			case 0b000:
 				// Both PIC outputs are low, the chip died
@@ -163,23 +157,11 @@ int main() {
 			}
 			break;
 		case CMD_POWERON:
-			if (powered_on) {
-				putchar(RESP_KO);
-				break;
-			}
-			powered_on = true;
-			*SET_GPIO_ATOMIC = MAX_SEL_MASK;
-			*CLR_GPIO_ATOMIC = MAX_EN_MASK;
+			glitch_power_on(false);
 			putchar(RESP_OK);
 			break;
 		case CMD_POWEROFF:
-			if (!powered_on) {
-				putchar(RESP_KO);
-				break;
-			}
-			powered_on = false;
-			*SET_GPIO_ATOMIC = MAX_EN_MASK;
-			*CLR_GPIO_ATOMIC = MAX_SEL_MASK;
+			glitch_power_off();
 			putchar(RESP_OK);
 			break;
 		}

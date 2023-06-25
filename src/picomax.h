@@ -12,10 +12,11 @@
 
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
-#define CMD_GLITCH_INIT		'g'
 #define CMD_GLITCH			'G'
 #define CMD_TRIG_OUT_EN		'O'
 #define CMD_TRIG_OUT_DIS	'o'
+#define CMD_TRIG_IN_RISING	'I'
+#define CMD_TRIG_IN_FALLING 'i'
 #define CMD_PING			'P'
 #define CMD_POWERON			'+'
 #define CMD_POWEROFF		'-'
