@@ -19,4 +19,9 @@ be found in
 - Clock speed: 16MHz
 
 ## PIC Port configuration
+```
+RA0: High during loop execution
+RA1: High after loop if glitch occurred
+RA2: High after loop if no glitch
+```
 ![](../img/MPLAB_PIC_pin_config.png)
