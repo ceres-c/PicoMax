@@ -41,52 +41,49 @@ int main() {
 	while (true) {
 		uint8_t cmd = getchar();
 		switch(cmd) {
-		// TODO CMD_READ_DATA
-
-		case 'N': // NEW ICSP test
-			uint16_t data_out;
-
-			icsp_power_on();
-			icsp_enter(&icsp);
-
-			data_out = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
-			printf("0x%x\n", data_out);
-
-			icsp_load(&icsp, ICSP_CMD_LOAD_PROG_MEM, 0x1111);
-			icsp_imperative(&icsp, ICSP_CMD_BEGIN_EXT_TIMED);
-			sleep_us(ICSP_TPEXT_MIN);
-			icsp_imperative(&icsp, ICSP_CMD_END_EXT_TIMED);
-			sleep_us(ICSP_TDIS_MIN);
-
-			// icsp_imperative(&icsp, ICSP_CMD_INCREMENT_ADDR);
-			data_out = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
-			printf("0x%x\n", data_out);
-			pio_remove_program(icsp.pio, &icsp_program, icsp.prog_offs);
-			icsp_power_off();
-
-			putchar(RESP_OK);
-			break;
-		case CMD_READ_PROG:
-			uint32_t read_addr = 0, size = 0;
-			fread(&read_addr, 1, 4, stdin); // In words
-			fread(&size, 1, 4, stdin); // In words, again
-			if ((size * ICSP_BYTES_PER_WORD) > 0xFFFF) {
+		case CMD_READ_DATA:
+			uint32_t read_data_addr = 0, read_data_size = 0;
+			fread(&read_data_addr, 1, 4, stdin); // Words in this case are bytes because the upper 6 bits from the PIC are zeros
+			fread(&read_data_size, 1, 4, stdin);
+			if (read_data_size > 0xFFFF) {
 				// Trying to allocate more than 65k. Honestly didn't try if it could work, but let's just not
 				putchar(RESP_KO);
 				break;
 			}
-			uint8_t *data = calloc(size, ICSP_BYTES_PER_WORD);
+			uint8_t *data_data = calloc(read_data_size, 1);
 			putchar(RESP_OK);
 
 			icsp_power_on();
-			read_prog_mem(&icsp, read_addr, size, data);
+			read_data_mem(&icsp, read_data_addr, read_data_size, data_data);
 			icsp_power_off();
 
 			putchar(RESP_OK);
 
-			fwrite(data, ICSP_BYTES_PER_WORD, size, stdout);
+			fwrite(data_data, 1, read_data_size, stdout);
 			fflush(stdout);
-			free(data);
+			free(data_data);
+			break;
+		case CMD_READ_PROG:
+			uint32_t read_prog_addr = 0, read_prog_size = 0;
+			fread(&read_prog_addr, 1, 4, stdin); // In words
+			fread(&read_prog_size, 1, 4, stdin); // In words, again
+			if ((read_prog_size * ICSP_BYTES_PER_WORD) > 0xFFFF) {
+				// Trying to allocate more than 65k. Honestly didn't try if it could work, but let's just not
+				putchar(RESP_KO);
+				break;
+			}
+			uint8_t *prog_data = calloc(read_prog_size, ICSP_BYTES_PER_WORD);
+			putchar(RESP_OK);
+
+			icsp_power_on();
+			read_prog_mem(&icsp, read_prog_addr, read_prog_size, prog_data);
+			icsp_power_off();
+
+			putchar(RESP_OK);
+
+			fwrite(prog_data, ICSP_BYTES_PER_WORD, read_prog_size, stdout);
+			fflush(stdout);
+			free(prog_data);
 			break;
 		// TODO CMD_WRITE_DATA
 		case CMD_WRITE_PROG:
@@ -104,7 +101,14 @@ int main() {
 
 			putchar(RESP_OK);
 			break;
-		case CMD_ERASE_BULK:
+		case CMD_ERASE_BULK_DATA:
+			icsp_power_on();
+			bulk_erase_data(&icsp);
+			icsp_power_off();
+
+			putchar(RESP_OK);
+			break;
+		case CMD_ERASE_BULK_PROG:
 			icsp_power_on();
 			bulk_erase_prog(&icsp, false); // Do not erase user IDs
 			icsp_power_off();

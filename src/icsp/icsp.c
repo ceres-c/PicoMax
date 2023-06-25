@@ -1,5 +1,20 @@
 #include "icsp.h"
 
+void read_data_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
+	icsp_enter(icsp);
+
+	int pc = 0;
+
+	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+
+	for (pc; pc < addr; pc++)
+		icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
+	for (int j = 0; j < size; j++) {
+		*(dst + j) = icsp_read(icsp, ICSP_CMD_READ_DATA_MEM) >> 8;
+		icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
+	}
+}
+
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 	icsp_enter(icsp);
 
@@ -42,12 +57,20 @@ void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
 
 }
 
+void bulk_erase_data(icsp_t *icsp) {
+	icsp_enter(icsp);
+
+	icsp_imperative(icsp, ICSP_CMD_BULK_ERASE_DATA);
+	sleep_us(ICSP_TERAB_MAX);
+}
+
 void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
 	icsp_enter(icsp);
 
-	if (erase_user_ids) // According to DS41397B, to erase user IDs the current address must be 0x8000 <= addr <= 0x8008
-		for (int i = 0; i < ICSP_CONFIG_MEM_ADDR; i++)
-			icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
+	// According to DS41397B, to erase user IDs the current address must be 0x8000 <= addr <= 0x8008
+	if (erase_user_ids) {
+		icsp_load(icsp, ICSP_CMD_LOAD_CONFIG, 0);
+	}
 
 	icsp_imperative(icsp, ICSP_CMD_BULK_ERASE_PROG);
 	sleep_us(ICSP_TERAB_MAX);
@@ -88,7 +111,7 @@ void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
 	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
-	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 start/stop bits - 1
 	pio_sm_put_blocking(icsp->pio, icsp->sm, command);
 	pio_sm_put_blocking(icsp->pio, icsp->sm, (data << 2) | 1); // Add start bit and mark as send command
 
@@ -101,7 +124,7 @@ uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
 	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
-	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 star/stop bits - 1
+	pio_sm_put_blocking(icsp->pio, icsp->sm, 15); // 14 bits data from the PIC + 2 start/stop bits - 1
 	pio_sm_put_blocking(icsp->pio, icsp->sm, command);
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 0);
 

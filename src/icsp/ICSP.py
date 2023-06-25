@@ -13,7 +13,8 @@ CMD_READ_DATA		= b'R'
 CMD_READ_PROG		= b'r'
 CMD_WRITE_DATA		= b'W'
 CMD_WRITE_PROG		= b'w'
-CMD_ERASE_BULK		= b'E'
+CMD_ERASE_BULK_DATA	= b'E'
+CMD_ERASE_BULK_PROG	= b'e'
 
 RESP_OK				= b'k'
 RESP_KO				= b'x'
@@ -29,6 +30,11 @@ class ICSP():
 
 		self.s = serial.Serial(port=self.port, baudrate=self.baudrate, timeout=self.default_timeout)
 
+	def ping(self) -> (bool, bytes):
+		self.s.write(CMD_PING)
+		r = self.s.read(len(RESP_PONG))
+		return (r == RESP_PONG, r)
+
 	def read_data(self, start_page: int, length: int) -> bytes:
 		self.s.write(CMD_READ_DATA)
 		self.s.write(struct.pack('<I', start_page))
@@ -42,7 +48,7 @@ class ICSP():
 		if r != RESP_OK:
 			raise Exception(f'[!] The programmer could not read data. Got:\n{r}\nAborting.')
 		
-		r = self.s.read(length * BYTES_PER_WORD) # TODO check this, it depends on how I will return data from the programmer
+		r = self.s.read(length)
 		self.s.timeout = self.default_timeout
 
 		return r
@@ -65,24 +71,56 @@ class ICSP():
 
 		return r
 	
-	def read_IDs(self) -> dict:
-		conf_mem_data = self.read_data(self.device.config_memory.addr, self.device.config_memory.size)
+	def read_config(self) -> dict:
+		conf_mem_data = self.read_program(self.device.config_memory.addr, self.device.config_memory.size)
 		ret = {}
-		for id, offset in vars(self.device.config_memory.IDs):
+		for id, offset in vars(self.device.config_memory.config):
 			ret[id.replace('_offset', '')] = struct.unpack('<H', _slice_data(conf_mem_data, offset, 1))[0]
 		return ret
 
-	def read_device_ID(self) -> bytes:
-		r = self.read_data(self.device.config_memory.addr + self.device.config_memory.IDs.device_ID_offset, 1)
-		return r
+	def read_device_ID(self) -> DeviceID:
+		r = self.read_program(self.device.config_memory.addr + self.device.config_memory.config.device_ID_offset, 1)
+		id = struct.unpack('<H', r)[0]
+		return DeviceID(
+			dev = id >> (self.device.word_size - self.device.device_ID.dev_size),
+			rev = id & ((1 << self.device.device_ID.rev_size))
+		)
 
+	# Checks the device ID of the chip connected to the programmer
 	def check_device_ID(self) -> bool:
 		r = self.read_device_ID()
 		id = struct.unpack('<H', r)[0]
-		return id >> (self.device.word_size - self.device.device_ID_size - 1) == self.device.device_ID
+		return id >> (self.device.word_size - self.device.device_ID.dev_size) == self.device.device_ID.dev
 
-	def check_device_id(self, id: int) -> bool:
-		return id >> (self.device.word_size - self.device.device_ID_size - 1) == self.device.device_ID
+	# Checks if a given device ID matches the one in the database
+	def check_device_ID_offline(self, id: int) -> bool:
+		return id == self.device.device_ID.dev
+
+	def erase_bulk_program(self) -> None:
+		self.s.write(CMD_ERASE_BULK_PROG)
+		r = self.s.read(len(RESP_OK))
+		if r != RESP_OK:
+			raise Exception(f'[!] The programmer could not erase the chip. Got:\n{r}\nAborting.')
+
+	def erase_bulk_data(self) -> None:
+		self.s.write(CMD_ERASE_BULK_DATA)
+		r = self.s.read(len(RESP_OK))
+		if r != RESP_OK:
+			raise Exception(f'[!] The programmer could not erase the chip. Got:\n{r}\nAborting.')
+
+	def write_program(self, start_addr: int, data: bytes) -> None:
+		if len(data) != BYTES_PER_WORD:
+			raise Exception(f'[!] The programmer can only write one word at a time. Got:\n{len(data)} bytes\nAborting.')
+
+		self.s.timeout = self.extra_timeout
+		self.s.write(CMD_WRITE_PROG)
+		self.s.write(struct.pack('<I', start_addr))
+		self.s.write(data)
+
+		r = self.s.read(len(RESP_OK))
+		if r != RESP_OK:
+			raise Exception(f'[!] The programmer could not write program. Got:\n{r}\nAborting.')
+		self.s.timeout = self.default_timeout
 
 def _slice_data(data: bytes, start: int, length: int) -> bytes:
 	return data[start * BYTES_PER_WORD : start * BYTES_PER_WORD + length * BYTES_PER_WORD]

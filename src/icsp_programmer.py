@@ -4,108 +4,54 @@ import argparse
 import struct
 
 import hexdump
-import serial
 
-BYTES_PER_WORD = 2
-MEM_OP_TIMEOUT = 5 # Serial timeout used for memory reads/writes
+import icsp
+from icsp import devices
 
-CMD = {
-	'PING'			: b'P',
-	'READ_DATA'		: b'R',
-	'READ_PROG'		: b'r',
-	'WRITE_DATA'	: b'W',
-	'WRITE_PROG'	: b'w',
-	'ERASE_PROG'	: b'E',
-}
-RESP = {
-	'OK'			: b'k',
-	'KO'			: b'x',
-	'PONG'			: b'p',
-}
-
-def pic_read_data(s: serial.Serial, addr: int, size: int, timeout: int) -> bytes:
-	s.write(CMD['READ_DATA'] + struct.pack('<i', addr) + struct.pack('<i', size)) # Pi Pico defaults to little endian
-	r = s.read(len(RESP['OK']))
-	if r != RESP['OK']:
-		raise Exception(f'[!] Could not allocate memory on the programmer to read data memory. Got:\n{r}\nAborting.')
-
-	s.timeout = MEM_OP_TIMEOUT
-	r = s.read(len(RESP['OK']))
-	if r != RESP['OK']:
-		raise Exception(f'[!] The programmer could not read data. Got:\n{r}\nAborting.')
-	
-	r = s.read(size * BYTES_PER_WORD)
-	s.timeout = timeout # Reset timeout
-
-	return r
-
-def pic_read_program(s: serial.Serial, addr: int, size: int, timeout: int) -> bytes:
-	s.write(CMD['READ_PROG'] + struct.pack('<i', addr) + struct.pack('<i', size)) # Pi Pico defaults to little endian
-	r = s.read(len(RESP['OK']))
-	if r != RESP['OK']:
-		raise Exception(f'[!] Could not allocate memory on the programmer to read program memory. Got:\n{r}\nAborting.')
-
-	s.timeout = MEM_OP_TIMEOUT
-	r = s.read(len(RESP['OK']))
-	if r != RESP['OK']:
-		raise Exception(f'[!] The programmer could not read program. Got:\n{r}\nAborting.')
-
-	r = s.read(size * BYTES_PER_WORD)
-	s.timeout = timeout # Reset timeout
-
-	return r
-
-def pic_write_program(s: serial.Serial, addr: int, data: bytes, timeout: int) -> None:
-	s.write(CMD['WRITE_PROG'] + struct.pack('<i', addr) + data) # Pi Pico defaults to little endian
-
-	s.timeout = MEM_OP_TIMEOUT
-	r = s.read(len(RESP['OK']))
-	if r != RESP['OK']:
-		raise Exception(f'[!] The programmer could not read program. Got:\n{r}\nAborting.')
-
-	s.timeout = timeout # Reset timeout
-
-def pic_erase_program_bulk(s: serial.Serial, timeout: int) -> None:
-	s.write(CMD['ERASE_PROG'])
-
-	s.timeout = MEM_OP_TIMEOUT
-	r = s.read(len(RESP['OK']))
-	if r != RESP['OK']:
-		raise Exception(f'[!] The programmer could not erase the chip. Got:\n{r}\nAborting.')
-
-	s.timeout = timeout # Reset timeout
+MEM_OP_TIMEOUT = 5.0 # Serial timeout used for memory reads/writes
 
 def main(args):
 
 	try: 
-		s = serial.Serial(port=args.port, baudrate=args.baud, timeout=args.timeout)
+		pic = icsp.ICSP(devices.PIC16LF1936 , args.port, args.baud, args.timeout, MEM_OP_TIMEOUT)
 	except Exception as e:
 		print(f'[!] Could not open serial port. Got:\n{e}\nAborting.')
 		exit(1)
 
-	s.write(CMD['PING'])
-	r = s.read(len(RESP['PONG']))
-	if r != RESP['PONG']:
-		print(f'[!] Could not ping the programmer. Got:\n{r}\nAborting.')
+	connected, res = pic.ping()
+	if not connected:
+		print(f'[!] Could not ping the programmer. Got:\n{res}\nAborting.')
 		exit(1)
 	print('[+] Programmer available.')
 
 	if args.read_data:
-		addr, size = args.read_data
-		dump = pic_read_data(s, addr, size, args.timeout)
+		dump = pic.read_data(*args.read_data)
 		hexdump.hexdump(dump)
 	elif args.read_program:
-		addr, size = args.read_program
-		dump = pic_read_program(s, addr, size, args.timeout)
+		dump = pic.read_program(*args.read_program)
 		hexdump.hexdump(dump)
 	elif args.write_program:
 		print('[?] Have you erased the PIC program memory first? Otherwise, the write will silently fail.')
 		addr, data = args.write_program
 		data = struct.pack('<h', data)
-		pic_write_program(s, addr, data, args.timeout)
-	elif args.erase_program_bulk:
-		pic_erase_program_bulk(s, args.timeout)
-	
+		pic.write_program(addr, data)
+	elif args.erase_bulk_program:
+		pic.erase_bulk_program()
+	elif args.erase_bulk_data:
+		pic.erase_bulk_data()
+	elif args.device_id:
+		id = pic.read_device_ID()
+		print(f'[+] Device ID: {id.dev:b}')
+		print(f'[+] Revision: {id.rev:b}')
+		if pic.check_device_ID_offline(id.dev):
+			print('[+] Device ID is valid.')
+		else:
+			print('[!] Device ID is invalid.')
+	elif args.config:
+		conf = pic.read_config()
+		for k,v in conf.items():
+			print(f'{k}: {v}')
+
 	print('[+] Done.')
 
 if __name__ == "__main__":
@@ -127,7 +73,13 @@ Note: max is not inclusive, i.e. the range is [start_page page_number)''')
 	# TODO write-data
 	parser.add_argument('--write-program', type=lambda x: int(x,0), nargs=2, default=None,
 						help='write the PIC program memory [start_page data] (start_page in 14-bit words, data as a 16 bits hex number)')
-	parser.add_argument('--erase-program-bulk', action='store_true', default=False,
+	parser.add_argument('--erase-bulk-program', action='store_true', default=False,
 						help='erase the PIC program memory')
+	parser.add_argument('--erase-bulk-data', action='store_true', default=False,
+						help='erase the PIC data memory')
+	parser.add_argument('--device-id', action='store_true', default=False,
+						help='read the PIC device ID')
+	parser.add_argument('--config', action='store_true', default=False,
+						help='read the PIC device configuration')
 	args = parser.parse_args()
 	main(args)

@@ -49,8 +49,10 @@ typedef struct icsp_s {
 } icsp_t;
 
 // Wrappers around common functionality
+void read_data_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
+void bulk_erase_data(icsp_t *icsp);
 void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids);
 // This function should not be used when glitching because it will reset the PIC
 inline void icsp_power_on() {
