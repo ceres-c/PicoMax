@@ -20,10 +20,10 @@
 // TODO remove these once I start glitching the code readout
 #define PIC_OUT_PIN			0x07 // pin 10
 #define PIC_OUT_MASK		(1 << PIC_OUT_PIN)
-#define PIC_GLITCH_SUCC_PIN	0x08 // pin 11 - These MUST be consecutive for the PIO to work
-#define PIC_GLITCH_SUCC_MASK	(1 << PIC_GLITCH_SUCC_PIN)
-#define PIC_GLITCH_FAIL_PIN	0x09 // pin 12 - These MUST be consecutive for the PIO to work
+#define PIC_GLITCH_FAIL_PIN	0x08 // pin 11 - These MUST be consecutive for the PIO to work
 #define PIC_GLITCH_FAIL_MASK	(1 << PIC_GLITCH_FAIL_PIN)
+#define PIC_GLITCH_SUCC_PIN	0x09 // pin 12 - These MUST be consecutive for the PIO to work
+#define PIC_GLITCH_SUCC_MASK	(1 << PIC_GLITCH_SUCC_PIN)
 
 // Registers for the SIO
 #define GPIO_ATOMIC			((volatile uint32_t*)(SIO_BASE + SIO_GPIO_OUT_OFFSET))

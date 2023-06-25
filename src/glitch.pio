@@ -43,6 +43,4 @@ width:
 
 	set PINS, 1 side 0	; End glitch
 
-	wait 0 PIN 0	; Wait for input pin 0 to go to low (either loop end or brownout)
-	mov ISR, PINS	; Return the current pin state
 	push

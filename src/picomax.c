@@ -140,21 +140,17 @@ int main() {
 			break;
 		case CMD_GLITCH:
 			// enable_prog_mode(); // TODO decomment when glitching code readout
-			uint8_t ret = do_glitch(&glitch);
-			switch(ret) {
-			case 0b000:
-				// Both PIC outputs are low, the chip died
+			target_glitch(&glitch);
+			target_wait();
+			if (!target_alive()) {
 				putchar(RESP_KO);
 				break;
-			case 0b010:
-				// PIC is alive, but glitching failed
-				putchar(RESP_GLITCH_FAIL);
-				break;
-			case 0b100:
-				// GLITCH!
+			}
+			if (target_glitched()) {
 				putchar(RESP_OK);
 				break;
 			}
+			putchar(RESP_GLITCH_FAIL);
 			break;
 		case CMD_POWERON:
 			glitch_power_on(false);

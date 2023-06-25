@@ -45,13 +45,12 @@ static inline void enable_prog_mode() {
 	gpio_pull_down(nMCLR);
 }
 
-// TODO implement these and don't return from the PIO glitch program anymore
-bool target_dead();
-bool glitch_success();
-
-// This function is in RAM to be fast.
+// These functions are in RAM to be fast.
 // Due to Pi Pico's slow flash, first few executions after cache evict take far longer
-uint8_t __no_inline_not_in_flash_func(do_glitch)(glitch_t *glitch);
+void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch);
+void __no_inline_not_in_flash_func(target_wait)();
+bool __no_inline_not_in_flash_func(target_alive)();
+bool __no_inline_not_in_flash_func(target_glitched)();
 
 static inline void glitch_trigger_program_init(PIO pio, uint sm, uint prog_offs,
 	bool trig_out_enabled, uint pin_max_sel, uint pin_trig_in, uint pin_trig_out) {
