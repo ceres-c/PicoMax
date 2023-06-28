@@ -4,8 +4,11 @@
 ; - pulse_width: the number of cycles to keep the glitch active
 ; It will switch the MAX4619 selector to the lower voltage for pulse_width cycles, then switch it
 ; back to the higher voltage.
-.program glitch_trigger
+; This also signals the host that the glitch is done by setting IRQ 0
+.program glitch_pio
 .side_set 1 opt
+
+	irq clear 0
 
 	pull block		; Get input trigger type
 	mov Y, OSR
@@ -43,4 +46,5 @@ width:
 
 	set PINS, 1 side 0	; End glitch
 
+	irq set 0
 	push

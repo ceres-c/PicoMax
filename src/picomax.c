@@ -156,6 +156,14 @@ int main() {
 			}
 			putchar(RESP_GLITCH_FAIL);
 			break;
+		case CMD_GLITCH_BLOCK:
+			glitch.blocking = true;
+			putchar(RESP_OK);
+			break;
+		case CMD_GLITCH_NONBLOCK:
+			glitch.blocking = false;
+			putchar(RESP_OK);
+			break;
 		case CMD_POWERON:
 			glitch_power_on(false);
 			putchar(RESP_OK);

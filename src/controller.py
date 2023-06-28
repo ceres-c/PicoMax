@@ -10,6 +10,8 @@ CMD = {
 	'DELAY'				: b'D',
 	'WIDTH'				: b'W',
 	'GLITCH'			: b'G',
+	'GLITCH_BLOCK'		: b'B',
+	'GLITCH_NONBLOCK'	: b'b',
 	'TRIG_OUT_EN'		: b'O',
 	'TRIG_OUT_DIS'		: b'o',
 	'TRIG_IN_RISING'	: b'I',
@@ -64,14 +66,19 @@ def main(args):
 			print(f'[!] Could not enable output trigger. Got:\n{r}\nAborting.')
 			exit(1)
 		print('[+] Output trigger enabled.')
+	else:
+		print('[+] Output trigger disabled.')
 
-	if args.input_trigger_rise:
+	if args.rising_edge_trigger:
 		s.write(CMD['TRIG_IN_RISING'])
 		r = s.read(len(RESP['OK']))
 		if r != RESP['OK']:
 			print(f'[!] Could not set trigger input to rising edge. Got:\n{r}\nAborting.')
 			exit(1)
-	
+		print('[+] Input trigger set to rising edge.')
+	else:
+		print('[+] Input trigger set to falling edge.')
+
 	if not reboot_target(s):
 		exit(1)
 
@@ -117,8 +124,8 @@ if __name__ == "__main__":
 						help='serial timeout (default: 0.1s)')
 	parser.add_argument('-o', '--output-trigger', action='store_true',
 		     			help='enable output trigger (default: False)')
-	parser.add_argument('-r', '--input-trigger-rise', action='store_true',
-						help='trigger glitch on rising edge (default: falling edge)')
+	parser.add_argument('-r', '--rising-edge-trigger', action='store_true',
+						help='trigger glitch on input rising edge (default: falling edge)')
 	parser.add_argument('-d', '--delay', type=int, nargs=3, default=[1,100,1],
 						help=
 '''delay for the pulse [min max step] (default: 1 100 1 glitcher clock cycles)
