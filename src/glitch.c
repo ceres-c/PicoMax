@@ -1,5 +1,8 @@
 #include "glitch.h"
 
+const PIO glitcher_pio = pio0;
+bool glitch_irq_registered = false;
+
 void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch) {
 	// TODO maybe add a timeout with an external watchdog timer?
 	glitch_pio_program_init(glitch, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
@@ -10,7 +13,6 @@ void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch) {
 	if (glitch->blocking) {
 		pio_sm_get_blocking(glitch->pio, glitch->sm);
 		gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
-		// TODO return the pin to GPIO in interrupt handler
 	}
 }
 void __no_inline_not_in_flash_func(target_wait)() {
@@ -22,6 +24,13 @@ bool __no_inline_not_in_flash_func(target_alive)() {
 }
 bool __no_inline_not_in_flash_func(target_glitched)() {
 	return gpio_get(PIC_GLITCH_SUCC_PIN);
+}
+void __no_inline_not_in_flash_func(glitch_irq_func)(void) {
+	irq_set_enabled((glitcher_pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0, false); // Disable this IRQ
+	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
+	// Add here code that should be executed when right after the glitch happened, if needed
+	gpio_set_function(TRIG_OUT_PIN, GPIO_FUNC_SIO); // TODO remove
+	*SET_GPIO_ATOMIC = TRIG_OUT_MASK; // Disable MAX4619
 }
 
 bool glitch_init(PIO pio, glitch_t *glitch) {

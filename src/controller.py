@@ -78,6 +78,16 @@ def main(args):
 		print('[+] Input trigger set to rising edge.')
 	else:
 		print('[+] Input trigger set to falling edge.')
+	
+	if args.glitch_non_blocking:
+		s.write(CMD['GLITCH_NONBLOCK'])
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
+			print(f'[!] Could not set glitcher to non-blocking mode. Got:\n{r}\nAborting.')
+			exit(1)
+		print('[+] Glitcher set to non-blocking mode.')
+	else:
+		print('[+] Glitcher set to blocking mode.')
 
 	if not reboot_target(s):
 		exit(1)
@@ -126,6 +136,8 @@ if __name__ == "__main__":
 		     			help='enable output trigger (default: False)')
 	parser.add_argument('-r', '--rising-edge-trigger', action='store_true',
 						help='trigger glitch on input rising edge (default: falling edge)')
+	parser.add_argument('--glitch-non-blocking', action='store_true',
+						help='non-blocking glitch initialization (default: blocking)')
 	parser.add_argument('-d', '--delay', type=int, nargs=3, default=[1,100,1],
 						help=
 '''delay for the pulse [min max step] (default: 1 100 1 glitcher clock cycles)

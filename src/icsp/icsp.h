@@ -8,6 +8,8 @@
 
 #include "icsp.pio.h"
 
+extern const PIO icsp_pio;
+
 // All the characteristics (word size), commands and timings are relative to the PIC16F1936 chip
 // and taken from the Memory Programming Specification DS41397B
 #define ICSP_WORD_SIZE				14
@@ -55,7 +57,7 @@ void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
 void bulk_erase_data(icsp_t *icsp);
 void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids);
 // This function should not be used when glitching because it will reset the PIC
-inline void icsp_power_on() {
+inline static void icsp_power_on() {
 	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK);
 	*CLR_GPIO_ATOMIC = MAX_EN_MASK;
 	sleep_us(ICSP_TENTS);
@@ -63,7 +65,7 @@ inline void icsp_power_on() {
 	sleep_us(ICSP_TENTH);
 }
 // This function should not be used when glitching because it will reset the PIC
-inline void icsp_power_off() {
+inline static void icsp_power_off() {
 	*CLR_GPIO_ATOMIC = nMCLR_MASK;
 	*SET_GPIO_ATOMIC = MAX_EN_MASK;
 }

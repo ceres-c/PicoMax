@@ -34,7 +34,4 @@
 #define RESP_PONG			'p'
 #define RESP_GLITCH_FAIL	'.'
 
-const PIO glitcher_pio = pio0;
-const PIO icsp_pio = pio1;
-
 #endif // _PICOMAX_H

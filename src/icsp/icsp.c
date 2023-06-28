@@ -1,5 +1,7 @@
 #include "icsp.h"
 
+const PIO icsp_pio = pio1;
+
 void read_data_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 	icsp_enter(icsp);
 

@@ -7,6 +7,9 @@
 #include "glitch.pio.h"
 #include "pins.h"
 
+extern const PIO glitcher_pio;
+extern bool glitch_irq_registered;
+
 typedef struct glitch_s {
 	PIO pio;
 	uint prog_offs;
@@ -16,7 +19,6 @@ typedef struct glitch_s {
 	uint32_t pulse_width;	// Defaults to 0
 	bool trig_out;	// Defaults to false
 	bool blocking;	// Defaults to blocking, if disabled an interrupt is generated when the glitch is done
-	// TODO register interrupt
 } glitch_t;
 
 static inline void glitch_power_on(bool prog_mode) {
@@ -52,6 +54,7 @@ void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch);
 void __no_inline_not_in_flash_func(target_wait)();
 bool __no_inline_not_in_flash_func(target_alive)();
 bool __no_inline_not_in_flash_func(target_glitched)();
+void __no_inline_not_in_flash_func(glitch_irq_func)(void);
 
 static inline void glitch_pio_program_init(glitch_t *glitch, uint pin_max_sel, uint pin_trig_in, uint pin_trig_out) {
 
@@ -82,11 +85,17 @@ static inline void glitch_pio_program_init(glitch_t *glitch, uint pin_max_sel, u
 	sm_config_set_sideset_pins(&c, pin_trig_out);	// Set sideset base pin
 
 	if (!glitch->blocking) {
-		// TODO register interrupt for non-blocking mode
-		// irq_add_shared_handler(pio_irq, pio_irq_func, PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY); // Add a shared IRQ handler
-		// irq_set_enabled(pio_irq, true); // Enable the IRQ
-		// const uint irq_index = pio_irq - ((pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0); // Get index of the IRQ
-		// pio_set_irqn_source_enabled(pio, irq_index, pis_sm0_rx_fifo_not_empty + sm, true); // Set pio to tell us when the FIFO is NOT empty
+		int8_t pio_irq = (glitch->pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0;
+		if (!glitch_irq_registered) {
+			// There are max 4 IRQ, they are not automatically evicted
+			glitch_irq_registered = true;
+			irq_add_shared_handler(pio_irq, glitch_irq_func, PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY); // Add a shared IRQ handler
+		}
+		irq_set_enabled(pio_irq, true); // Enable the IRQ
+		const uint irq_index = pio_irq - ((glitch->pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0); // Get index of the IRQ
+		pio_set_irqn_source_enabled(glitch->pio, irq_index, pis_interrupt0 + glitch->sm, true); // Set pio to tell us when the FIFO is NOT empty
+		gpio_set_function(TRIG_OUT_PIN, GPIO_FUNC_SIO); // TODO remove
+		*SET_GPIO_ATOMIC = TRIG_OUT_MASK; // Disable MAX4619
 	}
 
 	// Initialize the state machine
