@@ -54,7 +54,8 @@ void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch);
 void __no_inline_not_in_flash_func(target_wait)();
 bool __no_inline_not_in_flash_func(target_alive)();
 bool __no_inline_not_in_flash_func(target_glitched)();
-void __no_inline_not_in_flash_func(glitch_irq_func)(void);
+
+void glitch_irq_func();
 
 static inline void glitch_pio_program_init(glitch_t *glitch, uint pin_max_sel, uint pin_trig_in, uint pin_trig_out) {
 
@@ -93,9 +94,7 @@ static inline void glitch_pio_program_init(glitch_t *glitch, uint pin_max_sel, u
 		}
 		irq_set_enabled(pio_irq, true); // Enable the IRQ
 		const uint irq_index = pio_irq - ((glitch->pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0); // Get index of the IRQ
-		pio_set_irqn_source_enabled(glitch->pio, irq_index, pis_interrupt0 + glitch->sm, true); // Set pio to tell us when the FIFO is NOT empty
-		gpio_set_function(TRIG_OUT_PIN, GPIO_FUNC_SIO); // TODO remove
-		*SET_GPIO_ATOMIC = TRIG_OUT_MASK; // Disable MAX4619
+		pio_set_irqn_source_enabled(glitch->pio, irq_index, pis_interrupt0 + glitch->sm, true);
 	}
 
 	// Initialize the state machine

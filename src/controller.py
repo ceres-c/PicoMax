@@ -78,7 +78,7 @@ def main(args):
 		print('[+] Input trigger set to rising edge.')
 	else:
 		print('[+] Input trigger set to falling edge.')
-	
+
 	if args.glitch_non_blocking:
 		s.write(CMD['GLITCH_NONBLOCK'])
 		r = s.read(len(RESP['OK']))
