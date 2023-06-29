@@ -18,7 +18,6 @@ typedef struct glitch_s {
 	uint32_t delay;	// Defaults to 0
 	uint32_t pulse_width;	// Defaults to 0
 	bool trig_out;	// Defaults to false
-	bool blocking;	// Defaults to blocking, if disabled an interrupt is generated when the glitch is done
 } glitch_t;
 
 static inline void glitch_power_on(bool prog_mode) {
@@ -85,17 +84,15 @@ static inline void glitch_pio_program_init(glitch_t *glitch, uint pin_max_sel, u
 	sm_config_set_in_pins(&c, pin_trig_in); 		// Set input base pin
 	sm_config_set_sideset_pins(&c, pin_trig_out);	// Set sideset base pin
 
-	if (!glitch->blocking) {
-		int8_t pio_irq = (glitch->pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0;
-		if (!glitch_irq_registered) {
-			// There are max 4 IRQ, they are not automatically evicted
-			glitch_irq_registered = true;
-			irq_add_shared_handler(pio_irq, glitch_irq_func, PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY); // Add a shared IRQ handler
-		}
-		irq_set_enabled(pio_irq, true); // Enable the IRQ
-		const uint irq_index = pio_irq - ((glitch->pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0); // Get index of the IRQ
-		pio_set_irqn_source_enabled(glitch->pio, irq_index, pis_interrupt0 + glitch->sm, true);
+	int8_t pio_irq = (glitch->pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0;
+	if (!glitch_irq_registered) {
+		// There are max 4 IRQ, they are not automatically evicted
+		glitch_irq_registered = true;
+		irq_add_shared_handler(pio_irq, glitch_irq_func, PICO_SHARED_IRQ_HANDLER_DEFAULT_ORDER_PRIORITY); // Add a shared IRQ handler
 	}
+	irq_set_enabled(pio_irq, true); // Enable the IRQ
+	const uint irq_index = pio_irq - ((glitch->pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0); // Get index of the IRQ
+	pio_set_irqn_source_enabled(glitch->pio, irq_index, pis_interrupt0 + glitch->sm, true);
 
 	// Initialize the state machine
 	pio_sm_init(glitch->pio, glitch->sm, glitch->prog_offs, &c);

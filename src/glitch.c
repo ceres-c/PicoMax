@@ -10,10 +10,6 @@ void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch) {
 	pio_sm_put_blocking(glitch->pio, glitch->sm, glitch->on_rising);
 	pio_sm_put_blocking(glitch->pio, glitch->sm, glitch->delay);
 	pio_sm_put_blocking(glitch->pio, glitch->sm, glitch->pulse_width);
-	if (glitch->blocking) {
-		pio_sm_get_blocking(glitch->pio, glitch->sm);
-		gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
-	}
 }
 void __no_inline_not_in_flash_func(target_wait)() {
 	while (gpio_get(PIC_OUT_PIN)); // Wait for PIC to finish the loop
@@ -43,6 +39,5 @@ bool glitch_init(PIO pio, glitch_t *glitch) {
 	glitch->delay = 0;
 	glitch->pulse_width = 0;
 	glitch->trig_out = false;
-	glitch->blocking = true;
 	return true;
 }
