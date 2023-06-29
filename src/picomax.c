@@ -148,6 +148,10 @@ int main() {
 			putchar(RESP_OK);
 			break;
 		case CMD_GLITCH:
+			// Power off
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
+			sleep_ms(5); // Randomly chosen
+
 			prepare_glitch(&glitch);
 
 			// Power on
@@ -178,8 +182,6 @@ int main() {
 				putchar(RESP_OK);
 			else
 				putchar(RESP_GLITCH_FAIL);
-
-			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
 			break;
 		case CMD_POWERON:
 			glitch_power_on(false);

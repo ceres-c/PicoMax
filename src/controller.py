@@ -2,9 +2,14 @@
 
 import argparse
 import struct
+import sys
+import threading
 import time
 
 import serial
+from PyQt6.QtCore import QTimer
+from PyQt6.QtWidgets import QApplication, QGridLayout, QMainWindow, QWidget
+import pyqtgraph as pg  # Must be after PyQT import
 
 CMD = {
 	'DELAY'				: b'D',
@@ -23,104 +28,154 @@ RESP = {
 	'KO'				: b'x',
 	'PONG'				: b'p',
 	'GLITCH_FAIL'		: b'.',
+	'GLITCH_WEIRD'		: b'y',
+}
+QT_COLORS = {
+	RESP['GLITCH_FAIL']:	(0, 255, 0),	# Green
+	RESP['KO']:				(255, 0, 0),	# Red
+	RESP['OK']:				(255, 255, 0),	# Yellow
+	RESP['GLITCH_WEIRD']:	(255, 128, 0),	# Orange
 }
 
-def success() -> bool:
-	# TODO: Implement
-	return False
+class Window(QMainWindow):
+	def __init__(self, queue: list[tuple[int, int, bytes]]):
+		self.queue = queue
+		super().__init__()
+		self.setWindowTitle("PicoMax Live Plotter")
+		# self.setGeometry(100, 100, 600, 500)
+		self.UiComponents()
+		self.show()
 
-def main(args):
+	def UiComponents(self):
+		widget = QWidget()
 
-	def reboot_target(s: serial.Serial) -> bool:
-		s.write(CMD['POWEROFF'])
-		r = s.read(len(RESP['OK']))
-		if r != RESP['OK']:
-			print(f'[!] Could not power off the target. Got:\n{r}\nAborting.')
-			return False
-		s.write(CMD['POWERON'])
-		r = s.read(len(RESP['OK']))
-		if r != RESP['OK']:
-			print(f'[!] Could not power on the target. Got:\n{r}\nAborting.')
-			return False
-		return True
+		pg.setConfigOption('background', 'w')
+		plot = pg.plot()
+		self.scatter = pg.ScatterPlotItem()
+		plot.addItem(self.scatter)
 
-	try: 
-		s = serial.Serial(port=args.port, baudrate=args.baud, timeout=args.timeout)
-	except Exception as e:
-		print(f'[!] Could not open serial port. Got:\n{e}\nAborting.')
-		exit(1)
+		layout = QGridLayout()
+		widget.setLayout(layout)
+		layout.addWidget(plot, 0, 0, 3, 1)
 
-	s.write(CMD['PING'])
-	r = s.read(len(RESP['PONG']))
-	if r != RESP['PONG']:
-		print(f'[!] Could not ping the glitcher. Got:\n{r}\nAborting.')
-		exit(1)
-	print('[+] PicoMax available.')
+		self.setCentralWidget(widget)
 
-	if args.output_trigger:
-		s.write(CMD['TRIG_OUT_EN'])
-		r = s.read(len(RESP['OK']))
-		if r != RESP['OK']:
-			print(f'[!] Could not enable output trigger. Got:\n{r}\nAborting.')
+		# Timer to update the plot
+		self.timer = QTimer()
+		self.timer.setInterval(50)
+		self.timer.timeout.connect(self.update_plot_data)
+		self.timer.start()
+
+	def update_plot_data(self):
+		try:
+			delay, width, result = self.queue.pop()
+		except IndexError:
+			# No new data
+			return
+
+		self.scatter.addPoints([{
+			'pos': (delay, width),
+			'size': 10,
+			'pen': {'color': (0, 0, 0), 'width': .5},
+			'brush': QT_COLORS[result],
+		}])
+
+class Glitcher(threading.Thread):
+	def __init__(self, args: argparse.Namespace, queue: list[tuple[int, int, bytes]]):
+		self.args = args
+		self.queue = queue
+		threading.Thread.__init__(self, daemon=True)
+
+
+	def run(self):
+		def poweroff_target(s: serial.Serial) -> bool:
+			s.write(CMD['POWEROFF'])
+			r = s.read(len(RESP['OK']))
+			if r != RESP['OK']:
+				print(f'[!] Could not power off the target. Got:\n{r}\nAborting.')
+				return False
+			return True
+
+		try: 
+			s = serial.Serial(port=self.args.port, baudrate=self.args.baud, timeout=self.args.timeout)
+		except Exception as e:
+			print(f'[!] Could not open serial port. Got:\n{e}\nAborting.')
 			exit(1)
-		print('[+] Output trigger enabled.')
-	else:
-		s.write(CMD['TRIG_OUT_DIS'])
-		r = s.read(len(RESP['OK']))
-		if r != RESP['OK']:
-			print(f'[!] Could not disable output trigger. Got:\n{r}\nAborting.')
+
+		s.write(CMD['PING'])
+		r = s.read(len(RESP['PONG']))
+		if r != RESP['PONG']:
+			print(f'[!] Could not ping the glitcher. Got:\n{r}\nAborting.')
 			exit(1)
-		print('[+] Output trigger disabled.')
+		print('[+] PicoMax available.')
 
-	if args.rising_edge_trigger:
-		s.write(CMD['TRIG_IN_RISING'])
-		r = s.read(len(RESP['OK']))
-		if r != RESP['OK']:
-			print(f'[!] Could not set trigger input to rising edge. Got:\n{r}\nAborting.')
-			exit(1)
-		print('[+] Input trigger set to rising edge.')
-	else:
-		s.write(CMD['TRIG_IN_FALLING'])
-		r = s.read(len(RESP['OK']))
-		if r != RESP['OK']:
-			print(f'[!] Could not set trigger input to falling edge. Got:\n{r}\nAborting.')
-			exit(1)
-		print('[+] Input trigger set to falling edge.')
-
-	if not reboot_target(s):
-		exit(1)
-
-	start = time.time()
-	i = 0
-	for i, (d, w) in enumerate(((x, y) for x in range(*args.delay) for y in range(*args.width))):
-		if i % 10 == 0:
-			# print(f'[.] Sending {i}', end='\r', flush=True)
-			print('.', end='', flush=True)
-
-		s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian
-		r = s.read(len(CMD['DELAY']))
-		s.write(CMD['WIDTH'] + struct.pack('<i', w))
-		r = s.read(len(CMD['WIDTH']))
-		s.write(CMD['GLITCH'])
-		r = s.read(len(RESP['OK']))
-		# print(r.decode('ascii'), end='', flush=True)
-		if r == RESP['GLITCH_FAIL']: # Glitch failed
-			print(RESP['GLITCH_FAIL'].decode('ascii'), end='', flush=True)
-		elif r == RESP['KO']: # Target dead
-			print(RESP['KO'].decode('ascii'), end='', flush=True)
-			if not reboot_target(s):
-				break
-		elif r == RESP['OK']: # Glitched
-			print(f'\n[!] SUCCESS! Settings: delay={d}, width={w}')
-			break
+		if self.args.output_trigger:
+			s.write(CMD['TRIG_OUT_EN'])
+			r = s.read(len(RESP['OK']))
+			if r != RESP['OK']:
+				print(f'[!] Could not enable output trigger. Got:\n{r}\nAborting.')
+				exit(1)
+			print('[+] Output trigger enabled.')
 		else:
-			print(f'\n[!] Unknown response: {r}')
+			s.write(CMD['TRIG_OUT_DIS'])
+			r = s.read(len(RESP['OK']))
+			if r != RESP['OK']:
+				print(f'[!] Could not disable output trigger. Got:\n{r}\nAborting.')
+				exit(1)
+			print('[+] Output trigger disabled.')
 
-	end = time.time()
-	print()
-	print(f'[+] Sent {i + 1} in {end - start}s.')
+		if self.args.rising_edge_trigger:
+			s.write(CMD['TRIG_IN_RISING'])
+			r = s.read(len(RESP['OK']))
+			if r != RESP['OK']:
+				print(f'[!] Could not set trigger input to rising edge. Got:\n{r}\nAborting.')
+				exit(1)
+			print('[+] Input trigger set to rising edge.')
+		else:
+			s.write(CMD['TRIG_IN_FALLING'])
+			r = s.read(len(RESP['OK']))
+			if r != RESP['OK']:
+				print(f'[!] Could not set trigger input to falling edge. Got:\n{r}\nAborting.')
+				exit(1)
+			print('[+] Input trigger set to falling edge.')
 
-	s.close()
+		if not poweroff_target(s):
+			exit(1)
+
+		start = time.time()
+		i = 0
+		for i, (d, w) in enumerate(((x, y) for x in range(*self.args.delay) for y in range(*self.args.width))):
+			s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian
+			r = s.read(len(CMD['DELAY']))
+			s.write(CMD['WIDTH'] + struct.pack('<i', w))
+			r = s.read(len(CMD['WIDTH']))
+			if not poweroff_target(s):
+				print(f'[!] Could not power off the target. Got:\n{r}\nAborting.')
+				break
+			s.write(CMD['GLITCH'])
+			r = s.read(len(RESP['OK']))
+			# print(r.decode('ascii'), end='', flush=True)
+			if r == RESP['GLITCH_FAIL']: # Glitch failed
+				# print(r.decode('ascii'), end='', flush=True)
+				self.queue.append((d, w, RESP['GLITCH_FAIL']))
+			elif r == RESP['GLITCH_WEIRD']: # Wrong deviceID
+				# print(r.decode('ascii'), end='', flush=True)
+				self.queue.append((d, w, RESP['GLITCH_WEIRD']))
+			elif r == RESP['KO']: # Target dead
+				# print(r.decode('ascii'), end='', flush=True)
+				self.queue.append((d, w, RESP['KO']))
+			elif r == RESP['OK']: # Glitched
+				# print(f'\n[!] SUCCESS! Settings: delay={d}, width={w}')
+				# break
+				self.queue.append((d, w, RESP['OK']))
+			else:
+				print(f'\n[!] Unknown response: {r}')
+
+		end = time.time()
+		print()
+		print(f'[+] Sent {i} in {end - start}s.')
+
+		s.close()
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='PicoMax glitcher controller', formatter_class=argparse.RawTextHelpFormatter)
@@ -143,4 +198,13 @@ Note: max is not inclusive, i.e. the range is [min, max)''')
 '''glitch pulse width [min max step] (default: 1 100 1 glitcher clock cycles)
 Note: max is not inclusive, i.e. the range is [min, max)''')
 	args = parser.parse_args()
-	main(args)
+
+	sync_list = []
+
+	glitcher = Glitcher(args, sync_list)
+	glitcher.start()
+
+	App = QApplication(sys.argv)
+	window = Window(sync_list)
+	sys.exit(App.exec())
+
