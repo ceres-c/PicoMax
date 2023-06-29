@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import argparse
+import itertools
+import random
 import struct
 import sys
 import threading
@@ -35,6 +37,7 @@ QT_COLORS = {
 	RESP['KO']:				(255, 0, 0),	# Red
 	RESP['OK']:				(255, 255, 0),	# Yellow
 	RESP['GLITCH_WEIRD']:	(255, 128, 0),	# Orange
+	b'?':					(0, 0, 255),	# Blue (used for unknown responses)
 }
 
 class Window(QMainWindow):
@@ -143,8 +146,11 @@ class Glitcher(threading.Thread):
 			exit(1)
 
 		start = time.time()
-		i = 0
-		for i, (d, w) in enumerate(((x, y) for x in range(*self.args.delay) for y in range(*self.args.width))):
+
+		prod = list(itertools.product(range(*self.args.delay), range(*self.args.width)))
+		random.shuffle(prod)
+
+		for d, w in prod:
 			s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian
 			r = s.read(len(CMD['DELAY']))
 			s.write(CMD['WIDTH'] + struct.pack('<i', w))
@@ -154,26 +160,21 @@ class Glitcher(threading.Thread):
 				break
 			s.write(CMD['GLITCH'])
 			r = s.read(len(RESP['OK']))
-			# print(r.decode('ascii'), end='', flush=True)
 			if r == RESP['GLITCH_FAIL']: # Glitch failed
-				# print(r.decode('ascii'), end='', flush=True)
 				self.queue.append((d, w, RESP['GLITCH_FAIL']))
 			elif r == RESP['GLITCH_WEIRD']: # Wrong deviceID
-				# print(r.decode('ascii'), end='', flush=True)
 				self.queue.append((d, w, RESP['GLITCH_WEIRD']))
 			elif r == RESP['KO']: # Target dead
-				# print(r.decode('ascii'), end='', flush=True)
 				self.queue.append((d, w, RESP['KO']))
 			elif r == RESP['OK']: # Glitched
-				# print(f'\n[!] SUCCESS! Settings: delay={d}, width={w}')
-				# break
 				self.queue.append((d, w, RESP['OK']))
 			else:
 				print(f'\n[!] Unknown response: {r}')
+				self.queue.append((d, w, b'?'))
 
 		end = time.time()
 		print()
-		print(f'[+] Sent {i} in {end - start}s.')
+		print(f'[+] Sent {len(prod)} in {end - start}s.')
 
 		s.close()
 
