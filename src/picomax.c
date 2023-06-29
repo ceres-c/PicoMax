@@ -54,6 +54,7 @@ int main() {
 			putchar(RESP_OK);
 
 			icsp_power_on();
+			icsp_enter(&icsp);
 			read_data_mem(&icsp, read_data_addr, read_data_size, data_data);
 			icsp_power_off();
 
@@ -76,6 +77,7 @@ int main() {
 			putchar(RESP_OK);
 
 			icsp_power_on();
+			icsp_enter(&icsp);
 			read_prog_mem(&icsp, read_prog_addr, read_prog_size, prog_data);
 			icsp_power_off();
 
@@ -96,6 +98,7 @@ int main() {
 			// TODO check for max address?
 
 			icsp_power_on();
+			icsp_enter(&icsp);
 			write_prog_mem(&icsp, write_addr, new_data);
 			icsp_power_off();
 
@@ -103,6 +106,7 @@ int main() {
 			break;
 		case CMD_ERASE_BULK_DATA:
 			icsp_power_on();
+			icsp_enter(&icsp);
 			bulk_erase_data(&icsp);
 			icsp_power_off();
 
@@ -110,6 +114,7 @@ int main() {
 			break;
 		case CMD_ERASE_BULK_PROG:
 			icsp_power_on();
+			icsp_enter(&icsp);
 			bulk_erase_prog(&icsp, false); // Do not erase user IDs
 			icsp_power_off();
 
@@ -143,18 +148,38 @@ int main() {
 			putchar(RESP_OK);
 			break;
 		case CMD_GLITCH:
-			// enable_prog_mode(); // TODO decomment when glitching code readout
-			target_glitch(&glitch);
-			target_wait();
-			if (!target_alive()) {
+			prepare_glitch(&glitch);
+
+			// Power on
+			gpio_disable_pulls(nMCLR);
+			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK;	// Then enable MAX4619
+			sleep_us(ICSP_TENTS);
+
+			// Enable programming mode
+			*CLR_GPIO_ATOMIC = nMCLR_MASK;
+			// The glitcher PIO program will trigger here and start counting for delay
+			sleep_us(ICSP_TENTH);
+
+			uint16_t data;
+			icsp_enter(&icsp);
+			read_prog_mem(&icsp, 0x8006, 0x01, (uint8_t*)&data);
+
+			if (data == 0) {
 				putchar(RESP_KO);
 				break;
-			}
-			if (target_glitched()) {
-				putchar(RESP_OK);
+			} else if ((data & DEVICEID_MASK) != PIC16LF1936_DEVICEID) {
+				putchar(RESP_GLITCH_WEIRD);
 				break;
 			}
-			putchar(RESP_GLITCH_FAIL);
+
+			read_prog_mem(&icsp, 0x00, 0x01, (uint8_t*)&data);
+			if (data != 0)
+				putchar(RESP_OK);
+			else
+				putchar(RESP_GLITCH_FAIL);
+
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
 			break;
 		case CMD_POWERON:
 			glitch_power_on(false);

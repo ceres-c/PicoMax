@@ -65,6 +65,11 @@ def main(args):
 			exit(1)
 		print('[+] Output trigger enabled.')
 	else:
+		s.write(CMD['TRIG_OUT_DIS'])
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
+			print(f'[!] Could not disable output trigger. Got:\n{r}\nAborting.')
+			exit(1)
 		print('[+] Output trigger disabled.')
 
 	if args.rising_edge_trigger:
@@ -75,6 +80,11 @@ def main(args):
 			exit(1)
 		print('[+] Input trigger set to rising edge.')
 	else:
+		s.write(CMD['TRIG_IN_FALLING'])
+		r = s.read(len(RESP['OK']))
+		if r != RESP['OK']:
+			print(f'[!] Could not set trigger input to falling edge. Got:\n{r}\nAborting.')
+			exit(1)
 		print('[+] Input trigger set to falling edge.')
 
 	if not reboot_target(s):
@@ -108,7 +118,7 @@ def main(args):
 
 	end = time.time()
 	print()
-	print(f'[+] Sent {i} in {end - start}s.')
+	print(f'[+] Sent {i + 1} in {end - start}s.')
 
 	s.close()
 

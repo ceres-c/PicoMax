@@ -31,5 +31,6 @@
 #define RESP_KO				'x'
 #define RESP_PONG			'p'
 #define RESP_GLITCH_FAIL	'.'
+#define RESP_GLITCH_WEIRD	'y' // Used when deviceID is wrong but nonzero
 
 #endif // _PICOMAX_H

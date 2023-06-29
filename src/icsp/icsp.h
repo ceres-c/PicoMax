@@ -43,6 +43,9 @@ typedef uint16_t icsp_word_t;
 #define ICSP_TDIS_TYP				10000	// 10ms (got from pickle code)
 #define ICSP_TERAB_MAX				5000	// 5ms
 
+#define DEVICEID_MASK				(((1 << 9) - 1) << 5)
+#define PIC16LF1936_DEVICEID		(0b100100011 << 5) // Bottom 5 bits are REV, ignore
+
 typedef struct icsp_s {
 	PIO pio;
 	uint prog_offs;

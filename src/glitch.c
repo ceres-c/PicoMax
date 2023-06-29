@@ -3,7 +3,7 @@
 const PIO glitcher_pio = pio0;
 bool glitch_irq_registered = false;
 
-void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch) {
+void __no_inline_not_in_flash_func(prepare_glitch)(glitch_t *glitch) {
 	// TODO maybe add a timeout with an external watchdog timer?
 	glitch_pio_program_init(glitch, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
 
@@ -21,8 +21,8 @@ bool __no_inline_not_in_flash_func(target_alive)() {
 bool __no_inline_not_in_flash_func(target_glitched)() {
 	return gpio_get(PIC_GLITCH_SUCC_PIN);
 }
-void glitch_irq_func() {
-	// These two instructions take roughly 4,5us
+void __isr glitch_irq_func() {
+	// These two operations take roughly 4,5us
 	irq_set_enabled((glitcher_pio == pio0) ? PIO0_IRQ_0 : PIO1_IRQ_0, false); // Disable this IRQ
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // Return MAX_SEL_PIN to SIO after PIO
 	// Add here code that should be executed when right after the glitch happened, if needed

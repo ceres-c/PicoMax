@@ -3,8 +3,6 @@
 const PIO icsp_pio = pio1;
 
 void read_data_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
-	icsp_enter(icsp);
-
 	int pc = 0;
 
 	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
@@ -18,8 +16,6 @@ void read_data_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 }
 
 void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
-	icsp_enter(icsp);
-
 	int pc = 0;
 
 	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
@@ -37,8 +33,6 @@ void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 }
 
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
-	icsp_enter(icsp);
-
 	int pc = 0;
 
 	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
@@ -60,15 +54,11 @@ void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
 }
 
 void bulk_erase_data(icsp_t *icsp) {
-	icsp_enter(icsp);
-
 	icsp_imperative(icsp, ICSP_CMD_BULK_ERASE_DATA);
 	sleep_us(ICSP_TERAB_MAX);
 }
 
 void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
-	icsp_enter(icsp);
-
 	// According to DS41397B, to erase user IDs the current address must be 0x8000 <= addr <= 0x8008
 	if (erase_user_ids) {
 		icsp_load(icsp, ICSP_CMD_LOAD_CONFIG, 0);

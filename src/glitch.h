@@ -49,12 +49,12 @@ static inline void enable_prog_mode() {
 
 // These functions are in RAM to be fast.
 // Due to Pi Pico's slow flash, first few executions after cache evict take far longer
-void __no_inline_not_in_flash_func(target_glitch)(glitch_t *glitch);
+void __no_inline_not_in_flash_func(prepare_glitch)(glitch_t *glitch);
 void __no_inline_not_in_flash_func(target_wait)();
 bool __no_inline_not_in_flash_func(target_alive)();
 bool __no_inline_not_in_flash_func(target_glitched)();
 
-void glitch_irq_func();
+void __isr glitch_irq_func();
 
 static inline void glitch_pio_program_init(glitch_t *glitch, uint pin_max_sel, uint pin_trig_in, uint pin_trig_out) {
 
@@ -65,7 +65,7 @@ static inline void glitch_pio_program_init(glitch_t *glitch, uint pin_max_sel, u
 	pio_sm_set_pindirs_with_mask(
 		glitch->pio, glitch->sm,
 		(glitch->trig_out << pin_trig_out) | (1u << pin_max_sel),
-		(glitch->trig_out << pin_trig_out) | (1u << pin_max_sel) | (1u << pin_trig_in));
+		(1u << pin_trig_out) | (1u << pin_max_sel) | (1u << pin_trig_in));
 
 	// Set default pin values (pin_trigger_out is low, pin_max_sel is high)
 	pio_sm_set_pins_with_mask(
