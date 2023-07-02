@@ -34,8 +34,8 @@ RESP = {
 }
 QT_COLORS = {
 	RESP['GLITCH_FAIL']:	(0, 255, 0),	# Green
-	RESP['KO']:				(255, 0, 0),	# Red
-	RESP['OK']:				(255, 255, 0),	# Yellow
+	RESP['KO']:				(255, 255, 0),	# Yellow
+	RESP['OK']:				(255, 0, 0),	# Red
 	RESP['GLITCH_WEIRD']:	(255, 128, 0),	# Orange
 	b'?':					(0, 0, 255),	# Blue (used for unknown responses)
 }
@@ -149,6 +149,7 @@ class Glitcher(threading.Thread):
 
 		prod = list(itertools.product(range(*self.args.delay), range(*self.args.width)))
 		random.shuffle(prod)
+		i = 0
 
 		for d, w in prod:
 			s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian
@@ -168,13 +169,17 @@ class Glitcher(threading.Thread):
 				self.queue.append((d, w, RESP['KO']))
 			elif r == RESP['OK']: # Glitched
 				self.queue.append((d, w, RESP['OK']))
+				r = s.read(2)
+				print(f'[+] Data output: {struct.unpack("<H", r)[0]:x}')
+				# input('Waiting to continue')
 			else:
-				print(f'\n[!] Unknown response: {r}')
+				print(f'[!] Unknown response: {r}')
 				self.queue.append((d, w, b'?'))
+			i += 1
 
 		end = time.time()
 		print()
-		print(f'[+] Sent {len(prod)} in {end - start}s.')
+		print(f'[+] Sent {i} in {end - start}s.')
 
 		s.close()
 

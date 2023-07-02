@@ -152,8 +152,6 @@ int main() {
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
 			sleep_ms(5); // Randomly chosen
 
-			prepare_glitch(&glitch);
-
 			// Power on
 			gpio_disable_pulls(nMCLR);
 			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
@@ -166,22 +164,35 @@ int main() {
 			sleep_us(ICSP_TENTH);
 
 			uint16_t data;
-			icsp_enter(&icsp);
-			read_prog_mem(&icsp, 0x8006, 0x01, (uint8_t*)&data);
+			// // Get DeviceID
+			// icsp_enter(&icsp);
+			// read_prog_mem(&icsp, 0x8006, 0x01, (uint8_t*)&data);
 
-			if (data == 0) {
-				putchar(RESP_KO);
-				break;
-			} else if ((data & DEVICEID_MASK) != PIC16LF1936_DEVICEID) {
-				putchar(RESP_GLITCH_WEIRD);
-				break;
+			// if (data == 0) {
+			// 	putchar(RESP_KO);
+			// 	break;
+			// } else if ((data & DEVICEID_MASK) != PIC16LF1936_DEVICEID) {
+			// 	putchar(RESP_GLITCH_WEIRD);
+			// 	break;
+			// }
+
+			prepare_glitch(&glitch);
+			icsp_enter(&icsp);
+
+			icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+
+			// for (pc; pc < addr; pc++)
+			// 	icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
+			data = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
+
+			if (data != 0) {
+				putchar(RESP_OK);
+				fwrite(&data, ICSP_BYTES_PER_WORD, 1, stdout);
+				fflush(stdout);
+			} else {
+				putchar(RESP_GLITCH_FAIL);
 			}
 
-			read_prog_mem(&icsp, 0x00, 0x01, (uint8_t*)&data);
-			if (data != 0)
-				putchar(RESP_OK);
-			else
-				putchar(RESP_GLITCH_FAIL);
 			break;
 		case CMD_POWERON:
 			glitch_power_on(false);

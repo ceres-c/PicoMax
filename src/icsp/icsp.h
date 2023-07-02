@@ -76,9 +76,9 @@ inline static void icsp_power_off() {
 
 // Bare operations
 void icsp_enter(icsp_t* icsp);
-void icsp_imperative(icsp_t* icsp, uint8_t command);
+void __no_inline_not_in_flash_func(icsp_imperative)(icsp_t* icsp, uint8_t command);
 void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
-uint16_t icsp_read(icsp_t* icsp, uint8_t command);
+uint16_t __no_inline_not_in_flash_func(icsp_read)(icsp_t* icsp, uint8_t command);
 
 // PIO init
 // TODO pass icsp_t as argument

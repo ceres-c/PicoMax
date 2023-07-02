@@ -83,7 +83,7 @@ void icsp_enter(icsp_t* icsp) {
 	// sleep_us(1000); // Is this needed? In pickle they had it but my PIC seems to work without it
 }
 
-void icsp_imperative(icsp_t* icsp, uint8_t command) {
+void __no_inline_not_in_flash_func(icsp_imperative)(icsp_t* icsp, uint8_t command) {
 	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
@@ -112,7 +112,7 @@ void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data) {
 	pio_sm_set_enabled(icsp->pio, icsp->sm, false);
 }
 
-uint16_t icsp_read(icsp_t* icsp, uint8_t command) {
+uint16_t __no_inline_not_in_flash_func(icsp_read)(icsp_t* icsp, uint8_t command) {
 	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 5);
