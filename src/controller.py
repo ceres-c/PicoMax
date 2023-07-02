@@ -170,7 +170,7 @@ class Glitcher(threading.Thread):
 			elif r == RESP['OK']: # Glitched
 				self.queue.append((d, w, RESP['OK']))
 				r = s.read(2)
-				print(f'[+] Data output: {struct.unpack("<H", r)[0]:x}')
+				# print(f'[+] OK output: {struct.unpack("<H", r)[0]:x}')
 				# input('Waiting to continue')
 			else:
 				print(f'[!] Unknown response: {r}')

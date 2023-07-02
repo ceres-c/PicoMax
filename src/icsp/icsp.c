@@ -15,7 +15,7 @@ void read_data_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 	}
 }
 
-void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
+void __no_inline_not_in_flash_func(read_prog_mem)(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst) {
 	int pc = 0;
 
 	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
@@ -45,11 +45,13 @@ void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src) {
 		icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
 	icsp_load(icsp, ICSP_CMD_LOAD_PROG_MEM, src);
 
-	// icsp_imperative(icsp, ICSP_CMD_BEGIN_INT_TIMED); // This could also work, I guess
-	// sleep_us(ICSP_TDIS_TYP);
-	icsp_imperative(icsp, ICSP_CMD_BEGIN_EXT_TIMED);
-	sleep_us(ICSP_TPEXT_MIN);
-	icsp_imperative(icsp, ICSP_CMD_END_EXT_TIMED);
+	icsp_imperative(icsp, ICSP_CMD_BEGIN_INT_TIMED);
+	sleep_us(ICSP_TDIS_TYP);
+	// Code below is working, but as stated in DS41397B 4.3.9, it is not possible to write conf words with
+	// externally timed writes, so I'll just use internally timed ones and call it a day
+	// icsp_imperative(icsp, ICSP_CMD_BEGIN_EXT_TIMED);
+	// sleep_us(ICSP_TPEXT_MIN);
+	// icsp_imperative(icsp, ICSP_CMD_END_EXT_TIMED);
 
 }
 
@@ -68,7 +70,7 @@ void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
 	sleep_us(ICSP_TERAB_MAX);
 }
 
-void icsp_enter(icsp_t* icsp) {
+void __no_inline_not_in_flash_func(icsp_enter)(icsp_t* icsp) {
 	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 
 	pio_sm_put_blocking(icsp->pio, icsp->sm, 32);

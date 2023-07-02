@@ -55,7 +55,7 @@ typedef struct icsp_s {
 
 // Wrappers around common functionality
 void read_data_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
-void read_prog_mem(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
+void __no_inline_not_in_flash_func(read_prog_mem)(icsp_t *icsp, uint32_t addr, uint32_t size, uint8_t *dst);
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
 void bulk_erase_data(icsp_t *icsp);
 void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids);
@@ -75,7 +75,7 @@ inline static void icsp_power_off() {
 
 
 // Bare operations
-void icsp_enter(icsp_t* icsp);
+void __no_inline_not_in_flash_func(icsp_enter)(icsp_t* icsp);
 void __no_inline_not_in_flash_func(icsp_imperative)(icsp_t* icsp, uint8_t command);
 void icsp_load(icsp_t* icsp, uint8_t command, uint16_t data);
 uint16_t __no_inline_not_in_flash_func(icsp_read)(icsp_t* icsp, uint8_t command);

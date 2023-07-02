@@ -148,46 +148,51 @@ int main() {
 			putchar(RESP_OK);
 			break;
 		case CMD_GLITCH:
+			uint16_t deviceID = 0, page = 0;
+
 			// Power off
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
 			sleep_ms(5); // Randomly chosen
+
+			prepare_glitch(&glitch);
 
 			// Power on
 			gpio_disable_pulls(nMCLR);
 			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
 			*CLR_GPIO_ATOMIC = MAX_EN_MASK;	// Then enable MAX4619
-			sleep_us(ICSP_TENTS);
+			// sleep_us(ICSP_TENTS);
+			sleep_us(50); // Waiting far more to separate startup and programming mode enable
 
 			// Enable programming mode
 			*CLR_GPIO_ATOMIC = nMCLR_MASK;
 			// The glitcher PIO program will trigger here and start counting for delay
-			sleep_us(ICSP_TENTH);
+			// sleep_us(ICSP_TENTH);
 
-			uint16_t data;
-			// // Get DeviceID
-			// icsp_enter(&icsp);
-			// read_prog_mem(&icsp, 0x8006, 0x01, (uint8_t*)&data);
-
-			// if (data == 0) {
-			// 	putchar(RESP_KO);
-			// 	break;
-			// } else if ((data & DEVICEID_MASK) != PIC16LF1936_DEVICEID) {
-			// 	putchar(RESP_GLITCH_WEIRD);
-			// 	break;
-			// }
-
-			prepare_glitch(&glitch);
+			// Get DeviceID
 			icsp_enter(&icsp);
+			read_prog_mem(&icsp, 0x8006, 0x01, (uint8_t*)&deviceID);
+			if ((deviceID & DEVICEID_MASK) == PIC16LF1936_DEVICEID) {
+				// ////////////////// Glitch after key send //////////////////
+				// prepare_glitch(&glitch);
+				// icsp_enter(&icsp);
 
-			icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+				////////////////// Common code //////////////////
+				icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
 
-			// for (pc; pc < addr; pc++)
-			// 	icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
-			data = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
+				// for (pc; pc < addr; pc++)
+				// 	icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
+				page = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
+			}
 
-			if (data != 0) {
+			if (deviceID == 0) {
+				putchar(RESP_KO);
+			} else if ((deviceID & DEVICEID_MASK) != PIC16LF1936_DEVICEID) {
+				putchar(RESP_GLITCH_WEIRD);
+				fwrite(&deviceID, ICSP_BYTES_PER_WORD, 1, stdout);
+				fflush(stdout);
+			} else if (page != 0) {
 				putchar(RESP_OK);
-				fwrite(&data, ICSP_BYTES_PER_WORD, 1, stdout);
+				fwrite(&page, ICSP_BYTES_PER_WORD, 1, stdout);
 				fflush(stdout);
 			} else {
 				putchar(RESP_GLITCH_FAIL);
