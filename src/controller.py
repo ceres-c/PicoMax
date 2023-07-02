@@ -31,13 +31,14 @@ RESP = {
 	'PONG'				: b'p',
 	'GLITCH_FAIL'		: b'.',
 	'GLITCH_WEIRD'		: b'y',
+	'WTF'				: b'?',
 }
 QT_COLORS = {
-	RESP['GLITCH_FAIL']:	(0, 255, 0),	# Green
+	RESP['GLITCH_FAIL']:	(255, 0, 0),	# Red
 	RESP['KO']:				(255, 255, 0),	# Yellow
-	RESP['OK']:				(255, 0, 0),	# Red
+	RESP['OK']:				(0, 255, 0),	# Green
 	RESP['GLITCH_WEIRD']:	(255, 128, 0),	# Orange
-	b'?':					(0, 0, 255),	# Blue (used for unknown responses)
+	RESP['WTF']:			(0, 0, 255),	# Blue (used for unknown responses)
 }
 
 class Window(QMainWindow):
@@ -168,13 +169,13 @@ class Glitcher(threading.Thread):
 			elif r == RESP['KO']: # Target dead
 				self.queue.append((d, w, RESP['KO']))
 			elif r == RESP['OK']: # Glitched
-				self.queue.append((d, w, RESP['OK']))
 				r = s.read(2)
-				# print(f'[+] OK output: {struct.unpack("<H", r)[0]:x}')
-				# input('Waiting to continue')
+				print(f'[+] WTF output: {struct.unpack("<H", r)[0]:x}')
+				self.queue.append((d, w, RESP['OK']))
+				input('Waiting to continue')
 			else:
 				print(f'[!] Unknown response: {r}')
-				self.queue.append((d, w, b'?'))
+				self.queue.append((d, w, RESP['WTF']))
 			i += 1
 
 		end = time.time()

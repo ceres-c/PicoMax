@@ -5,6 +5,7 @@
 #include "pico/stdlib.h"
 #include "pico/stdio_usb.h"
 #include "hardware/pio.h"
+#include "hardware/structs/xip_ctrl.h" // To disable cache
 
 #include "icsp/icsp.h"
 #include "glitch.h"
@@ -26,6 +27,8 @@
 #define CMD_WRITE_PROG		'w'
 #define CMD_ERASE_BULK_DATA	'E'
 #define CMD_ERASE_BULK_PROG	'e'
+
+#define CMD_READ_ATOMIC		'A'
 
 #define RESP_OK				'k'
 #define RESP_KO				'x'

@@ -22,6 +22,9 @@ static void init_pins() {
 int main() {
 	bool powered_on = false;
 
+	// Disable eXecute In Place cache: we mostly care about accuracy, not speed right now
+	hw_clear_bits(&xip_ctrl_hw->ctrl, XIP_CTRL_EN_BITS);
+
 	stdio_init_all();
 	stdio_set_translate_crlf(&stdio_usb, false);
 	init_pins();
@@ -147,14 +150,43 @@ int main() {
 			glitch.on_rising = false;
 			putchar(RESP_OK);
 			break;
+		case CMD_READ_ATOMIC:
+			// This command is as barebone as it gets: no prints no function calls to flash, no nothing.
+			// I am thinking about doing CPA and I NEED timings to be consistent
+
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
+			for(uint32_t i=0; i < 0xffff; i++)
+				asm("NOP");
+
+			gpio_disable_pulls(nMCLR);
+			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK;	// Then enable MAX4619
+			for(uint32_t i=0; i < 0x20; i++)
+				asm("NOP");
+
+			// Enable programming mode
+			*CLR_GPIO_ATOMIC = nMCLR_MASK;
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+			asm("NOP");
+
+			icsp_enter(&icsp);
+			icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+			icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
+			break;
 		case CMD_GLITCH:
-			uint16_t deviceID = 0, page = 0;
+			uint16_t deviceID = PIC16LF1936_DEVICEID, page = 0;
 
 			// Power off
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
 			sleep_ms(5); // Randomly chosen
-
-			prepare_glitch(&glitch);
 
 			// Power on
 			gpio_disable_pulls(nMCLR);
@@ -169,20 +201,24 @@ int main() {
 			// sleep_us(ICSP_TENTH);
 
 			// Get DeviceID
+			// icsp_enter(&icsp);
+			// read_prog_mem(&icsp, 0x8006, 0x01, (uint8_t*)&deviceID);
+			// if ((deviceID & DEVICEID_MASK) == PIC16LF1936_DEVICEID) {
+			// 	// ////////////////// Glitch after key send //////////////////
+			// 	// prepare_glitch(&glitch);
+			// 	// icsp_enter(&icsp);
+
+			// 	////////////////// Common code //////////////////
+			// 	icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+
+			// 	// for (pc; pc < addr; pc++)
+			// 	// 	icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
+			// 	page = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
+			// }
 			icsp_enter(&icsp);
-			read_prog_mem(&icsp, 0x8006, 0x01, (uint8_t*)&deviceID);
-			if ((deviceID & DEVICEID_MASK) == PIC16LF1936_DEVICEID) {
-				// ////////////////// Glitch after key send //////////////////
-				// prepare_glitch(&glitch);
-				// icsp_enter(&icsp);
-
-				////////////////// Common code //////////////////
-				icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
-
-				// for (pc; pc < addr; pc++)
-				// 	icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
-				page = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
-			}
+			prepare_glitch(&glitch);
+			icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+			page = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
 
 			if (deviceID == 0) {
 				putchar(RESP_KO);
