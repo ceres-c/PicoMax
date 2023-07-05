@@ -164,15 +164,18 @@ class Glitcher(threading.Thread):
 			r = s.read(len(RESP['OK']))
 			if r == RESP['GLITCH_FAIL']: # Glitch failed
 				self.queue.append((d, w, RESP['GLITCH_FAIL']))
+				# input(f'(delay: {d}, width: {w})')
 			elif r == RESP['GLITCH_WEIRD']: # Wrong deviceID
 				self.queue.append((d, w, RESP['GLITCH_WEIRD']))
 			elif r == RESP['KO']: # Target dead
 				self.queue.append((d, w, RESP['KO']))
 			elif r == RESP['OK']: # Glitched
-				r = s.read(2)
-				print(f'[+] WTF output: {struct.unpack("<H", r)[0]:x}')
 				self.queue.append((d, w, RESP['OK']))
-				input('Waiting to continue')
+				r = s.read(2)
+				r_num = struct.unpack("<H", r)[0]
+				if r_num != 0x3fff:
+					print(f'[+] WTF output: {r_num:x} (delay: {d}, width: {w})')
+					input('Waiting to continue')
 			else:
 				print(f'[!] Unknown response: {r}')
 				self.queue.append((d, w, RESP['WTF']))

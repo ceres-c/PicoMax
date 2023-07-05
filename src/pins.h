@@ -22,6 +22,9 @@
 #define PIC_GLITCH_SUCC_PIN		0x09 // pin 12
 #define PIC_GLITCH_SUCC_MASK	(1 << PIC_GLITCH_SUCC_PIN)
 
+#define ICPS_READ_CMD_TRIGGER_PIN	0x0A
+#define ICPS_READ_CMD_TRIGGER_PIN_MASK (1 << ICPS_READ_CMD_TRIGGER_PIN)
+
 // PIC ICSP programming-related
 #define ICSPCLK					0x12 // pin 24
 #define ICSPDAT					0x13 // pin 25

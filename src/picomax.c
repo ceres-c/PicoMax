@@ -4,10 +4,12 @@ static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // This will be handed over to PIO when we start glitching
 	gpio_set_function(nMCLR, GPIO_FUNC_SIO);
+	gpio_set_function(ICPS_READ_CMD_TRIGGER_PIN, GPIO_FUNC_SIO);
 
 	gpio_set_dir(MAX_EN_PIN, GPIO_OUT);
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(nMCLR, GPIO_OUT);
+	gpio_set_dir(ICPS_READ_CMD_TRIGGER_PIN, true);
 
 	gpio_pull_up(MAX_EN_PIN);	// MAX4619 EN is active low
 	gpio_pull_up(MAX_SEL_PIN);	// Default selected voltage to the highest of the two
@@ -180,6 +182,7 @@ int main() {
 			icsp_enter(&icsp);
 			icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
 			icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
+
 			break;
 		case CMD_GLITCH:
 			uint16_t deviceID = PIC16LF1936_DEVICEID, page = 0;
@@ -187,6 +190,8 @@ int main() {
 			// Power off
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
 			sleep_ms(5); // Randomly chosen
+
+			prepare_glitch(&glitch);
 
 			// Power on
 			gpio_disable_pulls(nMCLR);
@@ -216,8 +221,8 @@ int main() {
 			// 	page = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
 			// }
 			icsp_enter(&icsp);
-			prepare_glitch(&glitch);
-			icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+			// prepare_glitch(&glitch);
+			// icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
 			page = icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
 
 			if (deviceID == 0) {

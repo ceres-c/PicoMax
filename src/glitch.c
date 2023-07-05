@@ -5,21 +5,11 @@ bool glitch_irq_registered = false;
 
 void __no_inline_not_in_flash_func(prepare_glitch)(glitch_t *glitch) {
 	// TODO maybe add a timeout with an external watchdog timer?
-	glitch_pio_program_init(glitch, MAX_SEL_PIN, PIC_OUT_PIN, TRIG_OUT_PIN);
+	glitch_pio_program_init(glitch, MAX_SEL_PIN, TRIG_IN_PIN, TRIG_OUT_PIN);
 
 	pio_sm_put_blocking(glitch->pio, glitch->sm, glitch->on_rising);
 	pio_sm_put_blocking(glitch->pio, glitch->sm, glitch->delay);
 	pio_sm_put_blocking(glitch->pio, glitch->sm, glitch->pulse_width);
-}
-void __no_inline_not_in_flash_func(target_wait)() {
-	while (gpio_get(PIC_OUT_PIN)); // Wait for PIC to finish the loop
-	return;
-}
-bool __no_inline_not_in_flash_func(target_alive)() {
-	return gpio_get(PIC_GLITCH_SUCC_PIN) || gpio_get(PIC_GLITCH_FAIL_PIN);
-}
-bool __no_inline_not_in_flash_func(target_glitched)() {
-	return gpio_get(PIC_GLITCH_SUCC_PIN);
 }
 void __isr glitch_irq_func() {
 	// These two operations take roughly 4,5us
