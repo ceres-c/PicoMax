@@ -51,6 +51,7 @@ target_link_libraries(picomax
   pico_stdlib
   hardware_pio
   icsp
+  hardware_i2c
 )
 
 # Add the standard include files to the build

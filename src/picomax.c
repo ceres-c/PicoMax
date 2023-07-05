@@ -20,19 +20,16 @@ static void init_pins() {
 
 	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // MAX4619 enable is active low, so disable it
 
-	gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
-	gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
+	gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
+	gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
+	gpio_pull_up(I2C_SDA_PIN);
+	gpio_pull_up(I2C_SCL_PIN);
 }
 
-bool read_uart_16_t(uint8_t *dst) {
-	// Poor man's uart_getc_timeout
-	if (!uart_is_readable_within_us(UART_ID, 100000))
-		return false;
-	*dst = uart_getc(UART_ID);
-	if (!uart_is_readable_within_us(UART_ID, 50000))
-		return false;
-	*(dst + 1) = uart_getc(UART_ID);
-	return true;
+// I2C reserves some addresses for special purposes. We exclude these from the scan.
+// These are any addresses of the form 000 0xxx or 111 1xxx
+bool reserved_addr(uint8_t addr) {
+	return (addr & 0x78) == 0 || (addr & 0x78) == 0x78;
 }
 
 int main() {
@@ -44,10 +41,7 @@ int main() {
 	stdio_init_all();
 	stdio_set_translate_crlf(&stdio_usb, false);
 	init_pins();
-	uart_init(UART_ID, BAUD_RATE);
-    uart_set_hw_flow(UART_ID, false, false); // CTS/RTS off
-    uart_set_format(UART_ID, 8, 1, UART_PARITY_NONE); // 8N1
-    uart_set_fifo_enabled(UART_ID, false); // UART char by char
+	i2c_init(picomax_i2c, 100 * 1000);
 
 	glitch_t glitch;
 	if (!glitch_init(glitcher_pio, &glitch)) {
@@ -203,11 +197,6 @@ int main() {
 
 			break;
 		case CMD_GLITCH_LOOP:
-			// Clear UART buffer, whatever
-			while (uart_is_readable_within_us(UART_ID, 500)) {
-				uart_getc(UART_ID);
-			}
-
 			// Power on
 			gpio_disable_pulls(nMCLR);
 			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
@@ -215,16 +204,12 @@ int main() {
 			// sleep_us(ICSP_TENTS);
 			sleep_ms(5);
 
-			prepare_glitch(&glitch);
+			// prepare_glitch(&glitch); // TODO decomment
 
-			uint16_t uart_data = 0;
-			if (!read_uart_16_t((uint8_t*)(&uart_data))) {
-				putchar(RESP_KO);
-			} else {
-				putchar(RESP_OK);
-				fwrite(&uart_data, 1, ICSP_BYTES_PER_WORD, stdout);
-				fflush(stdout);
-			}
+			putchar(RESP_OK);
+			uint16_t rxdata;
+			int ret = i2c_read_blocking(picomax_i2c, PIC_SLAVE_ADDR, (uint8_t*)&rxdata, 1, false); // TODO read 2 instead of 1 later
+			printf(ret < 0 ? "." : "@");
 
 			// Power off
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619

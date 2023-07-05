@@ -6,7 +6,7 @@
 #include "pico/stdio_usb.h"
 #include "hardware/pio.h"
 #include "hardware/structs/xip_ctrl.h" // To disable cache
-#include "hardware/uart.h"
+#include "hardware/i2c.h"
 
 #include "icsp/icsp.h"
 #include "glitch.h"
@@ -38,7 +38,10 @@
 #define RESP_GLITCH_FAIL	'.'
 #define RESP_GLITCH_WEIRD	'y' // Used when deviceID is wrong but nonzero
 
-#define UART_ID				uart0
-#define BAUD_RATE			9600
+#define picomax_i2c			i2c0
+#define I2C_SDA_PIN			0x10 // pin 22 (opposite of 1)
+#define I2C_SCL_PIN			0x11 // pin 23
+
+#define PIC_SLAVE_ADDR		0x8
 
 #endif // _PICOMAX_H
