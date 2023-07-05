@@ -6,6 +6,7 @@
 #include "pico/stdio_usb.h"
 #include "hardware/pio.h"
 #include "hardware/structs/xip_ctrl.h" // To disable cache
+#include "hardware/uart.h"
 
 #include "icsp/icsp.h"
 #include "glitch.h"
@@ -14,6 +15,7 @@
 #define CMD_DELAY			'D' // Accepts 4 bytes (little endian) of delay value
 #define CMD_WIDTH			'W' // Accepts 4 bytes (little endian) of pulse width value
 #define CMD_GLITCH			'G'
+#define CMD_GLITCH_LOOP		'L'	// TODO remove
 #define CMD_TRIG_OUT_EN		'O'
 #define CMD_TRIG_OUT_DIS	'o'
 #define CMD_TRIG_IN_RISING	'I'
@@ -35,5 +37,8 @@
 #define RESP_PONG			'p'
 #define RESP_GLITCH_FAIL	'.'
 #define RESP_GLITCH_WEIRD	'y' // Used when deviceID is wrong but nonzero
+
+#define UART_ID				uart0
+#define BAUD_RATE			9600
 
 #endif // _PICOMAX_H

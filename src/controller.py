@@ -17,6 +17,7 @@ CMD = {
 	'DELAY'				: b'D',
 	'WIDTH'				: b'W',
 	'GLITCH'			: b'G',
+	'GLITCH_LOOP'		: b'L',
 	'TRIG_OUT_EN'		: b'O',
 	'TRIG_OUT_DIS'		: b'o',
 	'TRIG_IN_RISING'	: b'I',
@@ -152,6 +153,10 @@ class Glitcher(threading.Thread):
 		random.shuffle(prod)
 		i = 0
 
+		if len(prod) == 0:
+			print('[!] No glitching parameters to test. Double check your delay and width ranges.')
+			exit(1)
+
 		for d, w in prod:
 			s.write(CMD['DELAY'] + struct.pack('<i', d)) # Pi Pico defaults to little endian
 			r = s.read(len(CMD['DELAY']))
@@ -160,7 +165,10 @@ class Glitcher(threading.Thread):
 			if not poweroff_target(s):
 				print(f'[!] Could not power off the target. Got:\n{r}\nAborting.')
 				break
-			s.write(CMD['GLITCH'])
+
+			# s.write(CMD['GLITCH']) # TODO DECOMMENT MEEEEEEEEEEEEEEEEEEEEEEEE
+			s.write(CMD['GLITCH_LOOP']) # TODO REMOVE ME
+
 			r = s.read(len(RESP['OK']))
 			if r == RESP['GLITCH_FAIL']: # Glitch failed
 				self.queue.append((d, w, RESP['GLITCH_FAIL']))
@@ -173,8 +181,8 @@ class Glitcher(threading.Thread):
 				self.queue.append((d, w, RESP['OK']))
 				r = s.read(2)
 				r_num = struct.unpack("<H", r)[0]
-				if r_num != 0x3fff:
-					print(f'[+] WTF output: {r_num:x} (delay: {d}, width: {w})')
+				if r_num != 0x1010:
+					print(f'[+] WTF output: 0x{r_num:x} (delay: {d}, width: {w})')
 					input('Waiting to continue')
 			else:
 				print(f'[!] Unknown response: {r}')

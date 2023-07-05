@@ -33,7 +33,7 @@ def main(args):
 	elif args.write_program:
 		print('[?] Have you erased the PIC program memory first? Otherwise, the write will silently fail.')
 		addr, data = args.write_program
-		data = struct.pack('<h', data)
+		data = struct.pack('<H', data)
 		pic.write_program(addr, data)
 	elif args.erase_bulk_program:
 		pic.erase_bulk_program()

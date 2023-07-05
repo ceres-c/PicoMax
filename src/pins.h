@@ -3,8 +3,11 @@
 
 // If you need to rewire the board, change here
 
+#define UART_TX_PIN				0x00 // Rpi pico pin 1
+#define UART_RX_PIN				0x01 // pin 2
+
 // Glitcher-specific
-#define MAX_EN_PIN				0x02 // Rpi pico pin 4
+#define MAX_EN_PIN				0x02 // pin 4
 #define MAX_EN_MASK				(1 << MAX_EN_PIN)
 #define MAX_SEL_PIN				0x03 // pin 5
 #define MAX_SEL_MASK			(1 << MAX_SEL_PIN)
@@ -13,15 +16,7 @@
 #define TRIG_OUT_PIN			0x05 // pin 7
 #define TRIG_OUT_MASK			(1 << TRIG_OUT_PIN)
 
-// TODO remove these once I start glitching the code readout
-// Communication with the target device
-#define PIC_OUT_PIN				0x07 // pin 10
-#define PIC_OUT_MASK			(1 << PIC_OUT_PIN)
-#define PIC_GLITCH_FAIL_PIN		0x08 // pin 11
-#define PIC_GLITCH_FAIL_MASK	(1 << PIC_GLITCH_FAIL_PIN)
-#define PIC_GLITCH_SUCC_PIN		0x09 // pin 12
-#define PIC_GLITCH_SUCC_MASK	(1 << PIC_GLITCH_SUCC_PIN)
-
+// TODO remove this
 #define ICPS_READ_CMD_TRIGGER_PIN	0x0A
 #define ICPS_READ_CMD_TRIGGER_PIN_MASK (1 << ICPS_READ_CMD_TRIGGER_PIN)
 

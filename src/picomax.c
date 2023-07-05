@@ -19,6 +19,20 @@ static void init_pins() {
 	gpio_set_slew_rate(MAX_SEL_PIN, GPIO_SLEW_RATE_FAST);
 
 	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // MAX4619 enable is active low, so disable it
+
+	gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
+	gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
+}
+
+bool read_uart_16_t(uint8_t *dst) {
+	// Poor man's uart_getc_timeout
+	if (!uart_is_readable_within_us(UART_ID, 500000))
+		return false;
+	*dst = uart_getc(UART_ID);
+	if (!uart_is_readable_within_us(UART_ID, 100000))
+		return false;
+	*(dst + 1) = uart_getc(UART_ID);
+	return true;
 }
 
 int main() {
@@ -30,6 +44,15 @@ int main() {
 	stdio_init_all();
 	stdio_set_translate_crlf(&stdio_usb, false);
 	init_pins();
+	uart_init(UART_ID, BAUD_RATE);
+    uart_set_hw_flow(UART_ID, false, false); // CTS/RTS off
+    uart_set_format(UART_ID, 8, 1, UART_PARITY_NONE); // 8N1
+    uart_set_fifo_enabled(UART_ID, false); // UART char by char
+
+	// Clear UART buffer, whatever
+	while (uart_is_readable_within_us(UART_ID, 100000)) {
+		uart_getc(UART_ID);
+	}
 
 	glitch_t glitch;
 	if (!glitch_init(glitcher_pio, &glitch)) {
@@ -183,6 +206,30 @@ int main() {
 			icsp_imperative(&icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
 			icsp_read(&icsp, ICSP_CMD_READ_PROG_MEM);
 
+			break;
+		case CMD_GLITCH_LOOP:
+
+			// Power on
+			gpio_disable_pulls(nMCLR);
+			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
+			*CLR_GPIO_ATOMIC = MAX_EN_MASK;	// Then enable MAX4619
+			// sleep_us(ICSP_TENTS);
+			sleep_ms(5);
+
+			prepare_glitch(&glitch);
+
+			uint16_t uart_data = 0;
+			if (!read_uart_16_t((uint8_t*)(&uart_data))) {
+				putchar(RESP_KO);
+			} else {
+				putchar(RESP_OK);
+				fwrite(&uart_data, 1, ICSP_BYTES_PER_WORD, stdout);
+				fflush(stdout);
+			}
+
+			// Power off
+			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
+			sleep_ms(5); // Randomly chosen
 			break;
 		case CMD_GLITCH:
 			uint16_t deviceID = PIC16LF1936_DEVICEID, page = 0;
