@@ -1,0 +1,7 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "MAX4916")(type "KiCad")(uri "${KIPRJMOD}/MAX4619CPE/MAX4619CPE_.kicad_sym")(options "")(descr ""))
+  (lib (name "PIC16F")(type "KiCad")(uri "${KIPRJMOD}/PIC16LF1936-I_SS/PIC16LF1936-I_SS.kicad_sym")(options "")(descr ""))
+  (lib (name "PiPico")(type "KiCad")(uri "${KIPRJMOD}/SC0915/SC0915.kicad_sym")(options "")(descr ""))
+  (lib (name "Vglitch")(type "KiCad")(uri "${KIPRJMOD}/Vglitch.kicad_sym")(options "")(descr ""))
+)

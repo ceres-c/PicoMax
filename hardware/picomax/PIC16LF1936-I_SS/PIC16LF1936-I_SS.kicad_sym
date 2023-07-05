@@ -1,0 +1,243 @@
+
+(kicad_symbol_lib (version 20211014) (generator kicad_symbol_editor)
+  (symbol "PIC16LF1936-I{slash}SS" (pin_names (offset 1.016)) (in_bom yes) (on_board yes)
+    (property "Reference" "U" (id 0) (at -60.96 41.64 0.0)
+      (effects (font (size 1.27 1.27)) (justify bottom left))
+    )
+    (property "Value" "PIC16LF1936-I{slash}SS" (id 1) (at -60.96 -44.64 0.0)
+      (effects (font (size 1.27 1.27)) (justify bottom left))
+    )
+    (property "Footprint" "SOP65P780X200-28N" (id 2) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (symbol "PIC16LF1936-I{slash}SS_0_0"
+      (rectangle (start -60.96 -40.64) (end 60.96 40.64)
+        (stroke (width 0.41)) (fill (type background))
+      )
+      (pin input line (at -66.04 33.02 0) (length 5.08)
+        (name "COM2/DACOUT/C2IN+/VREF-/AN2/RA2"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "4"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin input line (at -66.04 30.48 0) (length 5.08)
+        (name "RB0/AN12/CCP4/CPS0/SRI/INT/SEG0"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "21"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin input line (at -66.04 27.94 0) (length 5.08)
+        (name "RB1/AN10/C12IN3-/P1C/CPS1/VLCD1"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "22"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin input line (at -66.04 25.4 0) (length 5.08)
+        (name "RB3/AN9/C12IN2-/CPS3/CCP2/P2A/VLCD3"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "24"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin input clock (at -66.04 22.86 0) (length 5.08)
+        (name "SEG2/CLKIN/OSC1/RA7"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "9"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin input line (at -66.04 20.32 0) (length 5.08)
+        (name "SEG7/C12IN1-/AN1/RA1"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "3"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin input line (at -66.04 17.78 0) (length 5.08)
+        (name "SEG15/COM3/C1IN+/VREF+/AN3/RA3"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "5"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin input line (at -66.04 15.24 0) (length 5.08)
+        (name "VCAP/~SS/SEG12/SRNQ/C2OUT/C12IN0-/AN0/RA0"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "2"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 10.16 0) (length 5.08)
+        (name "P2A/CCP2/T1OSI/RC1"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "12"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 7.62 0) (length 5.08)
+        (name "P2B/T1CKI/T1OSO/RC0"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "11"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 2.54 0) (length 5.08)
+        (name "RB2/AN8/P1B/CPS2/VLCD2"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "23"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 1.06581e-14 0) (length 5.08)
+        (name "RB4/AN11/P1D/CPS4/COM0"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "25"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 -7.62 0) (length 5.08)
+        (name "RC4/SDI/SDA/T1G/SEG11"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "15"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 -10.16 0) (length 5.08)
+        (name "RC5/SDO/SEG10"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "16"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 -15.24 0) (length 5.08)
+        (name "SEG3/P1A/CCP1/RC2"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "13"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 -17.78 0) (length 5.08)
+        (name "SEG4/CCP5/SRNQ/C1OUT/T0CKI/CPS6/RA4"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "6"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 -20.32 0) (length 5.08)
+        (name "SEG6/SCL/SCK/RC3"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "14"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional clock (at -66.04 -25.4 0) (length 5.08)
+        (name "VCAP/SEG1/CLKOUT/OSC2/RA6"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "10"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 -27.94 0) (length 5.08)
+        (name "VCAP/SEG5/~SS/CPS7/SRNQ/C2OUT/AN4/RA5"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "7"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at -66.04 -33.02 0) (length 5.08)
+        (name "VPP/~MCLR/RE3"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "1"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin power_in line (at 66.04 38.1 180.0) (length 5.08)
+        (name "VDD"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "20"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at 66.04 30.48 180.0) (length 5.08)
+        (name "RB5/AN13/P2B/CCP3/P3A/CPS5/T1G/COM1"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "26"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional clock (at 66.04 27.94 180.0) (length 5.08)
+        (name "RB6/SEG14/ICSPCLK"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "27"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at 66.04 25.4 180.0) (length 5.08)
+        (name "RB7/SEG13/ICSPDAT"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "28"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at 66.04 -7.62 180.0) (length 5.08)
+        (name "RC6/TX/CK/CCP3/P3A/SEG9"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "17"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin bidirectional line (at 66.04 -10.16 180.0) (length 5.08)
+        (name "RC7/RX/DT/P3B/SEG8"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "18"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin power_in line (at 66.04 -38.1 180.0) (length 5.08)
+        (name "VSS"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "19"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin power_in line (at 66.04 -38.1 180.0) (length 5.08)
+        (name "VSS"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "8"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+    )
+  )
+)
