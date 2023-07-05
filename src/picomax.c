@@ -26,10 +26,10 @@ static void init_pins() {
 
 bool read_uart_16_t(uint8_t *dst) {
 	// Poor man's uart_getc_timeout
-	if (!uart_is_readable_within_us(UART_ID, 500000))
+	if (!uart_is_readable_within_us(UART_ID, 100000))
 		return false;
 	*dst = uart_getc(UART_ID);
-	if (!uart_is_readable_within_us(UART_ID, 100000))
+	if (!uart_is_readable_within_us(UART_ID, 50000))
 		return false;
 	*(dst + 1) = uart_getc(UART_ID);
 	return true;
@@ -48,11 +48,6 @@ int main() {
     uart_set_hw_flow(UART_ID, false, false); // CTS/RTS off
     uart_set_format(UART_ID, 8, 1, UART_PARITY_NONE); // 8N1
     uart_set_fifo_enabled(UART_ID, false); // UART char by char
-
-	// Clear UART buffer, whatever
-	while (uart_is_readable_within_us(UART_ID, 100000)) {
-		uart_getc(UART_ID);
-	}
 
 	glitch_t glitch;
 	if (!glitch_init(glitcher_pio, &glitch)) {
@@ -208,6 +203,10 @@ int main() {
 
 			break;
 		case CMD_GLITCH_LOOP:
+			// Clear UART buffer, whatever
+			while (uart_is_readable_within_us(UART_ID, 500)) {
+				uart_getc(UART_ID);
+			}
 
 			// Power on
 			gpio_disable_pulls(nMCLR);
