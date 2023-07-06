@@ -39,6 +39,8 @@ def main(args):
 		pic.erase_bulk_program()
 	elif args.erase_bulk_data:
 		pic.erase_bulk_data()
+	elif args.erase_row_program:
+		pic.erase_row_program(*args.erase_row_program)
 	elif args.device_id:
 		id = pic.read_device_ID()
 		print(f'[+] Device ID: {id.dev:b}')
@@ -77,6 +79,8 @@ Note: max is not inclusive, i.e. the range is [start_page page_number)''')
 						help='erase the PIC program memory')
 	parser.add_argument('--erase-bulk-data', action='store_true', default=False,
 						help='erase the PIC data memory')
+	parser.add_argument('--erase-row-program', type=lambda x: int(x,0), nargs=1, default=None,
+		     			help='erase the entire row of the PIC program memory containing address [address] (address in 14-bit words)')
 	parser.add_argument('--device-id', action='store_true', default=False,
 						help='read the PIC device ID')
 	parser.add_argument('--config', action='store_true', default=False,

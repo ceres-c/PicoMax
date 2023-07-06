@@ -29,6 +29,7 @@
 #define CMD_WRITE_PROG		'w'
 #define CMD_ERASE_BULK_DATA	'E'
 #define CMD_ERASE_BULK_PROG	'e'
+#define CMD_ERASE_ROW_PROG	'@'
 
 #define CMD_READ_ATOMIC		'A'
 

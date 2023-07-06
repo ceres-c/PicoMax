@@ -15,6 +15,7 @@ CMD_WRITE_DATA		= b'W'
 CMD_WRITE_PROG		= b'w'
 CMD_ERASE_BULK_DATA	= b'E'
 CMD_ERASE_BULK_PROG	= b'e'
+CMD_ERASE_ROW_PROG	= b'@'
 
 RESP_OK				= b'k'
 RESP_KO				= b'x'
@@ -107,6 +108,13 @@ class ICSP():
 		r = self.s.read(len(RESP_OK))
 		if r != RESP_OK:
 			raise Exception(f'[!] The programmer could not erase the chip. Got:\n{r}\nAborting.')
+
+	def erase_row_program(self, addr: int) -> None:
+		self.s.write(CMD_ERASE_ROW_PROG)
+		self.s.write(struct.pack('<I', addr))
+		r = self.s.read(len(RESP_OK))
+		if r != RESP_OK:
+			raise Exception(f'[!] The programmer could not erase the required row. Got:\n{r}\nAborting.')
 
 	def write_program(self, start_addr: int, data: bytes) -> None:
 		if len(data) != BYTES_PER_WORD:

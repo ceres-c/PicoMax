@@ -70,6 +70,23 @@ void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids) {
 	sleep_us(ICSP_TERAB_MAX);
 }
 
+void row_erase_prog(icsp_t *icsp, uint32_t addr) {
+	// "A row of program memory consists of 32 consecutive 14-bit words.
+	//  A row is addressed by the address PC<15:5>"
+	int pc = 0;
+
+	icsp_imperative(icsp, ICSP_CMD_RESET_ADDR); // Reset to 0
+	if (addr >= ICSP_CONFIG_MEM_ADDR) {
+		icsp_load(icsp, ICSP_CMD_LOAD_CONFIG, 0); // Idk which word to load here, pickle does 0, let's go with that
+		pc =+ ICSP_CONFIG_MEM_ADDR;
+	}
+
+	for (pc; (pc & (-1 << 5)) < (addr & (-1 << 5)); pc++)
+		icsp_imperative(icsp, ICSP_CMD_INCREMENT_ADDR);
+	icsp_imperative(icsp, ICSP_CMD_ROW_ERASE_PROG);
+	sleep_us(ICSP_TERAR_MAX);
+}
+
 void __no_inline_not_in_flash_func(icsp_enter)(icsp_t* icsp) {
 	icsp_program_init(icsp, ICSPCLK, ICSPDAT);
 

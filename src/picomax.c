@@ -138,6 +138,16 @@ int main() {
 
 			putchar(RESP_OK);
 			break;
+		case CMD_ERASE_ROW_PROG:
+			uint32_t erase_row_addr = 0;
+			fread(&erase_row_addr, 1, 4, stdin); // In words
+			icsp_power_on();
+			icsp_enter(&icsp);
+			row_erase_prog(&icsp, erase_row_addr);
+			icsp_power_off();
+
+			putchar(RESP_OK);
+			break;
 		case CMD_PING:
 			putchar(RESP_PONG);
 			break;

@@ -42,6 +42,7 @@ typedef uint16_t icsp_word_t;
 #define ICSP_TDIS_MIN				300
 #define ICSP_TDIS_TYP				10000	// 10ms (got from pickle code)
 #define ICSP_TERAB_MAX				5000	// 5ms
+#define ICSP_TERAR_MAX				2500	// 2.5ms
 
 #define DEVICEID_MASK				(((1 << 9) - 1) << 5)
 #define PIC16LF1936_DEVICEID		(0b100100011 << 5) // Bottom 5 bits are REV, ignore
@@ -59,6 +60,8 @@ void __no_inline_not_in_flash_func(read_prog_mem)(icsp_t *icsp, uint32_t addr, u
 void write_prog_mem(icsp_t *icsp, uint32_t addr, icsp_word_t src);
 void bulk_erase_data(icsp_t *icsp);
 void bulk_erase_prog(icsp_t *icsp, bool erase_user_ids);
+// Note: this will NOT delete only the specified address, but the row that address is in
+void row_erase_prog(icsp_t *icsp, uint32_t addr);
 // This function should not be used when glitching because it will reset the PIC
 inline static void icsp_power_on() {
 	*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK);
