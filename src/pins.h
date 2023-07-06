@@ -13,10 +13,11 @@
 #define TRIG_OUT_PIN			0x05 // pin 7
 #define TRIG_OUT_MASK			(1 << TRIG_OUT_PIN)
 
-#define START_READ_PIN			0x06 // pin 9
-#define START_READ_MASK			(1 << START_READ_PIN)
-#define I2C_SDA_PIN				0x10 // pin 22 (opposite of 1)
-#define I2C_SCL_PIN				0x11 // pin 23
+// PIC firmware-related
+#define PIC_START_READ_PIN		0x06 // pin 9
+#define START_READ_MASK			(1 << PIC_START_READ_PIN)
+#define I2C_SDA_PIN				0x10 // pin 21 (opposite of 1)
+#define I2C_SCL_PIN				0x11 // pin 22
 
 // PIC ICSP programming-related
 #define ICSPCLK					0x12 // pin 24

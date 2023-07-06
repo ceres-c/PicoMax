@@ -1,3 +1,6 @@
+# PicoMax
+A basic voltage glitcher built around the Raspberry Pi Pico and a MAX4619
+switch IC.
 
 # Building
 If running on Arch install `pico-sdk` and logout-login for the environment

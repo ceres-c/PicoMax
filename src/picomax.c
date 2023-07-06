@@ -4,17 +4,17 @@ static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // This will be handed over to PIO when we start glitching
 	gpio_set_function(nMCLR, GPIO_FUNC_SIO);
-	gpio_set_function(START_READ_PIN, GPIO_FUNC_SIO);
+	gpio_set_function(PIC_START_READ_PIN, GPIO_FUNC_SIO);
 
 	gpio_set_dir(MAX_EN_PIN, GPIO_OUT);
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(nMCLR, GPIO_OUT);
-	gpio_set_dir(START_READ_PIN, GPIO_OUT);
+	gpio_set_dir(PIC_START_READ_PIN, GPIO_OUT);
 
 	gpio_pull_up(MAX_EN_PIN);	// MAX4619 EN is active low
 	gpio_pull_up(MAX_SEL_PIN);	// Default selected voltage to the highest of the two
 	gpio_pull_down(nMCLR);
-	gpio_pull_down(START_READ_PIN);
+	gpio_pull_down(PIC_START_READ_PIN);
 
 	gpio_set_slew_rate(MAX_EN_PIN, GPIO_SLEW_RATE_FAST); // SPEED
 	gpio_set_slew_rate(MAX_SEL_PIN, GPIO_SLEW_RATE_FAST);
