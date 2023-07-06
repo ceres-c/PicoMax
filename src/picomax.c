@@ -166,8 +166,8 @@ int main() {
 			putchar(RESP_OK);
 			break;
 		case CMD_READ_ATOMIC:
-			// This command is as barebone as it gets: no prints no function calls to flash, no nothing.
-			// I am thinking about doing CPA and I NEED timings to be consistent
+			// This command is similar to CMD_GLITCH, but as barebone as it gets: no prints no function calls to flash.
+			// Read comments there for info on triggering
 
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619
 			for(uint32_t i=0; i < 0xffff; i++)
@@ -198,6 +198,15 @@ int main() {
 
 			break;
 		case CMD_GLITCH_LOOP:
+			// This command is used to glitch the "live" chip. I have used this to test if I could trigger
+			// wrong reads from the chip.
+			// On the PIC there is a loop reading program data from address 0xAAA and storing it in a global
+			// variable. Data from said variable is then later pushed via I2C when a read command is sent
+			// by the Pico. This data is then sent to the glitch control python program via UART
+			// Glitch trigger in is connected to PIC pin 2 (gpio output)
+			// The glitcher should be used to trigger on a *rising edge*, as the PIC raises pin 2 when starting the read.
+			// NOTE: you should write 0x1234 at address 0xAAA in the PIC program memory after programming it with the code
+
 			// Power on
 			gpio_disable_pulls(nMCLR);
 			*SET_GPIO_ATOMIC = (MAX_EN_MASK | MAX_SEL_MASK | nMCLR_MASK); // Ensure MAX4619 is disabled and highest voltage is selected
@@ -229,6 +238,14 @@ int main() {
 			sleep_ms(5); // Randomly chosen
 			break;
 		case CMD_GLITCH:
+			// This command is used to glitch the PIC while it's booting. This was the initial implementation, but
+			// I later switched to the CMD_READ_ATOMIC to reduce the moving parts. They're sort of similar, but this
+			// used to have less reliable timings. After commenting out all these lines, it's now probably the same
+			// Glitch trigger can be connected to:
+			//	- PIC pin 1 (nMCLR) to trigger when programming mode is enabled (falling edge)
+			//	- MAX EN to trigger when the chip is powered on (falling edge)
+
+
 			uint16_t deviceID = PIC16LF1936_DEVICEID, page = 0;
 
 			// Power off
