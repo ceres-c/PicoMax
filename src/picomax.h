@@ -39,8 +39,6 @@
 #define RESP_GLITCH_WEIRD	'y' // Used when deviceID is wrong but nonzero
 
 #define picomax_i2c			i2c0
-#define I2C_SDA_PIN			0x10 // pin 22 (opposite of 1)
-#define I2C_SCL_PIN			0x11 // pin 23
 
 #define PIC_SLAVE_ADDR		0x8
 

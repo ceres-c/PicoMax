@@ -180,12 +180,12 @@ class Glitcher(threading.Thread):
 			elif r == RESP['OK']: # Glitched
 				r = s.read(2)
 				r_num = struct.unpack("<H", r)[0]
-				if r_num == 0x1010:
+				if r_num == 0x1234:
 					self.queue.append((d, w, RESP['GLITCH_FAIL']))
 				else:
 					self.queue.append((d, w, RESP['OK']))
 					print(f'[+] WTF output: 0x{r_num:x} (delay: {d}, width: {w})')
-					input('Waiting to continue')
+					# input('Waiting to continue')
 			else:
 				print(f'[!] Unknown response: {r}')
 				self.queue.append((d, w, RESP['WTF']))

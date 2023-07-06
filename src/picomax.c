@@ -4,16 +4,17 @@ static void init_pins() {
 	gpio_set_function(MAX_EN_PIN, GPIO_FUNC_SIO);
 	gpio_set_function(MAX_SEL_PIN, GPIO_FUNC_SIO); // This will be handed over to PIO when we start glitching
 	gpio_set_function(nMCLR, GPIO_FUNC_SIO);
-	gpio_set_function(ICPS_READ_CMD_TRIGGER_PIN, GPIO_FUNC_SIO);
+	gpio_set_function(START_READ_PIN, GPIO_FUNC_SIO);
 
 	gpio_set_dir(MAX_EN_PIN, GPIO_OUT);
 	gpio_set_dir(MAX_SEL_PIN, GPIO_OUT);
 	gpio_set_dir(nMCLR, GPIO_OUT);
-	gpio_set_dir(ICPS_READ_CMD_TRIGGER_PIN, true);
+	gpio_set_dir(START_READ_PIN, GPIO_OUT);
 
 	gpio_pull_up(MAX_EN_PIN);	// MAX4619 EN is active low
 	gpio_pull_up(MAX_SEL_PIN);	// Default selected voltage to the highest of the two
 	gpio_pull_down(nMCLR);
+	gpio_pull_down(START_READ_PIN);
 
 	gpio_set_slew_rate(MAX_EN_PIN, GPIO_SLEW_RATE_FAST); // SPEED
 	gpio_set_slew_rate(MAX_SEL_PIN, GPIO_SLEW_RATE_FAST);
@@ -204,12 +205,24 @@ int main() {
 			// sleep_us(ICSP_TENTS);
 			sleep_ms(5);
 
-			// prepare_glitch(&glitch); // TODO decomment
+			prepare_glitch(&glitch); // TODO decomment
 
+			*SET_GPIO_ATOMIC = START_READ_MASK;
+			sleep_us(100);
+			*CLR_GPIO_ATOMIC = START_READ_MASK;
+			// Now PIC will start the memory read
+			sleep_ms(20); // Give some breathing space to read + setup I2C
+
+			uint16_t page_content = 0;
+			int i2c_read_ret = i2c_read_blocking(picomax_i2c, PIC_SLAVE_ADDR, (uint8_t*)&page_content, 2, false);
+			if (i2c_read_ret < 0) {
+				// Read failed
+				putchar(RESP_KO);
+				break;
+			}
 			putchar(RESP_OK);
-			uint16_t rxdata;
-			int ret = i2c_read_blocking(picomax_i2c, PIC_SLAVE_ADDR, (uint8_t*)&rxdata, 1, false); // TODO read 2 instead of 1 later
-			printf(ret < 0 ? "." : "@");
+			fwrite(&page_content, ICSP_BYTES_PER_WORD, 1, stdout);
+			fflush(stdout);
 
 			// Power off
 			*SET_GPIO_ATOMIC = MAX_EN_MASK; // Disable MAX4619

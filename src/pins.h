@@ -3,9 +3,6 @@
 
 // If you need to rewire the board, change here
 
-#define UART_TX_PIN				0x00 // Rpi pico pin 1
-#define UART_RX_PIN				0x01 // pin 2
-
 // Glitcher-specific
 #define MAX_EN_PIN				0x02 // pin 4
 #define MAX_EN_MASK				(1 << MAX_EN_PIN)
@@ -16,9 +13,10 @@
 #define TRIG_OUT_PIN			0x05 // pin 7
 #define TRIG_OUT_MASK			(1 << TRIG_OUT_PIN)
 
-// TODO remove this
-#define ICPS_READ_CMD_TRIGGER_PIN	0x0A
-#define ICPS_READ_CMD_TRIGGER_PIN_MASK (1 << ICPS_READ_CMD_TRIGGER_PIN)
+#define START_READ_PIN			0x06 // pin 9
+#define START_READ_MASK			(1 << START_READ_PIN)
+#define I2C_SDA_PIN				0x10 // pin 22 (opposite of 1)
+#define I2C_SCL_PIN				0x11 // pin 23
 
 // PIC ICSP programming-related
 #define ICSPCLK					0x12 // pin 24
