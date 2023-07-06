@@ -50,6 +50,7 @@
 void SYSTEM_Initialize(void)
 {
 
+    I2C_Initialize();
     PIN_MANAGER_Initialize();
     OSCILLATOR_Initialize();
     WDT_Initialize();
@@ -57,8 +58,8 @@ void SYSTEM_Initialize(void)
 
 void OSCILLATOR_Initialize(void)
 {
-    // SCS INTOSC; SPLLEN disabled; IRCF 16MHz_HF; 
-    OSCCON = 0x7A;
+    // SCS INTOSC; SPLLEN disabled; IRCF 500KHz_MF; 
+    OSCCON = 0x3A;
     // TUN 0; 
     OSCTUNE = 0x00;
     // SBOREN disabled; 

@@ -3,6 +3,14 @@
 [d edition pro ]
 [d chip 16LF1936 ]
 [d frameptr 6 ]
+"68 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+[e E2761 . `uc
+I2C_IDLE 0
+I2C_ADDR_TX 1
+I2C_ADDR_RX 2
+I2C_DATA_TX 3
+I2C_DATA_RX 4
+]
 "10 C:\Program Files\Microchip\xc8\v2.41\pic\sources\c99\common\sprcadd.c
 [v ___fladd __fladd `(d  1 e 4 0 ]
 "4 C:\Program Files\Microchip\xc8\v2.41\pic\sources\c99\common\Umul8_16.c
@@ -11,17 +19,148 @@
 [v ___eecpymem __eecpymem `(v  1 e 1 0 ]
 "39
 [v ___memcpyee __memcpyee `(v  1 e 1 0 ]
-"49 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+"11 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+[v _ReadIntHandler ReadIntHandler `(v  1 s 1 ReadIntHandler ]
+"21
+[v _AddressIntHandler AddressIntHandler `(v  1 s 1 AddressIntHandler ]
+"25
 [v _main main `(v  1 e 1 0 ]
+"108 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+[v _I2C_Initialize I2C_Initialize `(v  1 e 1 0 ]
+"116
+[v _I2C_Open I2C_Open `(v  1 e 1 0 ]
+"140
+[v _I2C_Write I2C_Write `(v  1 e 1 0 ]
+"165
+[v _I2C_Isr I2C_Isr `(v  1 s 1 I2C_Isr ]
+"223
+[v _I2C_SlaveSetIsrHandler I2C_SlaveSetIsrHandler `(v  1 e 1 0 ]
+"229
+[v _I2C_SlaveSetReadIntHandler I2C_SlaveSetReadIntHandler `(v  1 e 1 0 ]
+"233
+[v _I2C_SlaveRdCallBack I2C_SlaveRdCallBack `(v  1 s 1 I2C_SlaveRdCallBack ]
+"241
+[v _I2C_SlaveDefRdInterruptHandler I2C_SlaveDefRdInterruptHandler `(v  1 s 1 I2C_SlaveDefRdInterruptHandler ]
+"246
+[v _I2C_SlaveSetWriteIntHandler I2C_SlaveSetWriteIntHandler `(v  1 e 1 0 ]
+"250
+[v _I2C_SlaveWrCallBack I2C_SlaveWrCallBack `(v  1 s 1 I2C_SlaveWrCallBack ]
+"258
+[v _I2C_SlaveDefWrInterruptHandler I2C_SlaveDefWrInterruptHandler `(v  1 s 1 I2C_SlaveDefWrInterruptHandler ]
+"263
+[v _I2C_SlaveSetAddrIntHandler I2C_SlaveSetAddrIntHandler `(v  1 e 1 0 ]
+"267
+[v _I2C_SlaveAddrCallBack I2C_SlaveAddrCallBack `(v  1 s 1 I2C_SlaveAddrCallBack ]
+"274
+[v _I2C_SlaveDefAddrInterruptHandler I2C_SlaveDefAddrInterruptHandler `(v  1 s 1 I2C_SlaveDefAddrInterruptHandler ]
+"279
+[v _I2C_SlaveSetWrColIntHandler I2C_SlaveSetWrColIntHandler `(v  1 e 1 0 ]
+"291
+[v _I2C_SlaveDefWrColInterruptHandler I2C_SlaveDefWrColInterruptHandler `(v  1 s 1 I2C_SlaveDefWrColInterruptHandler ]
+"295
+[v _I2C_SlaveSetBusColIntHandler I2C_SlaveSetBusColIntHandler `(v  1 e 1 0 ]
+"307
+[v _I2C_SlaveDefBusColInterruptHandler I2C_SlaveDefBusColInterruptHandler `(v  1 s 1 I2C_SlaveDefBusColInterruptHandler ]
+"310
+[v _I2C_SlaveOpen I2C_SlaveOpen `T(a  1 s 1 I2C_SlaveOpen ]
+"323
+[v _I2C_SlaveClose I2C_SlaveClose `T(v  1 s 1 I2C_SlaveClose ]
+"331
+[v _I2C_SlaveSetSlaveAddr I2C_SlaveSetSlaveAddr `T(v  1 s 1 I2C_SlaveSetSlaveAddr ]
+"336
+[v _I2C_SlaveSetSlaveMask I2C_SlaveSetSlaveMask `T(v  1 s 1 I2C_SlaveSetSlaveMask ]
+"341
+[v _I2C_SlaveEnableIrq I2C_SlaveEnableIrq `T(v  1 s 1 I2C_SlaveEnableIrq ]
+"346
+[v _I2C_SlaveIsAddr I2C_SlaveIsAddr `T(a  1 s 1 I2C_SlaveIsAddr ]
+"351
+[v _I2C_SlaveIsRead I2C_SlaveIsRead `T(a  1 s 1 I2C_SlaveIsRead ]
+"356
+[v _I2C_SlaveClearIrq I2C_SlaveClearIrq `T(v  1 s 1 I2C_SlaveClearIrq ]
+"361
+[v _I2C_SlaveReleaseClock I2C_SlaveReleaseClock `T(v  1 s 1 I2C_SlaveReleaseClock ]
+"381
+[v _I2C_SlaveIsTxBufEmpty I2C_SlaveIsTxBufEmpty `T(a  1 s 1 I2C_SlaveIsTxBufEmpty ]
+"386
+[v _I2C_SlaveIsRxBufFull I2C_SlaveIsRxBufFull `T(a  1 s 1 I2C_SlaveIsRxBufFull ]
+"391
+[v _I2C_SlaveSendTxData I2C_SlaveSendTxData `T(v  1 s 1 I2C_SlaveSendTxData ]
+"396
+[v _I2C_SlaveGetRxData I2C_SlaveGetRxData `T(uc  1 s 1 I2C_SlaveGetRxData ]
+"406
+[v _I2C_SlaveSendAck I2C_SlaveSendAck `T(v  1 s 1 I2C_SlaveSendAck ]
+"412
+[v _I2C_SlaveSendNack I2C_SlaveSendNack `T(v  1 s 1 I2C_SlaveSendNack ]
+"52 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+[v _INTERRUPT_InterruptManager INTERRUPT_InterruptManager `II(v  1 e 1 0 ]
 "50 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
 [v _SYSTEM_Initialize SYSTEM_Initialize `(v  1 e 1 0 ]
-"58
+"59
 [v _OSCILLATOR_Initialize OSCILLATOR_Initialize `(v  1 e 1 0 ]
-"68
+"69
 [v _WDT_Initialize WDT_Initialize `(v  1 e 1 0 ]
+"58 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/memory.c
+[v _FLASH_ReadWord FLASH_ReadWord `(us  1 e 2 0 ]
+"95
+[v _FLASH_WriteBlock FLASH_WriteBlock `(c  1 e 1 0 ]
+"156
+[v _FLASH_EraseBlock FLASH_EraseBlock `(v  1 e 1 0 ]
 "55 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
 [v _PIN_MANAGER_Initialize PIN_MANAGER_Initialize `(v  1 e 1 0 ]
-"1223 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
+[s S123 . 1 `uc 1 IOCIF 1 0 :1:0 
+`uc 1 INTF 1 0 :1:1 
+`uc 1 TMR0IF 1 0 :1:2 
+`uc 1 IOCIE 1 0 :1:3 
+`uc 1 INTE 1 0 :1:4 
+`uc 1 TMR0IE 1 0 :1:5 
+`uc 1 PEIE 1 0 :1:6 
+`uc 1 GIE 1 0 :1:7 
+]
+"375 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
+[s S132 . 1 `uc 1 . 1 0 :2:0 
+`uc 1 T0IF 1 0 :1:2 
+`uc 1 . 1 0 :2:3 
+`uc 1 T0IE 1 0 :1:5 
+]
+[u S137 . 1 `S123 1 . 1 0 `S132 1 . 1 0 ]
+[v _INTCONbits INTCONbits `VES137  1 e 1 @11 ]
+[s S158 . 1 `uc 1 RA0 1 0 :1:0 
+`uc 1 RA1 1 0 :1:1 
+`uc 1 RA2 1 0 :1:2 
+`uc 1 RA3 1 0 :1:3 
+`uc 1 RA4 1 0 :1:4 
+`uc 1 RA5 1 0 :1:5 
+`uc 1 RA6 1 0 :1:6 
+`uc 1 RA7 1 0 :1:7 
+]
+"447
+[u S167 . 1 `S158 1 . 1 0 ]
+[v _PORTAbits PORTAbits `VES167  1 e 1 @12 ]
+[s S619 . 1 `uc 1 TMR1IF 1 0 :1:0 
+`uc 1 TMR2IF 1 0 :1:1 
+`uc 1 CCP1IF 1 0 :1:2 
+`uc 1 SSPIF 1 0 :1:3 
+`uc 1 TXIF 1 0 :1:4 
+`uc 1 RCIF 1 0 :1:5 
+`uc 1 ADIF 1 0 :1:6 
+`uc 1 TMR1GIF 1 0 :1:7 
+]
+"654
+[u S628 . 1 `S619 1 . 1 0 ]
+[v _PIR1bits PIR1bits `VES628  1 e 1 @17 ]
+[s S842 . 1 `uc 1 CCP2IF 1 0 :1:0 
+`uc 1 . 1 0 :1:1 
+`uc 1 LCDIF 1 0 :1:2 
+`uc 1 BCLIF 1 0 :1:3 
+`uc 1 EEIF 1 0 :1:4 
+`uc 1 C1IF 1 0 :1:5 
+`uc 1 C2IF 1 0 :1:6 
+`uc 1 OSFIF 1 0 :1:7 
+]
+"716
+[u S851 . 1 `S842 1 . 1 0 ]
+[v _PIR2bits PIR2bits `VES851  1 e 1 @18 ]
+"1223
 [v _TRISA TRISA `VEuc  1 e 1 @140 ]
 "1285
 [v _TRISB TRISB `VEuc  1 e 1 @141 ]
@@ -29,6 +168,30 @@
 [v _TRISC TRISC `VEuc  1 e 1 @142 ]
 "1409
 [v _TRISE TRISE `VEuc  1 e 1 @144 ]
+[s S577 . 1 `uc 1 TMR1IE 1 0 :1:0 
+`uc 1 TMR2IE 1 0 :1:1 
+`uc 1 CCP1IE 1 0 :1:2 
+`uc 1 SSPIE 1 0 :1:3 
+`uc 1 TXIE 1 0 :1:4 
+`uc 1 RCIE 1 0 :1:5 
+`uc 1 ADIE 1 0 :1:6 
+`uc 1 TMR1GIE 1 0 :1:7 
+]
+"1447
+[u S586 . 1 `S577 1 . 1 0 ]
+[v _PIE1bits PIE1bits `VES586  1 e 1 @145 ]
+[s S821 . 1 `uc 1 CCP2IE 1 0 :1:0 
+`uc 1 . 1 0 :1:1 
+`uc 1 LCDIE 1 0 :1:2 
+`uc 1 BCLIE 1 0 :1:3 
+`uc 1 EEIE 1 0 :1:4 
+`uc 1 C1IE 1 0 :1:5 
+`uc 1 C2IE 1 0 :1:6 
+`uc 1 OSFIE 1 0 :1:7 
+]
+"1509
+[u S830 . 1 `S821 1 . 1 0 ]
+[v _PIE2bits PIE2bits `VES830  1 e 1 @146 ]
 [s S34 . 1 `uc 1 PS0 1 0 :1:0 
 `uc 1 PS1 1 0 :1:1 
 `uc 1 PS2 1 0 :1:2 
@@ -54,7 +217,7 @@
 [v _OSCCON OSCCON `VEuc  1 e 1 @153 ]
 "2188
 [v _LATA LATA `VEuc  1 e 1 @268 ]
-[s S95 . 1 `uc 1 LATA0 1 0 :1:0 
+[s S220 . 1 `uc 1 LATA0 1 0 :1:0 
 `uc 1 LATA1 1 0 :1:1 
 `uc 1 LATA2 1 0 :1:2 
 `uc 1 LATA3 1 0 :1:3 
@@ -64,8 +227,8 @@
 `uc 1 LATA7 1 0 :1:7 
 ]
 "2205
-[u S104 . 1 `S95 1 . 1 0 ]
-[v _LATAbits LATAbits `VES104  1 e 1 @268 ]
+[u S229 . 1 `S220 1 . 1 0 ]
+[v _LATAbits LATAbits `VES229  1 e 1 @268 ]
 "2250
 [v _LATB LATB `VEuc  1 e 1 @269 ]
 "2312
@@ -80,37 +243,311 @@
 [v _ANSELA ANSELA `VEuc  1 e 1 @396 ]
 "3130
 [v _ANSELB ANSELB `VEuc  1 e 1 @397 ]
+"3195
+[v _EEADRL EEADRL `VEuc  1 e 1 @401 ]
+"3215
+[v _EEADRH EEADRH `VEuc  1 e 1 @402 ]
+"3242
+[v _EEDATL EEDATL `VEuc  1 e 1 @403 ]
+"3280
+[v _EEDATH EEDATH `VEuc  1 e 1 @404 ]
+[s S199 . 1 `uc 1 RD 1 0 :1:0 
+`uc 1 WR 1 0 :1:1 
+`uc 1 WREN 1 0 :1:2 
+`uc 1 WRERR 1 0 :1:3 
+`uc 1 FREE 1 0 :1:4 
+`uc 1 LWLO 1 0 :1:5 
+`uc 1 CFGS 1 0 :1:6 
+`uc 1 EEPGD 1 0 :1:7 
+]
+"3317
+[u S208 . 1 `S199 1 . 1 0 ]
+[v _EECON1bits EECON1bits `VES208  1 e 1 @405 ]
+"3362
+[v _EECON2 EECON2 `VEuc  1 e 1 @406 ]
 "3697
 [v _WPUB WPUB `VEuc  1 e 1 @525 ]
 "3767
 [v _WPUE WPUE `VEuc  1 e 1 @528 ]
-"49 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+"3788
+[v _SSPBUF SSPBUF `VEuc  1 e 1 @529 ]
+"3808
+[v _SSPADD SSPADD `VEuc  1 e 1 @530 ]
+"3828
+[v _SSPMSK SSPMSK `VEuc  1 e 1 @531 ]
+"3848
+[v _SSPSTAT SSPSTAT `VEuc  1 e 1 @532 ]
+[s S598 . 1 `uc 1 BF 1 0 :1:0 
+`uc 1 UA 1 0 :1:1 
+`uc 1 R_nW 1 0 :1:2 
+`uc 1 S 1 0 :1:3 
+`uc 1 P 1 0 :1:4 
+`uc 1 D_nA 1 0 :1:5 
+`uc 1 CKE 1 0 :1:6 
+`uc 1 SMP 1 0 :1:7 
+]
+"3865
+[u S607 . 1 `S598 1 . 1 0 ]
+[v _SSPSTATbits SSPSTATbits `VES607  1 e 1 @532 ]
+"3910
+[v _SSPCON1 SSPCON1 `VEuc  1 e 1 @533 ]
+[s S390 . 1 `uc 1 SSPM0 1 0 :1:0 
+`uc 1 SSPM1 1 0 :1:1 
+`uc 1 SSPM2 1 0 :1:2 
+`uc 1 SSPM3 1 0 :1:3 
+`uc 1 CKP 1 0 :1:4 
+`uc 1 SSPEN 1 0 :1:5 
+`uc 1 SSPOV 1 0 :1:6 
+`uc 1 WCOL 1 0 :1:7 
+]
+"3935
+[s S399 . 1 `uc 1 SSPM 1 0 :4:0 
+]
+[u S401 . 1 `S390 1 . 1 0 `S399 1 . 1 0 ]
+[v _SSPCON1bits SSPCON1bits `VES401  1 e 1 @533 ]
+"4048
+[v _SSPCON2 SSPCON2 `VEuc  1 e 1 @534 ]
+[s S640 . 1 `uc 1 SEN 1 0 :1:0 
+`uc 1 RSEN 1 0 :1:1 
+`uc 1 PEN 1 0 :1:2 
+`uc 1 RCEN 1 0 :1:3 
+`uc 1 ACKEN 1 0 :1:4 
+`uc 1 ACKDT 1 0 :1:5 
+`uc 1 ACKSTAT 1 0 :1:6 
+`uc 1 GCEN 1 0 :1:7 
+]
+"4065
+[u S649 . 1 `S640 1 . 1 0 ]
+[v _SSPCON2bits SSPCON2bits `VES649  1 e 1 @534 ]
+"4 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+[v _start_barrier start_barrier `VEuc  1 e 1 0 ]
+"5
+[v _prog_data prog_data `VEus  1 e 2 0 ]
+"6
+[v _read_state read_state `VEuc  1 e 1 0 ]
+"8
+[v _datl datl `VEuc  1 e 1 0 ]
+"9
+[v _dath dath `VEuc  1 e 1 0 ]
+"65 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+[v _i2cWrData i2cWrData `VEuc  1 e 1 0 ]
+"66
+[v _i2cRdData i2cRdData `VEuc  1 e 1 0 ]
+"67
+[v _i2cSlaveAddr i2cSlaveAddr `VEuc  1 e 1 0 ]
+"68
+[v _i2cSlaveState i2cSlaveState `VEE2761  1 s 1 i2cSlaveState ]
+"135 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.h
+[v _MSSP_InterruptHandler MSSP_InterruptHandler `*.37(v  1 e 2 0 ]
+"136
+[v _I2C_SlaveRdInterruptHandler I2C_SlaveRdInterruptHandler `*.37(v  1 e 2 0 ]
+"137
+[v _I2C_SlaveWrInterruptHandler I2C_SlaveWrInterruptHandler `*.37(v  1 e 2 0 ]
+"138
+[v _I2C_SlaveAddrInterruptHandler I2C_SlaveAddrInterruptHandler `*.37(v  1 e 2 0 ]
+"139
+[v _I2C_SlaveBusColInterruptHandler I2C_SlaveBusColInterruptHandler `*.37(v  1 e 2 0 ]
+"140
+[v _I2C_SlaveWrColInterruptHandler I2C_SlaveWrColInterruptHandler `*.37(v  1 e 2 0 ]
+"25 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
 [v _main main `(v  1 e 1 0 ]
 {
-"76
-[v main@i i `uc  1 a 1 3 ]
-"54
-[v main@a a `i  1 a 2 4 ]
-[v main@b b `i  1 a 2 1 ]
-"82
+"64
 } 0
 "50 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
 [v _SYSTEM_Initialize SYSTEM_Initialize `(v  1 e 1 0 ]
 {
-"56
+"57
 } 0
-"68
+"69
 [v _WDT_Initialize WDT_Initialize `(v  1 e 1 0 ]
 {
-"72
+"73
 } 0
 "55 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
 [v _PIN_MANAGER_Initialize PIN_MANAGER_Initialize `(v  1 e 1 0 ]
 {
 "97
 } 0
-"58 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+"59 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
 [v _OSCILLATOR_Initialize OSCILLATOR_Initialize `(v  1 e 1 0 ]
 {
-"66
+"67
+} 0
+"108 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+[v _I2C_Initialize I2C_Initialize `(v  1 e 1 0 ]
+{
+"114
+} 0
+"116
+[v _I2C_Open I2C_Open `(v  1 e 1 0 ]
+{
+"128
+} 0
+"246
+[v _I2C_SlaveSetWriteIntHandler I2C_SlaveSetWriteIntHandler `(v  1 e 1 0 ]
+{
+[v I2C_SlaveSetWriteIntHandler@handler handler `*.37(v  1 p 2 0 ]
+"248
+} 0
+"279
+[v _I2C_SlaveSetWrColIntHandler I2C_SlaveSetWrColIntHandler `(v  1 e 1 0 ]
+{
+[v I2C_SlaveSetWrColIntHandler@handler handler `*.37(v  1 p 2 0 ]
+"281
+} 0
+"336
+[v _I2C_SlaveSetSlaveMask I2C_SlaveSetSlaveMask `T(v  1 s 1 I2C_SlaveSetSlaveMask ]
+{
+[v I2C_SlaveSetSlaveMask@maskAddr maskAddr `uc  1 a 1 wreg ]
+[v I2C_SlaveSetSlaveMask@maskAddr maskAddr `uc  1 a 1 wreg ]
+"338
+[v I2C_SlaveSetSlaveMask@maskAddr maskAddr `uc  1 a 1 0 ]
+"339
+} 0
+"331
+[v _I2C_SlaveSetSlaveAddr I2C_SlaveSetSlaveAddr `T(v  1 s 1 I2C_SlaveSetSlaveAddr ]
+{
+[v I2C_SlaveSetSlaveAddr@slaveAddr slaveAddr `uc  1 a 1 wreg ]
+[v I2C_SlaveSetSlaveAddr@slaveAddr slaveAddr `uc  1 a 1 wreg ]
+"333
+[v I2C_SlaveSetSlaveAddr@slaveAddr slaveAddr `uc  1 a 1 0 ]
+"334
+} 0
+"229
+[v _I2C_SlaveSetReadIntHandler I2C_SlaveSetReadIntHandler `(v  1 e 1 0 ]
+{
+[v I2C_SlaveSetReadIntHandler@handler handler `*.37(v  1 p 2 0 ]
+"231
+} 0
+"223
+[v _I2C_SlaveSetIsrHandler I2C_SlaveSetIsrHandler `(v  1 e 1 0 ]
+{
+[v I2C_SlaveSetIsrHandler@handler handler `*.37(v  1 p 2 0 ]
+"226
+} 0
+"295
+[v _I2C_SlaveSetBusColIntHandler I2C_SlaveSetBusColIntHandler `(v  1 e 1 0 ]
+{
+[v I2C_SlaveSetBusColIntHandler@handler handler `*.37(v  1 p 2 0 ]
+"297
+} 0
+"263
+[v _I2C_SlaveSetAddrIntHandler I2C_SlaveSetAddrIntHandler `(v  1 e 1 0 ]
+{
+[v I2C_SlaveSetAddrIntHandler@handler handler `*.37(v  1 p 2 0 ]
+"265
+} 0
+"310
+[v _I2C_SlaveOpen I2C_SlaveOpen `T(a  1 s 1 I2C_SlaveOpen ]
+{
+"321
+} 0
+"341
+[v _I2C_SlaveEnableIrq I2C_SlaveEnableIrq `T(v  1 s 1 I2C_SlaveEnableIrq ]
+{
+"344
+} 0
+"52 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+[v _INTERRUPT_InterruptManager INTERRUPT_InterruptManager `II(v  1 e 1 0 ]
+{
+"74
+} 0
+"165 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+[v _I2C_Isr I2C_Isr `(v  1 s 1 I2C_Isr ]
+{
+"220
+} 0
+"250
+[v _I2C_SlaveWrCallBack I2C_SlaveWrCallBack `(v  1 s 1 I2C_SlaveWrCallBack ]
+{
+"256
+} 0
+"258
+[v _I2C_SlaveDefWrInterruptHandler I2C_SlaveDefWrInterruptHandler `(v  1 s 1 I2C_SlaveDefWrInterruptHandler ]
+{
+"260
+} 0
+"11 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+[v _ReadIntHandler ReadIntHandler `(v  1 s 1 ReadIntHandler ]
+{
+"19
+} 0
+"140 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+[v _I2C_Write I2C_Write `(v  1 e 1 0 ]
+{
+[v I2C_Write@data data `uc  1 a 1 wreg ]
+[v I2C_Write@data data `uc  1 a 1 wreg ]
+"142
+[v I2C_Write@data data `uc  1 a 1 1 ]
+"143
+} 0
+"391
+[v _I2C_SlaveSendTxData I2C_SlaveSendTxData `T(v  1 s 1 I2C_SlaveSendTxData ]
+{
+[v I2C_SlaveSendTxData@data data `uc  1 a 1 wreg ]
+[v I2C_SlaveSendTxData@data data `uc  1 a 1 wreg ]
+"393
+[v I2C_SlaveSendTxData@data data `uc  1 a 1 0 ]
+"394
+} 0
+"361
+[v _I2C_SlaveReleaseClock I2C_SlaveReleaseClock `T(v  1 s 1 I2C_SlaveReleaseClock ]
+{
+"364
+} 0
+"233
+[v _I2C_SlaveRdCallBack I2C_SlaveRdCallBack `(v  1 s 1 I2C_SlaveRdCallBack ]
+{
+"239
+} 0
+"241
+[v _I2C_SlaveDefRdInterruptHandler I2C_SlaveDefRdInterruptHandler `(v  1 s 1 I2C_SlaveDefRdInterruptHandler ]
+{
+"243
+} 0
+"381
+[v _I2C_SlaveIsTxBufEmpty I2C_SlaveIsTxBufEmpty `T(a  1 s 1 I2C_SlaveIsTxBufEmpty ]
+{
+"384
+} 0
+"386
+[v _I2C_SlaveIsRxBufFull I2C_SlaveIsRxBufFull `T(a  1 s 1 I2C_SlaveIsRxBufFull ]
+{
+"389
+} 0
+"351
+[v _I2C_SlaveIsRead I2C_SlaveIsRead `T(a  1 s 1 I2C_SlaveIsRead ]
+{
+"354
+} 0
+"346
+[v _I2C_SlaveIsAddr I2C_SlaveIsAddr `T(a  1 s 1 I2C_SlaveIsAddr ]
+{
+"349
+} 0
+"356
+[v _I2C_SlaveClearIrq I2C_SlaveClearIrq `T(v  1 s 1 I2C_SlaveClearIrq ]
+{
+"359
+} 0
+"267
+[v _I2C_SlaveAddrCallBack I2C_SlaveAddrCallBack `(v  1 s 1 I2C_SlaveAddrCallBack ]
+{
+"272
+} 0
+"21 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+[v _AddressIntHandler AddressIntHandler `(v  1 s 1 AddressIntHandler ]
+{
+"23
+} 0
+"274 C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+[v _I2C_SlaveDefAddrInterruptHandler I2C_SlaveDefAddrInterruptHandler `(v  1 s 1 I2C_SlaveDefAddrInterruptHandler ]
+{
+"276
+} 0
+"396
+[v _I2C_SlaveGetRxData I2C_SlaveGetRxData `T(uc  1 s 1 I2C_SlaveGetRxData ]
+{
+"399
 } 0

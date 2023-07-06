@@ -10,6 +10,9 @@
         <itemPath>mcc_generated_files/mcc.h</itemPath>
         <itemPath>mcc_generated_files/pin_manager.h</itemPath>
         <itemPath>mcc_generated_files/device_config.h</itemPath>
+        <itemPath>mcc_generated_files/memory.h</itemPath>
+        <itemPath>mcc_generated_files/i2c_slave.h</itemPath>
+        <itemPath>mcc_generated_files/interrupt_manager.h</itemPath>
       </logicalFolder>
       <itemPath>system.h</itemPath>
       <itemPath>user.h</itemPath>
@@ -23,6 +26,9 @@
         <itemPath>mcc_generated_files/device_config.c</itemPath>
         <itemPath>mcc_generated_files/pin_manager.c</itemPath>
         <itemPath>mcc_generated_files/mcc.c</itemPath>
+        <itemPath>mcc_generated_files/memory.c</itemPath>
+        <itemPath>mcc_generated_files/i2c_slave.c</itemPath>
+        <itemPath>mcc_generated_files/interrupt_manager.c</itemPath>
       </logicalFolder>
       <itemPath>configuration_bits.c</itemPath>
       <itemPath>main.c</itemPath>

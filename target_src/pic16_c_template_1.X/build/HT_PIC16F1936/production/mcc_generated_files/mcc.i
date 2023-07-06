@@ -4917,9 +4917,9 @@ extern __bank0 __bit __timeout;
 # 50 "mcc_generated_files/mcc.h" 2
 
 # 1 "mcc_generated_files/pin_manager.h" 1
-# 120 "mcc_generated_files/pin_manager.h"
+# 122 "mcc_generated_files/pin_manager.h"
 void PIN_MANAGER_Initialize (void);
-# 132 "mcc_generated_files/pin_manager.h"
+# 134 "mcc_generated_files/pin_manager.h"
 void PIN_MANAGER_IOC(void);
 # 51 "mcc_generated_files/mcc.h" 2
 
@@ -5082,11 +5082,114 @@ char *ctermid(char *);
 char *tempnam(const char *, const char *);
 # 8 "C:\\Program Files\\Microchip\\xc8\\v2.41\\pic\\include\\c99\\conio.h" 2 3
 # 54 "mcc_generated_files/mcc.h" 2
-# 69 "mcc_generated_files/mcc.h"
+
+# 1 "mcc_generated_files/interrupt_manager.h" 1
+# 55 "mcc_generated_files/mcc.h" 2
+
+# 1 "mcc_generated_files/i2c_slave.h" 1
+# 53 "mcc_generated_files/i2c_slave.h"
+typedef void (*i2cInterruptHandler)(void);
+
+
+
+
+
+
+
+void I2C_Initialize(void);
+
+
+
+
+
+
+void I2C_Open(void);
+
+
+
+
+
+
+
+void I2C_Close(void);
+
+
+
+
+
+
+uint8_t I2C_Read(void);
+
+
+
+
+
+
+void I2C_Write(uint8_t data);
+# 99 "mcc_generated_files/i2c_slave.h"
+_Bool I2C_IsRead(void);
+
+
+
+
+
+
+void I2C_Enable(void);
+
+
+
+
+
+
+void I2C_SendAck(void);
+
+
+
+
+
+
+void I2C_SendNack(void);
+
+
+
+
+
+
+
+void I2C_SlaveSetIsrHandler(i2cInterruptHandler handler);
+void I2C_SlaveSetAddrIntHandler(i2cInterruptHandler handler);
+void I2C_SlaveSetReadIntHandler(i2cInterruptHandler handler);
+void I2C_SlaveSetWriteIntHandler(i2cInterruptHandler handler);
+void I2C_SlaveSetBusColIntHandler(i2cInterruptHandler handler);
+void I2C_SlaveSetWrColIntHandler(i2cInterruptHandler handler);
+
+void (*MSSP_InterruptHandler)(void);
+void (*I2C_SlaveRdInterruptHandler)(void);
+void (*I2C_SlaveWrInterruptHandler)(void);
+void (*I2C_SlaveAddrInterruptHandler)(void);
+void (*I2C_SlaveBusColInterruptHandler)(void);
+void (*I2C_SlaveWrColInterruptHandler)(void);
+# 56 "mcc_generated_files/mcc.h" 2
+
+# 1 "mcc_generated_files/memory.h" 1
+# 99 "mcc_generated_files/memory.h"
+uint16_t FLASH_ReadWord(uint16_t flashAddr);
+# 128 "mcc_generated_files/memory.h"
+void FLASH_WriteWord(uint16_t flashAddr, uint16_t *ramBuf, uint16_t word);
+# 164 "mcc_generated_files/memory.h"
+int8_t FLASH_WriteBlock(uint16_t writeAddr, uint16_t *flashWordArray);
+# 189 "mcc_generated_files/memory.h"
+void FLASH_EraseBlock(uint16_t startAddr);
+# 220 "mcc_generated_files/memory.h"
+void DATAEE_WriteByte(uint8_t bAdd, uint8_t bData);
+# 246 "mcc_generated_files/memory.h"
+uint8_t DATAEE_ReadByte(uint8_t bAdd);
+# 57 "mcc_generated_files/mcc.h" 2
+# 72 "mcc_generated_files/mcc.h"
 void SYSTEM_Initialize(void);
-# 82 "mcc_generated_files/mcc.h"
+# 85 "mcc_generated_files/mcc.h"
 void OSCILLATOR_Initialize(void);
-# 94 "mcc_generated_files/mcc.h"
+# 97 "mcc_generated_files/mcc.h"
 void WDT_Initialize(void);
 # 47 "mcc_generated_files/mcc.c" 2
 
@@ -5095,6 +5198,7 @@ void WDT_Initialize(void);
 void SYSTEM_Initialize(void)
 {
 
+    I2C_Initialize();
     PIN_MANAGER_Initialize();
     OSCILLATOR_Initialize();
     WDT_Initialize();
@@ -5103,7 +5207,7 @@ void SYSTEM_Initialize(void)
 void OSCILLATOR_Initialize(void)
 {
 
-    OSCCON = 0x7A;
+    OSCCON = 0x3A;
 
     OSCTUNE = 0x00;
 

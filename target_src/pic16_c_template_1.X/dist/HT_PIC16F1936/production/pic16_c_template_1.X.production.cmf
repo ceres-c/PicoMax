@@ -12,17 +12,52 @@
 # in delta units.  Any other numeric values are decimal.
 %PSECTS
 $dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-cinit CODE 0 7FD 7FD 3 2 1
-text1 CODE 0 795 795 A 2 1
-text2 CODE 0 78A 78A 4 2 1
-text3 CODE 0 79F 79F 1B 2 1
-text4 CODE 0 78E 78E 7 2 1
-maintext CODE 0 7BA 7BA 43 2 1
-cstackCOMMON COMMON 1 70 70 6 1 1
+cinit CODE 0 29 29 14 2 1
+text1 CODE 0 165 165 D 2 1
+text2 CODE 0 20E 20E 4 2 1
+text3 CODE 0 129 129 1B 2 1
+text4 CODE 0 1A4 1A4 7 2 1
+text5 CODE 0 199 199 B 2 1
+text6 CODE 0 EA EA 3F 2 1
+text7 CODE 0 1BF 1BF 6 2 1
+text8 CODE 0 1C5 1C5 6 2 1
+text9 CODE 0 1CB 1CB 6 2 1
+text10 CODE 0 1D1 1D1 6 2 1
+text11 CODE 0 1D7 1D7 6 2 1
+text12 CODE 0 1DD 1DD 6 2 1
+text13 CODE 0 1E3 1E3 6 2 1
+text14 CODE 0 1E9 1E9 6 2 1
+text15 CODE 0 156 156 F 2 1
+text16 CODE 0 216 216 3 2 1
+text18 CODE 0 3D 3D 69 2 1
+text19 CODE 0 172 172 D 2 1
+text20 CODE 0 1F5 1F5 5 2 1
+text21 CODE 0 144 144 12 2 1
+text22 CODE 0 1EF 1EF 6 2 1
+text23 CODE 0 1FA 1FA 5 2 1
+text24 CODE 0 219 219 3 2 1
+text25 CODE 0 17F 17F D 2 1
+text26 CODE 0 1FF 1FF 5 2 1
+text27 CODE 0 1AB 1AB 7 2 1
+text28 CODE 0 212 212 4 2 1
+text29 CODE 0 204 204 5 2 1
+text30 CODE 0 1B2 1B2 7 2 1
+text31 CODE 0 21C 21C 3 2 1
+text32 CODE 0 18C 18C D 2 1
+text33 CODE 0 21F 21F 3 2 1
+text34 CODE 0 209 209 5 2 1
+text35 CODE 0 222 222 3 2 1
+maintext CODE 0 A6 A6 44 2 1
+cstackCOMMON COMMON 1 78 78 4 1 1
+cstackBANK0 BANK0 1 2E 2E 2 1 1
+intentry CODE 0 4 4 23 2 1
+bssBANK0 BANK0 1 20 20 E 1 1
+clrtext CODE 0 1B9 1B9 6 2 1
+bssCOMMON COMMON 1 70 70 8 1 1
 config CONFIG 4 8007 8007 2 2 1
-$C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
+$C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
 reset_vec CODE 0 0 0 2 2 1
-end_init CODE 0 2 2 2 2 1
+end_init CODE 0 27 27 2 2 1
 config CONFIG 4 8007 8007 2 2 1
 # %UNUSED Section
 # This section enumerates the unused ranges of each CLASS. Each entry
@@ -30,24 +65,24 @@ config CONFIG 4 8007 8007 2 2 1
 #    <class name> <range> <delta>
 # Addresses given in the range are in hexadecimal and units of delta.
 %UNUSED
-RAM 20-6F 1
+RAM 30-6F 1
 RAM A0-EF 1
 RAM 120-16F 1
 RAM 1A0-1EF 1
 RAM 220-26F 1
 RAM 2A0-2EF 1
 RAM 320-32F 1
-BANK0 20-6F 1
+BANK0 30-6F 1
 BANK1 A0-EF 1
 BANK2 120-16F 1
 BANK3 1A0-1EF 1
 BANK4 220-26F 1
 BANK5 2A0-2EF 1
 BANK6 320-32F 1
-CONST 4-789 2
-CONST 800-1FFF 2
-ENTRY 4-789 2
-ENTRY 800-1FFF 2
+CONST 2-3 2
+CONST 225-1FFF 2
+ENTRY 2-3 2
+ENTRY 225-1FFF 2
 IDLOC 8000-8003 2
 SFR10 500-56F 1
 SFR11 580-5EF 1
@@ -71,8 +106,8 @@ SFR28 E00-E6F 1
 SFR29 E80-EEF 1
 SFR30 F00-F6F 1
 SFR31 F80-FEF 1
-CODE 4-789 2
-CODE 800-1FFF 2
+CODE 2-3 2
+CODE 225-1FFF 2
 SFR0 0-1F 1
 SFR1 80-9F 1
 SFR2 100-11F 1
@@ -84,12 +119,12 @@ SFR7 380-3EF 1
 SFR8 400-46F 1
 SFR9 480-4EF 1
 BIGRAM 2000-21EF 1
-COMMON 76-7D 1
+COMMON 7C-7D 1
 EEDATA F000-F0FF 2
-STRCODE 4-789 2
-STRCODE 800-1FFF 2
-STRING 4-789 2
-STRING 800-1FFF 2
+STRCODE 2-3 2
+STRCODE 225-1FFF 2
+STRING 2-3 2
+STRING 225-1FFF 2
 # %LINETAB Section
 # This section enumerates the file/line to address mappings.
 # The beginning of the section is indicated by %LINETAB.
@@ -104,56 +139,240 @@ STRING 800-1FFF 2
 # All other numeric values are in decimal.
 %LINETAB
 $dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-7FD cinit CODE >2473:C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_1.s
-7FD cinit CODE >2476:C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_1.s
-7FD cinit CODE >2482:C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_1.s
-7FD cinit CODE >2484:C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_1.s
-7FE cinit CODE >2485:C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_1.s
-78E text4 CODE >58:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-78E text4 CODE >61:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-791 text4 CODE >63:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-792 text4 CODE >65:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-794 text4 CODE >66:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-79F text3 CODE >55:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-79F text3 CODE >60:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7A1 text3 CODE >61:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7A2 text3 CODE >62:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7A3 text3 CODE >63:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7A4 text3 CODE >68:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7A7 text3 CODE >69:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7A9 text3 CODE >70:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7AB text3 CODE >71:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7AD text3 CODE >76:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7B0 text3 CODE >77:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7B2 text3 CODE >82:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7B4 text3 CODE >83:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7B5 text3 CODE >84:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7B7 text3 CODE >90:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-7B9 text3 CODE >97:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
-78A text2 CODE >68:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-78A text2 CODE >71:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-78D text2 CODE >72:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-795 text1 CODE >50:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-795 text1 CODE >53:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-798 text1 CODE >54:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-79B text1 CODE >55:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-79E text1 CODE >56:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
-7BA maintext CODE >49:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7BA maintext CODE >52:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7BD maintext CODE >58:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7C1 maintext CODE >60:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7C3 maintext CODE >62:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7C5 maintext CODE >63:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7C9 maintext CODE >64:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7D2 maintext CODE >64:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7D6 maintext CODE >64:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7DA maintext CODE >67:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7E7 maintext CODE >68:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7EA maintext CODE >70:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7EC maintext CODE >73:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7ED maintext CODE >76:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7F7 maintext CODE >79:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
-7F9 maintext CODE >80:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+29 cinit CODE >3564:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+29 cinit CODE >3567:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+29 cinit CODE >3636:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+2A cinit CODE >3637:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+2B cinit CODE >3638:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+2C cinit CODE >3639:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+2D cinit CODE >3640:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+2E cinit CODE >3641:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+31 cinit CODE >3645:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+32 cinit CODE >3646:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+33 cinit CODE >3647:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+34 cinit CODE >3648:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+35 cinit CODE >3649:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+36 cinit CODE >3650:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+39 cinit CODE >3656:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+39 cinit CODE >3658:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+3A cinit CODE >3659:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+3B cinit CODE >3660:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+4 intentry CODE >52:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+6 intentry CODE >55:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+A intentry CODE >57:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+14 intentry CODE >59:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+19 intentry CODE >60:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+1A intentry CODE >61:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+25 intentry CODE >68:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+25 intentry CODE >74:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/interrupt_manager.c
+222 text35 CODE >396:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+222 text35 CODE >398:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+224 text35 CODE >399:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+209 text34 CODE >274:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+209 text34 CODE >275:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+20D text34 CODE >276:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+21F text33 CODE >21:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+21F text33 CODE >22:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+221 text33 CODE >23:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+18C text32 CODE >267:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+18C text32 CODE >269:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+193 text32 CODE >270:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+198 text32 CODE >272:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+21C text31 CODE >356:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+21C text31 CODE >358:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+21E text31 CODE >359:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1B2 text30 CODE >346:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1B2 text30 CODE >348:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1B5 text30 CODE >348:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1B8 text30 CODE >349:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+204 text29 CODE >351:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+204 text29 CODE >353:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+208 text29 CODE >354:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+212 text28 CODE >386:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+212 text28 CODE >388:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+215 text28 CODE >389:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1AB text27 CODE >381:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1AB text27 CODE >383:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1AE text27 CODE >383:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1B1 text27 CODE >384:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1FF text26 CODE >241:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1FF text26 CODE >242:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+203 text26 CODE >243:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+17F text25 CODE >233:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+17F text25 CODE >235:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+186 text25 CODE >237:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+18B text25 CODE >239:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+219 text24 CODE >361:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+219 text24 CODE >363:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+21B text24 CODE >364:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1FA text23 CODE >391:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1FB text23 CODE >393:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1FE text23 CODE >394:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1EF text22 CODE >140:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1F0 text22 CODE >142:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1F4 text22 CODE >143:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+144 text21 CODE >11:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+144 text21 CODE >12:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+149 text21 CODE >13:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+14D text21 CODE >14:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+14F text21 CODE >15:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+150 text21 CODE >16:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+154 text21 CODE >17:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+155 text21 CODE >19:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+1F5 text20 CODE >258:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1F5 text20 CODE >259:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1F9 text20 CODE >260:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+172 text19 CODE >250:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+172 text19 CODE >252:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+179 text19 CODE >254:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+17E text19 CODE >256:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+3D text18 CODE >165:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+3D text18 CODE >167:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+40 text18 CODE >169:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+44 text18 CODE >169:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+48 text18 CODE >171:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+4C text18 CODE >171:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+50 text18 CODE >173:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+52 text18 CODE >174:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+53 text18 CODE >177:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+56 text18 CODE >182:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+5A text18 CODE >182:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+5E text18 CODE >184:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+60 text18 CODE >185:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+61 text18 CODE >188:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+64 text18 CODE >195:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+67 text18 CODE >196:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+6B text18 CODE >196:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+6F text18 CODE >198:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+73 text18 CODE >202:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+76 text18 CODE >203:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+77 text18 CODE >205:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+7B text18 CODE >205:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+80 text18 CODE >211:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+84 text18 CODE >211:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+88 text18 CODE >213:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+8C text18 CODE >218:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+91 text18 CODE >218:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+96 text18 CODE >218:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+99 text18 CODE >218:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+9C text18 CODE >218:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+9F text18 CODE >218:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+A2 text18 CODE >219:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+A5 text18 CODE >220:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+216 text16 CODE >341:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+216 text16 CODE >343:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+218 text16 CODE >344:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+156 text15 CODE >310:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+156 text15 CODE >312:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+15B text15 CODE >314:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+15C text15 CODE >315:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+162 text15 CODE >316:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+163 text15 CODE >317:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+164 text15 CODE >321:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1E9 text14 CODE >263:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1E9 text14 CODE >264:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1EE text14 CODE >265:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1E3 text13 CODE >295:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1E3 text13 CODE >296:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1E8 text13 CODE >297:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1DD text12 CODE >223:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1DD text12 CODE >225:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1E2 text12 CODE >226:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1D7 text11 CODE >229:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1D7 text11 CODE >230:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1DC text11 CODE >231:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1D1 text10 CODE >331:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1D3 text10 CODE >333:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1D6 text10 CODE >334:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1CB text9 CODE >336:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1CD text9 CODE >338:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1D0 text9 CODE >339:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1C5 text8 CODE >279:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1C5 text8 CODE >280:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1CA text8 CODE >281:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1BF text7 CODE >246:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1BF text7 CODE >247:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1C4 text7 CODE >248:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+EA text6 CODE >116:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+EA text6 CODE >118:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+ED text6 CODE >119:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+F1 text6 CODE >120:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+F5 text6 CODE >121:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+FD text6 CODE >122:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+105 text6 CODE >123:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+10D text6 CODE >124:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+115 text6 CODE >125:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+11D text6 CODE >126:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+125 text6 CODE >127:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+128 text6 CODE >128:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+199 text5 CODE >108:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+199 text5 CODE >110:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+19B text5 CODE >111:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1A1 text5 CODE >112:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1A2 text5 CODE >113:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1A3 text5 CODE >114:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/i2c_slave.c
+1A4 text4 CODE >59:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+1A4 text4 CODE >62:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+1A7 text4 CODE >64:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+1A8 text4 CODE >66:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+1AA text4 CODE >67:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+129 text3 CODE >55:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+129 text3 CODE >60:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+12B text3 CODE >61:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+12C text3 CODE >62:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+12D text3 CODE >63:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+12E text3 CODE >68:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+131 text3 CODE >69:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+133 text3 CODE >70:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+135 text3 CODE >71:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+137 text3 CODE >76:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+13A text3 CODE >77:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+13C text3 CODE >82:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+13E text3 CODE >83:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+13F text3 CODE >84:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+141 text3 CODE >90:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+143 text3 CODE >97:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/pin_manager.c
+20E text2 CODE >69:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+20E text2 CODE >72:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+211 text2 CODE >73:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+165 text1 CODE >50:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+165 text1 CODE >53:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+168 text1 CODE >54:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+16B text1 CODE >55:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+16E text1 CODE >56:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+171 text1 CODE >57:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\mcc_generated_files/mcc.c
+A6 maintext CODE >25:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+A6 maintext CODE >28:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+A9 maintext CODE >29:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+AA maintext CODE >30:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+AB maintext CODE >31:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+AE maintext CODE >33:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+B0 maintext CODE >34:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+B1 maintext CODE >36:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+B9 maintext CODE >37:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+BF maintext CODE >39:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+C2 maintext CODE >40:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+CA maintext CODE >41:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+D2 maintext CODE >44:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+D5 maintext CODE >45:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+D7 maintext CODE >47:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+D8 maintext CODE >48:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+D9 maintext CODE >50:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+DB maintext CODE >51:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+DD maintext CODE >52:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+DE maintext CODE >53:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+DF maintext CODE >54:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+E1 maintext CODE >55:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+E4 maintext CODE >56:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+E6 maintext CODE >60:C:\Users\federico\MPLABXProjects\pic16_c_template_1.X\main.c
+1B9 clrtext CODE >3625:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+1B9 clrtext CODE >3626:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+1BA clrtext CODE >3627:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+1BA clrtext CODE >3628:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+1BB clrtext CODE >3629:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+1BC clrtext CODE >3630:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+1BD clrtext CODE >3631:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
+1BE clrtext CODE >3632:C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_1.s
 # %SYMTAB Section
 # An enumeration of all symbols in the program.
 # The beginning of the section is indicated by %SYMTAB.
@@ -167,17 +386,21 @@ $dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 # is the name of the object file in which the symbol was defined.
 %SYMTAB
 ___latbits 2 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__Hspace_0 800 0 ABS 0 - -
-__Hspace_1 76 0 ABS 0 - -
+__Hspace_0 225 0 ABS 0 - -
+__Hspace_1 7C 0 ABS 0 - -
 __Hspace_2 0 0 ABS 0 - -
 __Hspace_3 0 0 ABS 0 - -
 __Hspace_4 10010 0 ABS 0 - -
+_I2C_SlaveSetWrColIntHandler 38A 0 CODE 0 text8 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetBusColIntHandler@handler 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Heeprom_data 0 0 EEDATA 3 eeprom_data -
+_start_barrier 77 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __L__absolute__ 0 0 ABS 0 __absolute__ -
-__end_of_WDT_Initialize F1C 0 CODE 0 text2 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-main@a 74 0 COMMON 1 cstackCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-main@b 71 0 COMMON 1 cstackCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-main@i 73 0 COMMON 1 cstackCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveIsRxBufFull 424 0 CODE 0 text28 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveSetAddrIntHandler 3D2 0 CODE 0 text14 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_Write 3EA 0 CODE 0 text22 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_WDT_Initialize 424 0 CODE 0 text2 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveSetReadIntHandler 3BA 0 CODE 0 text11 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hstrings 0 0 ABS 0 strings -
 _LATA 10C 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _LATB 10D 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
@@ -185,34 +408,80 @@ _LATC 10E 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.productio
 _LATE 110 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _WPUB 20D 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _WPUE 210 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-___sp 0 0 STACK 2 stack C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-_main F74 0 CODE 0 maintext dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+___sp 0 0 STACK 2 stack C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+_dath 74 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_datl 75 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_main 14C 0 CODE 0 maintext dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 btemp 7E 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-start 4 0 CODE 0 init C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
+start 4E 0 CODE 0 init C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+__end_of_ReadIntHandler 2AC 0 CODE 0 text21 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__HbssCOMMON 0 0 ABS 0 bssCOMMON -
+_MSSP_InterruptHandler 2C 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _OPTION_REGbits 95 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hpowerup 0 0 CODE 0 powerup -
-intlevel0 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-intlevel1 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-intlevel2 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-intlevel3 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-intlevel4 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-intlevel5 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
+_I2C_Write 3DE 0 CODE 0 text22 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveSetWriteIntHandler 37E 0 CODE 0 text7 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_i2cSlaveState 70 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveWrInterruptHandler 28 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+intlevel0 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+intlevel1 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+intlevel2 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+intlevel3 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+intlevel4 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+intlevel5 0 0 ENTRY 0 functab C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+__LbssCOMMON 0 0 ABS 0 bssCOMMON -
+_I2C_SlaveSendTxData 3F4 0 CODE 0 text23 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 wtemp0 7E 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hfunctab 0 0 ENTRY 0 functab -
+_I2C_SlaveDefRdInterruptHandler 3FE 0 CODE 0 text26 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hclrtext 0 0 ABS 0 clrtext -
+_i2cRdData 72 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _ANSELA 18C 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _ANSELB 18D 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _APFCON 11D 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _BORCON 116 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_EECON1bits 195 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_INTERRUPT_InterruptManager 4E 0 CODE 0 intentry dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_Open 1D4 0 CODE 0 text6 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveSetIsrHandler 3BA 0 CODE 0 text12 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_Isr 14C 0 CODE 0 text18 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_prog_data 20 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_i2cWrData 73 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_EEADRH 192 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_EEADRL 191 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_EECON2 196 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_EEDATH 194 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_EEDATL 193 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lmaintext 0 0 ABS 0 maintext -
-___stackhi 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-___stacklo 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-_PIN_MANAGER_Initialize F3E 0 CODE 0 text3 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-start_initialization FFA 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_Open 252 0 CODE 0 text6 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveIsAddr 372 0 CODE 0 text30 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveIsRead 412 0 CODE 0 text29 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+___stackhi 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+___stacklo 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+_i2cSlaveAddr 71 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveDefAddrInterruptHandler 41C 0 CODE 0 text34 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveRdCallBack 2FE 0 CODE 0 text25 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_PIN_MANAGER_Initialize 252 0 CODE 0 text3 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+start_initialization 52 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveDefBusColInterruptHandler 0 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _OSCCON 99 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__end_of_SYSTEM_Initialize F3E 0 CODE 0 text1 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetSlaveMask@maskAddr 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveOpen 2AC 0 CODE 0 text15 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveSendTxData 3FE 0 CODE 0 text23 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetWrColIntHandler@handler 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_SYSTEM_Initialize 2E4 0 CODE 0 text1 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+clear_ram0 372 0 CODE 0 clrtext dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__pcstackBANK0 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPADD 212 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPBUF 211 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPMSK 213 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetReadIntHandler@handler 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveIsAddr 364 0 CODE 0 text30 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveIsRead 408 0 CODE 0 text29 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetSlaveAddr@slaveAddr 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _WDTCON 97 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-___int_sp 0 0 STACK 2 stack C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
+_I2C_SlaveBusColInterruptHandler 24 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+___int_sp 0 0 STACK 2 stack C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
 __Hbank0 0 0 ABS 0 bank0 -
 __Hbank1 0 0 ABS 0 bank1 -
 __Hbank2 0 0 ABS 0 bank2 -
@@ -223,7 +492,7 @@ __Hbank6 0 0 ABS 0 bank6 -
 __Hbank7 0 0 BANK7 1 bank7 -
 __Hbank8 0 0 BANK8 1 bank8 -
 __Hbank9 0 0 BANK9 1 bank9 -
-__Hcinit 1000 0 CODE 0 cinit -
+__Hcinit 7A 0 CODE 0 cinit -
 __Hsfr10 0 0 ABS 0 sfr10 -
 __Hsfr11 0 0 ABS 0 sfr11 -
 __Hsfr12 0 0 ABS 0 sfr12 -
@@ -269,10 +538,13 @@ __Hbank28 0 0 BANK28 1 bank28 -
 __Hbank29 0 0 BANK29 1 bank29 -
 __Hbank30 0 0 BANK30 1 bank30 -
 __Hbank31 0 0 BANK31 1 bank31 -
+__end_of_I2C_SlaveEnableIrq 432 0 CODE 0 text16 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hbigram 0 0 ABS 0 bigram -
 __Hmaintext 0 0 ABS 0 maintext -
+_I2C_SlaveSetReadIntHandler 3AE 0 CODE 0 text11 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hcommon 0 0 ABS 0 common -
 __Hconfig 10012 0 CONFIG 4 config -
+_I2C_SlaveRdInterruptHandler 2A 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lbank0 0 0 ABS 0 bank0 -
 __Lbank1 0 0 ABS 0 bank1 -
 __Lbank2 0 0 ABS 0 bank2 -
@@ -283,7 +555,7 @@ __Lbank6 0 0 ABS 0 bank6 -
 __Lbank7 0 0 BANK7 1 bank7 -
 __Lbank8 0 0 BANK8 1 bank8 -
 __Lbank9 0 0 BANK9 1 bank9 -
-__Lcinit FFA 0 CODE 0 cinit -
+__Lcinit 52 0 CODE 0 cinit -
 __Lsfr10 0 0 ABS 0 sfr10 -
 __Lsfr11 0 0 ABS 0 sfr11 -
 __Lsfr12 0 0 ABS 0 sfr12 -
@@ -307,10 +579,12 @@ __Lsfr29 0 0 ABS 0 sfr29 -
 __Lsfr30 0 0 ABS 0 sfr30 -
 __Lsfr31 0 0 ABS 0 sfr31 -
 __Lstack 0 0 STACK 2 stack -
+_PORTAbits C 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_INTCONbits B 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Habs1 0 0 ABS 0 abs1 -
 __Hcode 0 0 ABS 0 code -
 __Hheap 0 0 HEAP 7 heap -
-__Hinit 4 0 CODE 0 init -
+__Hinit 4E 0 CODE 0 init -
 __Hsfr0 0 0 ABS 0 sfr0 -
 __Hsfr1 0 0 ABS 0 sfr1 -
 __Hsfr2 0 0 ABS 0 sfr2 -
@@ -325,7 +599,7 @@ __Htext 0 0 ABS 0 text -
 __Labs1 0 0 ABS 0 abs1 -
 __Lcode 0 0 ABS 0 code -
 __Lheap 0 0 HEAP 7 heap -
-__Linit 4 0 CODE 0 init -
+__Linit 4E 0 CODE 0 init -
 __Lsfr0 0 0 ABS 0 sfr0 -
 __Lsfr1 0 0 ABS 0 sfr1 -
 __Lsfr2 0 0 ABS 0 sfr2 -
@@ -337,14 +611,60 @@ __Lsfr7 0 0 ABS 0 sfr7 -
 __Lsfr8 0 0 ABS 0 sfr8 -
 __Lsfr9 0 0 ABS 0 sfr9 -
 __Ltext 0 0 ABS 0 text -
+_I2C_SlaveSetBusColIntHandler 3C6 0 CODE 0 text13 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__LcstackBANK0 0 0 ABS 0 cstackBANK0 -
+int$flags 7E 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __HcstackCOMMON 0 0 ABS 0 cstackCOMMON -
-__S0 800 0 ABS 0 - -
-__S1 76 0 ABS 0 - -
+__S0 225 0 ABS 0 - -
+__S1 7C 0 ABS 0 - -
 __S3 0 0 ABS 0 - -
-_SYSTEM_Initialize F2A 0 CODE 0 text1 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__Lintentry 4 0 CODE 0 intentry -
-reset_vec 0 0 CODE 0 reset_vec C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-__end_of_PIN_MANAGER_Initialize F74 0 CODE 0 text3 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetAddrIntHandler@handler 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveRdCallBack 318 0 CODE 0 text25 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveEnableIrq 42C 0 CODE 0 text16 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSendTxData@data 78 0 COMMON 1 cstackCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveClearIrq 43E 0 CODE 0 text31 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveSetIsrHandler 3C6 0 CODE 0 text12 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveIsTxBufEmpty 364 0 CODE 0 text27 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetWriteIntHandler@handler 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveDefWrColInterruptHandler 0 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SYSTEM_Initialize 2CA 0 CODE 0 text1 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__Lintentry 8 0 CODE 0 intentry -
+reset_vec 0 0 CODE 0 reset_vec C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+__end_of_I2C_SlaveSetWrColIntHandler 396 0 CODE 0 text8 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveIsTxBufEmpty 356 0 CODE 0 text27 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__LbssBANK0 0 0 ABS 0 bssBANK0 -
+_I2C_Isr 7A 0 CODE 0 text18 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_INTERRUPT_InterruptManager 8 0 CODE 0 intentry dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveGetRxData 44A 0 CODE 0 text35 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_PIE1bits 91 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_PIE2bits 92 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext10 3A2 0 CODE 0 text10 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext11 3AE 0 CODE 0 text11 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext12 3BA 0 CODE 0 text12 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext13 3C6 0 CODE 0 text13 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext14 3D2 0 CODE 0 text14 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext15 2AC 0 CODE 0 text15 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext16 42C 0 CODE 0 text16 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext18 7A 0 CODE 0 text18 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext19 2E4 0 CODE 0 text19 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext20 3EA 0 CODE 0 text20 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext21 288 0 CODE 0 text21 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext22 3DE 0 CODE 0 text22 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext23 3F4 0 CODE 0 text23 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext24 432 0 CODE 0 text24 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext25 2FE 0 CODE 0 text25 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext26 3FE 0 CODE 0 text26 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext27 356 0 CODE 0 text27 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext28 424 0 CODE 0 text28 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext29 408 0 CODE 0 text29 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext30 364 0 CODE 0 text30 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext31 438 0 CODE 0 text31 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext32 318 0 CODE 0 text32 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext33 43E 0 CODE 0 text33 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext34 412 0 CODE 0 text34 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext35 444 0 CODE 0 text35 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_PIN_MANAGER_Initialize 288 0 CODE 0 text3 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveOpen 2CA 0 CODE 0 text15 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lbank10 0 0 BANK10 1 bank10 -
 __Lbank11 0 0 BANK11 1 bank11 -
 __Lbank12 0 0 BANK12 1 bank12 -
@@ -367,49 +687,97 @@ __Lbank28 0 0 BANK28 1 bank28 -
 __Lbank29 0 0 BANK29 1 bank29 -
 __Lbank30 0 0 BANK30 1 bank30 -
 __Lbank31 0 0 BANK31 1 bank31 -
-__pmaintext F74 0 CODE 0 maintext dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveDefWrInterruptHandler 3F4 0 CODE 0 text20 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__pmaintext 14C 0 CODE 0 maintext dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveIsRxBufFull 42C 0 CODE 0 text28 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lbigram 0 0 ABS 0 bigram -
 __Lcommon 0 0 ABS 0 common -
 __Lconfig 0 0 CONFIG 4 config -
 _LATAbits 10C 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_read_state 76 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveSetWriteIntHandler 38A 0 CODE 0 text7 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveSetAddrIntHandler 3DE 0 CODE 0 text14 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveGetRxData 444 0 CODE 0 text35 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveAddrCallBack 332 0 CODE 0 text32 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveReleaseClock 438 0 CODE 0 text24 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _OSCTUNE 98 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveClearIrq 438 0 CODE 0 text31 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lspace_0 0 0 ABS 0 - -
 __Lspace_1 0 0 ABS 0 - -
 __Lspace_2 0 0 ABS 0 - -
 __Lspace_3 0 0 ABS 0 - -
 __Lspace_4 0 0 ABS 0 - -
-__Lend_init 4 0 CODE 0 end_init -
+__pbssCOMMON 70 0 COMMON 1 bssCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__HcstackBANK0 0 0 ABS 0 cstackBANK0 -
+I2C_Write@data 79 0 COMMON 1 cstackCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_PIR1bits 11 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_PIR2bits 12 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__Lend_init 4E 0 CODE 0 end_init -
+__end_of_I2C_SlaveSetSlaveAddr 3AE 0 CODE 0 text10 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveSetSlaveMask 3A2 0 CODE 0 text9 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __LcstackCOMMON 0 0 ABS 0 cstackCOMMON -
-end_of_initialization FFA 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__Hintentry 4 0 CODE 0 intentry -
+end_of_initialization 72 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveAddrCallBack 318 0 CODE 0 text32 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__Hintentry 4E 0 CODE 0 intentry -
+_I2C_SlaveReleaseClock 432 0 CODE 0 text24 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lstrings 0 0 ABS 0 strings -
+_I2C_SlaveWrCallBack 2E4 0 CODE 0 text19 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hreset_vec 4 0 CODE 0 reset_vec -
-__ptext1 F2A 0 CODE 0 text1 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__ptext2 F14 0 CODE 0 text2 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__ptext3 F3E 0 CODE 0 text3 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__ptext4 F1C 0 CODE 0 text4 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__HbssBANK0 0 0 ABS 0 bssBANK0 -
+_I2C_SlaveSetSlaveAddr 3A2 0 CODE 0 text10 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveSetSlaveMask 396 0 CODE 0 text9 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPCON1bits 215 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPCON2bits 216 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext1 2CA 0 CODE 0 text1 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext2 41C 0 CODE 0 text2 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext3 252 0 CODE 0 text3 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext4 348 0 CODE 0 text4 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext5 332 0 CODE 0 text5 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext6 1D4 0 CODE 0 text6 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext7 37E 0 CODE 0 text7 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext8 38A 0 CODE 0 text8 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__ptext9 396 0 CODE 0 text9 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveSetBusColIntHandler 3D2 0 CODE 0 text13 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_AddressIntHandler 444 0 CODE 0 text33 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lpowerup 0 0 CODE 0 powerup -
 __Leeprom_data 0 0 EEDATA 3 eeprom_data -
 __H__absolute__ 0 0 ABS 0 __absolute__ -
+_I2C_SlaveAddrInterruptHandler 26 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lreset_vec 0 0 CODE 0 reset_vec -
-___heap_hi 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-___heap_lo 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcAs5u0.\driver_tmp_15.o
-__end_of__initialization FFA 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+I2C_SlaveSetIsrHandler@handler 2E 0 BANK0 1 cstackBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveDefAddrInterruptHandler 412 0 CODE 0 text34 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+___heap_hi 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+___heap_lo 0 0 ABS 0 - C:\Users\federico\AppData\Local\Temp\xcBs4r8.1\driver_tmp_15.o
+__end_of__initialization 72 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lfunctab 0 0 ENTRY 0 functab -
+_I2C_SlaveDefWrInterruptHandler 3EA 0 CODE 0 text20 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Lclrtext 0 0 ABS 0 clrtext -
-__pcstackCOMMON 70 0 COMMON 1 cstackCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__Hend_init 8 0 CODE 0 end_init -
-__end_of_main FFA 0 CODE 0 maintext dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_Initialize 332 0 CODE 0 text5 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__pcstackCOMMON 78 0 COMMON 1 cstackCOMMON dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPCON1 215 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPCON2 216 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPSTAT 214 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__Hend_init 52 0 CODE 0 end_init -
+__end_of_main 1D4 0 CODE 0 maintext dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _TRISA 8C 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _TRISB 8D 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _TRISC 8E 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 _TRISE 90 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 __Hram 0 0 ABS 0 ram -
 __Lram 0 0 ABS 0 ram -
-_WDT_Initialize F14 0 CODE 0 text2 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__end_of_OSCILLATOR_Initialize F2A 0 CODE 0 text4 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-__initialization FFA 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
-_OSCILLATOR_Initialize F1C 0 CODE 0 text4 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_I2C_SlaveWrColInterruptHandler 22 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_WDT_Initialize 41C 0 CODE 0 text2 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_SSPSTATbits 214 0 ABS 0 - dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__pintentry 8 0 CODE 0 intentry dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveDefRdInterruptHandler 408 0 CODE 0 text26 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_OSCILLATOR_Initialize 356 0 CODE 0 text4 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_ReadIntHandler 288 0 CODE 0 text21 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_SlaveWrCallBack 2FE 0 CODE 0 text19 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__initialization 52 0 CODE 0 cinit dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__pbssBANK0 20 0 BANK0 1 bssBANK0 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+__end_of_I2C_Initialize 348 0 CODE 0 text5 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_AddressIntHandler 43E 0 CODE 0 text33 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
+_OSCILLATOR_Initialize 348 0 CODE 0 text4 dist/HT_PIC16F1936/production\pic16_c_template_1.X.production.o
 # %SPLITSTAB Section
 # This section enumerates all the psect splits performed by the assembler.
 # The beginning of the section is indicated by %SPLITSTAB.
@@ -435,14 +803,10 @@ _OSCILLATOR_Initialize F1C 0 CODE 0 text4 dist/HT_PIC16F1936/production\pic16_c_
 # and size are in units of delta. The file address is in units of bytes.
 # All other numeric quantities are in decimal.
 %SEGMENTS
-cinit 0 7FD FFA 3 2
-text1 0 795 F2A A 2
-text2 0 78A F14 4 2
-text3 0 79F F3E 1B 2
-text4 0 78E F1C 7 2
-maintext 0 7BA F74 43 2
-cstackCOMMON 1 70 70 6 1
-reset_vec 0 0 0 4 2
+intentry 0 4 8 221 2
+reset_vec 0 0 0 2 2
+bssBANK0 1 20 20 10 1
+bssCOMMON 1 70 70 C 1
 # %NOTES Section
 # This section contains data of all the note-psects.  The beginning of the section
 # is indicated by %NOTES. The first line indicates the name and decimal

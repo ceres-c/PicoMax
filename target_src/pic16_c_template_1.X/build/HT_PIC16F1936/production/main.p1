@@ -1,9 +1,86 @@
 Version 4.0 HI-TECH Software Intermediate Code
+[v F3073 `(v ~T0 @X0 0 tf ]
+[v F3075 `(v ~T0 @X0 0 tf ]
+[v F3077 `(v ~T0 @X0 0 tf ]
+[v F3079 `(v ~T0 @X0 0 tf ]
+[v F3081 `(v ~T0 @X0 0 tf ]
+[v F3083 `(v ~T0 @X0 0 tf ]
+"90 ./mcc_generated_files/i2c_slave.h
+[; ;./mcc_generated_files/i2c_slave.h: 90: void I2C_Write(uint8_t data);
+[v _I2C_Write `(v ~T0 @X0 0 ef1`uc ]
+"3788 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3788: extern volatile unsigned char SSPBUF __attribute__((address(0x211)));
+[v _SSPBUF `Vuc ~T0 @X0 0 e@529 ]
 [p mainexit ]
-"69 ./mcc_generated_files/mcc.h
-[; ;./mcc_generated_files/mcc.h: 69: void SYSTEM_Initialize(void);
+"72 ./mcc_generated_files/mcc.h
+[; ;./mcc_generated_files/mcc.h: 72: void SYSTEM_Initialize(void);
 [v _SYSTEM_Initialize `(v ~T0 @X0 0 ef ]
-"2194 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
+"358 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 358:     struct {
+[s S31 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
+[n S31 . IOCIF INTF TMR0IF IOCIE INTE TMR0IE PEIE GIE ]
+"368
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 368:     struct {
+[s S32 :2 `uc 1 :1 `uc 1 :2 `uc 1 :1 `uc 1 ]
+[n S32 . . T0IF . T0IE ]
+"357
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 357: typedef union {
+[u S30 `S31 1 `S32 1 ]
+[n S30 . . . ]
+"375
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 375: extern volatile INTCONbits_t INTCONbits __attribute__((address(0x00B)));
+[v _INTCONbits `VS30 ~T0 @X0 0 e@11 ]
+"61 ./mcc_generated_files/i2c_slave.h
+[; ;./mcc_generated_files/i2c_slave.h: 61: void I2C_Initialize(void);
+[v _I2C_Initialize `(v ~T0 @X0 0 ef ]
+"3280 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3280: extern volatile unsigned char EEDATH __attribute__((address(0x194)));
+[v _EEDATH `Vuc ~T0 @X0 0 e@404 ]
+"3242
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3242: extern volatile unsigned char EEDATL __attribute__((address(0x193)));
+[v _EEDATL `Vuc ~T0 @X0 0 e@403 ]
+"436
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 436:     struct {
+[s S34 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
+[n S34 . RA0 RA1 RA2 RA3 RA4 RA5 RA6 RA7 ]
+"435
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 435: typedef union {
+[u S33 `S34 1 ]
+[n S33 . . ]
+"447
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 447: extern volatile PORTAbits_t PORTAbits __attribute__((address(0x00C)));
+[v _PORTAbits `VS33 ~T0 @X0 0 e@12 ]
+"68 ./mcc_generated_files/i2c_slave.h
+[; ;./mcc_generated_files/i2c_slave.h: 68: void I2C_Open(void);
+[v _I2C_Open `(v ~T0 @X0 0 ef ]
+[v F3061 `(v ~T0 @X0 0 tf ]
+"131
+[; ;./mcc_generated_files/i2c_slave.h: 131: void I2C_SlaveSetWriteIntHandler(i2cInterruptHandler handler);
+[v _I2C_SlaveSetWriteIntHandler `(v ~T0 @X0 0 ef1`*F3061 ]
+[v F3112 `(v ~T0 @X0 0 tf ]
+[v F3053 `(v ~T0 @X0 0 tf ]
+"129
+[; ;./mcc_generated_files/i2c_slave.h: 129: void I2C_SlaveSetAddrIntHandler(i2cInterruptHandler handler);
+[v _I2C_SlaveSetAddrIntHandler `(v ~T0 @X0 0 ef1`*F3053 ]
+[v F3114 `(v ~T0 @X0 0 tf ]
+"3195 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3195: extern volatile unsigned char EEADRL __attribute__((address(0x191)));
+[v _EEADRL `Vuc ~T0 @X0 0 e@401 ]
+"3215
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3215: extern volatile unsigned char EEADRH __attribute__((address(0x192)));
+[v _EEADRH `Vuc ~T0 @X0 0 e@402 ]
+"3306
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3306:     struct {
+[s S169 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
+[n S169 . RD WR WREN WRERR FREE LWLO CFGS EEPGD ]
+"3305
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3305: typedef union {
+[u S168 `S169 1 ]
+[n S168 . . ]
+"3317
+[; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 3317: extern volatile EECON1bits_t EECON1bits __attribute__((address(0x195)));
+[v _EECON1bits `VS168 ~T0 @X0 0 e@405 ]
+"2194
 [; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 2194:     struct {
 [s S115 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 :1 `uc 1 ]
 [n S115 . LATA0 LATA1 LATA2 LATA3 LATA4 LATA5 LATA6 LATA7 ]
@@ -14,6 +91,9 @@ Version 4.0 HI-TECH Software Intermediate Code
 "2205
 [; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 2205: extern volatile LATAbits_t LATAbits __attribute__((address(0x10C)));
 [v _LATAbits `VS114 ~T0 @X0 0 e@268 ]
+"8 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\builtins.h
+[v ___nop `(v ~T0 @X0 0 ef ]
+[p i ___nop ]
 "55 C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h
 [; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 55: __asm("INDF0 equ 00h");
 [; <" INDF0 equ 00h ;# ">
@@ -509,124 +589,205 @@ Version 4.0 HI-TECH Software Intermediate Code
 "7116
 [; ;C:/Program Files/Microchip/MPLABX/v6.05/packs/Microchip/PIC12-16F1xxx_DFP/1.3.90/xc8\pic\include\proc\pic16lf1936.h: 7116: __asm("TOSH equ 0FEFh");
 [; <" TOSH equ 0FEFh ;# ">
+"135 ./mcc_generated_files/i2c_slave.h
+[; ;./mcc_generated_files/i2c_slave.h: 135: void (*MSSP_InterruptHandler)(void);
+[v _MSSP_InterruptHandler `*F3073 ~T0 @X0 1 e ]
+"136
+[; ;./mcc_generated_files/i2c_slave.h: 136: void (*I2C_SlaveRdInterruptHandler)(void);
+[v _I2C_SlaveRdInterruptHandler `*F3075 ~T0 @X0 1 e ]
+"137
+[; ;./mcc_generated_files/i2c_slave.h: 137: void (*I2C_SlaveWrInterruptHandler)(void);
+[v _I2C_SlaveWrInterruptHandler `*F3077 ~T0 @X0 1 e ]
+"138
+[; ;./mcc_generated_files/i2c_slave.h: 138: void (*I2C_SlaveAddrInterruptHandler)(void);
+[v _I2C_SlaveAddrInterruptHandler `*F3079 ~T0 @X0 1 e ]
+"139
+[; ;./mcc_generated_files/i2c_slave.h: 139: void (*I2C_SlaveBusColInterruptHandler)(void);
+[v _I2C_SlaveBusColInterruptHandler `*F3081 ~T0 @X0 1 e ]
+"140
+[; ;./mcc_generated_files/i2c_slave.h: 140: void (*I2C_SlaveWrColInterruptHandler)(void);
+[v _I2C_SlaveWrColInterruptHandler `*F3083 ~T0 @X0 1 e ]
+"4 main.c
+[; ;main.c: 4: volatile uint8_t start_barrier = 0;
+[v _start_barrier `Vuc ~T0 @X0 1 e ]
+[i _start_barrier
+-> -> 0 `i `uc
+]
+"5
+[; ;main.c: 5: volatile uint16_t prog_data = 0;
+[v _prog_data `Vus ~T0 @X0 1 e ]
+[i _prog_data
+-> -> 0 `i `us
+]
+"6
+[; ;main.c: 6: volatile uint8_t read_state = 0;
+[v _read_state `Vuc ~T0 @X0 1 e ]
+[i _read_state
+-> -> 0 `i `uc
+]
+"8
+[; ;main.c: 8: volatile uint8_t datl = 0;
+[v _datl `Vuc ~T0 @X0 1 e ]
+[i _datl
+-> -> 0 `i `uc
+]
+"9
+[; ;main.c: 9: volatile uint8_t dath = 0;
+[v _dath `Vuc ~T0 @X0 1 e ]
+[i _dath
+-> -> 0 `i `uc
+]
+"11
+[; ;main.c: 11: static void ReadIntHandler() {
+[v _ReadIntHandler `(v ~T0 @X0 1 sf ]
+{
+[e :U _ReadIntHandler ]
+[f ]
+"12
+[; ;main.c: 12:     if (read_state == 0) {
+[e $ ! == -> _read_state `i -> 0 `i 359  ]
+{
+"13
+[; ;main.c: 13:         I2C_Write(datl);
+[e ( _I2C_Write (1 _datl ]
+"14
+[; ;main.c: 14:         read_state = 1;
+[e = _read_state -> -> 1 `i `uc ]
+"15
+[; ;main.c: 15:     } else {
+}
+[e $U 360  ]
+[e :U 359 ]
+{
+"16
+[; ;main.c: 16:         I2C_Write(dath);
+[e ( _I2C_Write (1 _dath ]
+"17
+[; ;main.c: 17:         read_state = 0;
+[e = _read_state -> -> 0 `i `uc ]
+"18
+[; ;main.c: 18:     }
+}
+[e :U 360 ]
+"19
+[; ;main.c: 19: }
+[e :UE 358 ]
+}
+"21
+[; ;main.c: 21: static void AddressIntHandler() {
+[v _AddressIntHandler `(v ~T0 @X0 1 sf ]
+{
+[e :U _AddressIntHandler ]
+[f ]
+"22
+[; ;main.c: 22:     uint8_t buf = SSPBUF;
+[v _buf `uc ~T0 @X0 1 a ]
+[e = _buf _SSPBUF ]
+"23
+[; ;main.c: 23: }
+[e :UE 361 ]
+}
 [v $root$_main `(v ~T0 @X0 0 e ]
-"49 main.c
-[; ;main.c: 49: void main(void)
+"25
+[; ;main.c: 25: void main(void)
 [v _main `(v ~T0 @X0 1 ef ]
-"50
-[; ;main.c: 50: {
+"26
+[; ;main.c: 26: {
 {
 [e :U _main ]
 [f ]
-"52
-[; ;main.c: 52:     SYSTEM_Initialize();
+"28
+[; ;main.c: 28:     SYSTEM_Initialize();
 [e ( _SYSTEM_Initialize ..  ]
-"54
-[; ;main.c: 54:     int a, b;
-[v _a `i ~T0 @X0 1 a ]
-[v _b `i ~T0 @X0 1 a ]
-"56
-[; ;main.c: 56:     while (1)
-[e :U 360 ]
-"57
-[; ;main.c: 57:     {
-{
-"58
-[; ;main.c: 58:         b = 0x10;
-[e = _b -> 16 `i ]
-"60
-[; ;main.c: 60:         do { LATAbits.LATA0 = 1; } while(0);
+"29
+[; ;main.c: 29:     (INTCONbits.GIE = 1);
+[e = . . _INTCONbits 0 7 -> -> 1 `i `uc ]
+"30
+[; ;main.c: 30:     (INTCONbits.PEIE = 1);
+[e = . . _INTCONbits 0 6 -> -> 1 `i `uc ]
+"31
+[; ;main.c: 31:     I2C_Initialize();
+[e ( _I2C_Initialize ..  ]
+"33
+[; ;main.c: 33:     EEDATH = 0;
+[e = _EEDATH -> -> 0 `i `uc ]
+"34
+[; ;main.c: 34:     EEDATL = 0;
+[e = _EEDATL -> -> 0 `i `uc ]
+"36
+[; ;main.c: 36:     while(!PORTAbits.RA1) __asm("nop");
+[e $U 363  ]
 [e :U 364 ]
+[; <" nop ;# ">
+[e :U 363 ]
+[e $ ! != -> . . _PORTAbits 0 1 `i -> 0 `i 364  ]
+[e :U 365 ]
+"37
+[; ;main.c: 37:     while(PORTAbits.RA1) __asm("nop");
+[e $U 366  ]
+[e :U 367 ]
+[; <" nop ;# ">
+[e :U 366 ]
+[e $ != -> . . _PORTAbits 0 1 `i -> 0 `i 367  ]
+[e :U 368 ]
+"39
+[; ;main.c: 39:     I2C_Open();
+[e ( _I2C_Open ..  ]
+"40
+[; ;main.c: 40:     I2C_SlaveSetWriteIntHandler(ReadIntHandler);
+[e ( _I2C_SlaveSetWriteIntHandler (1 -> &U _ReadIntHandler `*F3112 ]
+"41
+[; ;main.c: 41:     I2C_SlaveSetAddrIntHandler(AddressIntHandler);
+[e ( _I2C_SlaveSetAddrIntHandler (1 -> &U _AddressIntHandler `*F3114 ]
+"44
+[; ;main.c: 44:     EEADRL = (0xAAA & 0x00FF);
+[e = _EEADRL -> & -> 2730 `i -> 255 `i `uc ]
+"45
+[; ;main.c: 45:     EEADRH = ((0xAAA & 0xFF00) >> 8);
+[e = _EEADRH -> >> & -> -> 2730 `i `ui -> 65280 `ui -> 8 `i `uc ]
+"47
+[; ;main.c: 47:     EECON1bits.CFGS = 0;
+[e = . . _EECON1bits 0 6 -> -> 0 `i `uc ]
+"48
+[; ;main.c: 48:     EECON1bits.EEPGD = 1;
+[e = . . _EECON1bits 0 7 -> -> 1 `i `uc ]
+"50
+[; ;main.c: 50:     do { LATAbits.LATA0 = 1; } while(0);
+[e :U 371 ]
 {
 [e = . . _LATAbits 0 0 -> -> 1 `i `uc ]
 }
-[e :U 363 ]
-"62
-[; ;main.c: 62:         for(a = 0; a < 0x10; a++) {
-{
-[e = _a -> 0 `i ]
-[e $ < _a -> 16 `i 365  ]
-[e $U 366  ]
-[e :U 365 ]
-{
-"63
-[; ;main.c: 63:             b--;
-[e -- _b -> 1 `i ]
-"64
-[; ;main.c: 64:         }
-}
-[e ++ _a -> 1 `i ]
-[e $ < _a -> 16 `i 365  ]
-[e :U 366 ]
-}
-"67
-[; ;main.c: 67:         if (a == 0x10 && b == 0) {
-[e $ ! && == _a -> 16 `i == _b -> 0 `i 368  ]
-{
-"68
-[; ;main.c: 68:             do { LATAbits.LATA1 = 1; } while(0);
-[e :U 371 ]
-{
-[e = . . _LATAbits 0 1 -> -> 1 `i `uc ]
-}
 [e :U 370 ]
-"69
-[; ;main.c: 69:         } else {
-}
-[e $U 372  ]
-[e :U 368 ]
-{
-"70
-[; ;main.c: 70:             do { LATAbits.LATA2 = 1; } while(0);
-[e :U 375 ]
-{
-[e = . . _LATAbits 0 2 -> -> 1 `i `uc ]
-}
+"51
+[; ;main.c: 51:     EECON1bits.RD = 1;
+[e = . . _EECON1bits 0 0 -> -> 1 `i `uc ]
+"52
+[; ;main.c: 52:     __nop();
+[e ( ___nop ..  ]
+"53
+[; ;main.c: 53:     __nop();
+[e ( ___nop ..  ]
+"54
+[; ;main.c: 54:     do { LATAbits.LATA0 = 0; } while(0);
 [e :U 374 ]
-"71
-[; ;main.c: 71:         }
-}
-[e :U 372 ]
-"73
-[; ;main.c: 73:         do { LATAbits.LATA0 = 0; } while(0);
-[e :U 378 ]
 {
 [e = . . _LATAbits 0 0 -> -> 0 `i `uc ]
 }
+[e :U 373 ]
+"55
+[; ;main.c: 55:     datl = EEDATL;
+[e = _datl _EEDATL ]
+"56
+[; ;main.c: 56:     dath = EEDATH;
+[e = _dath _EEDATH ]
+"60
+[; ;main.c: 60:     while(1) __asm("nop");
+[e :U 376 ]
+[; <" nop ;# ">
+[e :U 375 ]
+[e $U 376  ]
 [e :U 377 ]
-"76
-[; ;main.c: 76:         for (uint8_t i = 0; i < 0xFF; i++);
-{
-[v _i `uc ~T0 @X0 1 a ]
-[e = _i -> -> 0 `i `uc ]
-[e $ < -> _i `i -> 255 `i 379  ]
-[e $U 380  ]
-[e :U 379 ]
-[e ++ _i -> -> 1 `i `uc ]
-[e $ < -> _i `i -> 255 `i 379  ]
-[e :U 380 ]
-}
-"79
-[; ;main.c: 79:         do { LATAbits.LATA1 = 0; } while(0);
-[e :U 384 ]
-{
-[e = . . _LATAbits 0 1 -> -> 0 `i `uc ]
-}
-[e :U 383 ]
-"80
-[; ;main.c: 80:         do { LATAbits.LATA2 = 0; } while(0);
-[e :U 387 ]
-{
-[e = . . _LATAbits 0 2 -> -> 0 `i `uc ]
-}
-[e :U 386 ]
-"81
-[; ;main.c: 81:     }
-}
-[e :U 359 ]
-[e $U 360  ]
-[e :U 361 ]
-"82
-[; ;main.c: 82: }
-[e :UE 358 ]
+"64
+[; ;main.c: 64: }
+[e :UE 362 ]
 }
