@@ -1,0 +1,27 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZsh{}define FLASH\PYGZus{}READ\PYGZus{}ADDR 0xAAA}
+
+\PYG{k}{while}\PYG{p}{(}\PYG{o}{!}\PYG{n}{IO\PYGZus{}RA1\PYGZus{}GetValue}\PYG{p}{())}\PYG{+w}{ }\PYG{k}{asm}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}nop\PYGZdq{}}\PYG{p}{);}\PYG{+w}{   }\PYG{c+c1}{// Wait for toggle high...}
+\PYG{k}{while}\PYG{p}{(}\PYG{n}{IO\PYGZus{}RA1\PYGZus{}GetValue}\PYG{p}{())}\PYG{+w}{  }\PYG{k}{asm}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}nop\PYGZdq{}}\PYG{p}{);}\PYG{+w}{   }\PYG{c+c1}{// ...and low}
+
+\PYG{n}{I2C\PYGZus{}Open}\PYG{p}{();}\PYG{+w}{ }\PYG{c+c1}{// From now on we can return data over i2c}
+\PYG{n}{I2C\PYGZus{}SlaveSetWriteIntHandler}\PYG{p}{(}\PYG{n}{ReadIntHandler}\PYG{p}{);}
+\PYG{n}{I2C\PYGZus{}SlaveSetAddrIntHandler}\PYG{p}{(}\PYG{n}{AddressIntHandler}\PYG{p}{);}
+
+\PYG{c+c1}{// Configure address to read from}
+\PYG{n}{EEADRL}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{FLASH\PYGZus{}READ\PYGZus{}ADDR}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{l+m+mh}{0x00FF}\PYG{p}{);}
+\PYG{n}{EEADRH}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{((}\PYG{n}{FLASH\PYGZus{}READ\PYGZus{}ADDR}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{l+m+mh}{0xFF00}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZgt{}\PYGZgt{}}\PYG{+w}{ }\PYG{l+m+mi}{8}\PYG{p}{);}
+
+\PYG{n}{EECON1bits}\PYG{p}{.}\PYG{n}{CFGS}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}\PYG{+w}{    }\PYG{c+c1}{// Deselect Configuration space}
+\PYG{n}{EECON1bits}\PYG{p}{.}\PYG{n}{EEPGD}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{   }\PYG{c+c1}{// Select Program Memory}
+
+\PYG{n}{IO\PYGZus{}RA0\PYGZus{}SetHigh}\PYG{p}{();}\PYG{+w}{       }\PYG{c+c1}{// Keep output pin high during memory read operation}
+\PYG{n}{EECON1bits}\PYG{p}{.}\PYG{n}{RD}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}\PYG{+w}{      }\PYG{c+c1}{// Initiate Read}
+\PYG{n}{NOP}\PYG{p}{();}
+\PYG{n}{NOP}\PYG{p}{();}
+\PYG{n}{IO\PYGZus{}RA0\PYGZus{}SetLow}\PYG{p}{();}\PYG{+w}{        }\PYG{c+c1}{// Then pull the loop pin down}
+\PYG{n}{datl}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{EEDATL}\PYG{p}{;}
+\PYG{n}{dath}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{EEDATH}\PYG{p}{;}
+
+\PYG{k}{while}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{k}{asm}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}nop\PYGZdq{}}\PYG{p}{);}
+\end{Verbatim}
