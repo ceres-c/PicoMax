@@ -75,16 +75,16 @@
 
 
 \section{PIC features}\label{sec:picfeatures}
-PIC microcontrollers are a family of microcontrollers produced by Microchip Technology Inc. All the devices, except for the modern PIC32 series, are Harvard architecture devices, and have variable word sizes depending on the generation. The PIC16 series, the focus of this report, uses 14-bit program words and 8-bit data words.
+PIC microcontrollers are a family of microcontrollers produced by Microchip Technology Inc. All the devices, except for the modern PIC32 series, are Harvard architecture. Word size depends on the generation, and the PIC16 series, the focus of this report, uses 14-bit program words and 8-bit data words.
 
-Differently from other microcontrollers, PICs do not have a bootloader in ROM or memory, and the firmware is executed directly from the program memory. This means that the boot process, as well as debug features are implemented in hardware.
+Differently from other microcontrollers, PICs do not have a bootloader in ROM or memory, and this means that the boot process and debug features are implemented in hardware.
 
 \subsection{Memory protection}\label{sec:memoryprotection}
-Most PICs support separated data and program memory protection mechanisms, and the implementation varies depending on the device. The PIC16F1936, has a protection bit for each memory type in Configuration Word 1, a specific 14-bit program memory page in the Configuration Memory space. This page also contains other configuration bits that are required to configure the microcontroller at boot time, such as if the chip should output its internal clock on a pin, or if the brownout reset should be enabled.
+Most PICs support separated data and program memory protection mechanisms, and the implementation varies depending on the device. The PIC16F1936, has a protection bit for each memory type in Configuration Word 1, a specific 14-bit program memory page in the Configuration Memory space. The same code page also contains other configuration bits that are required to configure the microcontroller at boot time, such as wether the chip should output its internal clock on a pin, or if the brownout reset should be enabled.
 
 When the Code Protection bit is set to 0, the whole program memory is protected, and any read to the program memory with an external programmer will return \texttt{0x00}s. The protection feature covers the entire memory of the device, with no per-page or per-block granularity options.
 
-The only way to reset the Code Protection bit to the default value of 1 is to issue a bulk erase program memory command, that will erase the entire program memory. Of course, the code protection does not prevent the code running on the device from reading the program memory.
+The only way to reset the Code Protection bit to the default value of 1 is to issue a bulk erase program memory command, that will erase the entire program memory. Of course, the code protection does not prevent the code running on the device from reading or executing the program memory.
 
 \subsection{ICSP}
 This is Microchip's proprietary protocol to program PIC microcontrollers, detailed in \cite{microchip:DS41397B} specifically for the PIC16F1936. The electrical interface is similar to I2C, with two wires (data and clock) and a shared data channel. The control protocol is however different: it does not support any kind of bus arbitration or addressing, there is no concept of read/write commands, and the microcontroller is always the slave.
@@ -109,14 +109,14 @@ No previous work on this specific device or chip series has been found, but diff
 
 Other chips of the PIC family implemented code protection differently, for example allowing to set code protection on memory blocks (groups of pages). As it was possible to erase a single block, it was also possible to clear the code protection on that block, and then to program it with new code. This is an attack vector, as it allows to fit a small program in the newly unprotected block that can then dump over the serial port the content of the remaining protected blocks \cite{meriac2010heart}. This approach is not feasible on the PIC16F1936, as the code protection is not implemented on a per-page basis, and write/erase commands at page granularity are ignored when the global code protection is enabled.
 
-Others managed to bypass the code protection shining UV light on the memory cells that store the code protection bit \cite{bunniepic}, thus erasing them ionizing the silicon in the transistor's gate. I have decided not to follow this approach as it is necessary to deal with strong acids to decap the chip. While not impossible per se, I wanted to avoid it if possible.
+Others managed to bypass the code protection shining UV light on the memory cells that store the code protection bit \cite{bunniepic}, ionizing the silicon in the transistor's gate and effectively erasing the stored value. I have decided not to follow this approach as it is necessary to deal with strong acids to decap the chip. While not impossible per se, I wanted to avoid it if possible.
 
 Someone already attempted, apparently unsuccessfully, to bypass the code protection by means of voltage glitching \cite{silviocopyprotection}. The presentation's slides are not available, and I have not been able to contact the author to ask for more information.
 
 
 
 \section{Hardware}
-I have decided to build my glitching setup around the MAX4619 \cite{maxim:MAX4617-MAX4619} high speed switch. This chip can be used to switch the power supply of the target between two different sources, and should be fast enough to be used for voltage glitching. It was successfully used by others to attack more modern, capable microcontrollers \cite{gerlinskyLPC}.
+I have decided to build my glitching setup around the MAX4619 \cite{maxim:MAX4617-MAX4619} high speed switch. This chip is used to switch the target's power supply between two different sources, and should be fast enough for voltage glitching. It was successfully used to attack more modern, capable microcontrollers \cite{gerlinskyLPC}.
 
 The switch is controlled by a Raspberry Pi Pico, which was picked due to its availability and low cost. Also, the PIO subsystem of the Pico allows to generate very precise pulses, which is a requirement for any kind of glitching. This will be discussed in \cref{sect:software}.
 
@@ -125,15 +125,15 @@ The schematic for the final version of the hardware can be seen in \cref{app:har
 
 
 \section{Software}\label{sect:software}
-To keep things simple and minimizing unnecessary complexity, the software component project is made of two main parts that talk over USB serial.
+To keep things simple and minimizing unnecessary complexity, the software component project is made of two main parts that talk over USB serial: the firmware and the control software running on the host. Accessory programs were developed for specific tasks.
 
 \subsection{Pico firmware}
-The firmware running on the Raspberry Pi Pico is written in plain C on top of the \texttt{pico-sdk}\footnote{\url{https://github.com/raspberrypi/pico-sdk}}. This program handles the low level details of both glitching and communicating with the \gls{dut}.
+The firmware running on the Raspberry Pi Pico is written in plain C leveraging the \texttt{pico-sdk}\footnote{\url{https://github.com/raspberrypi/pico-sdk}}. This program handles the low level details of both glitching and communicating with the \gls{dut}.
 
-The Pico is an ARM Cortex M0, and as such supports \gls{xip}, with an additional cache to allow executing at the nominal 125 MHz clock speed. The cache introduced timing variability, thus it was necessary to disable it to obtain consistent results; some key functions were moved in RAM.
+The Pico is an ARM Cortex M0, and as such supports \gls{xip}, with an additional cache to improve the performance at the nominal 125 MHz clock speed. The cache introduced timing variability, thus it was disabled it to obtain consistent results; some key functions were moved in RAM.
 
 \subsubsection{PIO}
-The IC on the Raspberry Pi Pico board, the RP2040, supports a novel feature called PIO, or Programmable IO. There are 2 PIO blocks, with 4 state machines each, that can be programmed to perform simple tasks, such as generating a pulse of a specific length, or reading a value from a pin and storing it in a register. These state machines run independently of the CPU, and each instruction takes a single clock cycle to execute.
+RP2040, the IC on the Raspberry Pi Pico board, supports a novel feature called PIO, or Programmable IO. There are 2 PIO blocks, with 4 state machines each, that can be programmed to perform simple tasks, such as generating a pulse of a specific length, or reading a value from a pin and storing it in a register. These state machines run independently of the CPU, and each instruction takes a single clock cycle to execute.
 
 This feature was designed to add support for a variety of peripherals/protocols while maintaining the chip silicon area low. Essentially, it allows to forgo the omnipresent bitbanging of GPIOs to implement custom protocols.
 
@@ -152,14 +152,15 @@ Glitching requires accurate timing, and the PIO state machines are perfect for t
 Once the state machine is configured with the necessary parameters (trigger waveform, delay, width), execution returns to the main program which can continue with its tasks, such as enabling programming mode and issuing commands to the target: the glitch will execute asynchronously.
 
 \subsubsection{ICSP}\label{sect:icsp}
-To break the code protection feature of the chip, it is necessary to issue commands to the target in programming mode. While ICSP is a proprietary protocol, many open source implementations exist, but most of them bitbang the GPIOs, taking a lot of CPU time and introducing timing variability.
+To verify if the code protection feature of the chip has been defeated, it is necessary to issue commands to the target in programming mode. While ICSP is a proprietary protocol, many open source implementations exist, but most of them bitbang the GPIOs, taking a lot of CPU time and introducing timing variability.
 
-I have then decided to implement ICSP in PIO assembly code, to minimize the timing variability and to allow the CPU to perform other tasks while the ICSP commands are executed. ICSP functionality is exposed on the same USB serial interface, and the glitch firmware can also be used as a standalone PIC programmer.
+I have then decided to implement ICSP in PIO assembly code, to minimize variability and to allow the CPU to perform other tasks while the ICSP commands are executed. ICSP functionality is exposed on the same USB serial interface, and the glitch firmware can also be used as a standalone PIC programmer.
 
 \subsection{Controller software}
 The controller software is written in Python, and is responsible for orchestrating the glitching process. It accepts options from the command line, and then configures the Pico firmware accordingly communicating over USB serial.
 
 To optimize the glitching process, the search space is explored in random order, and the results are plotted in real time with a QT scatter plot. This allows to monitor the ongoing glitch campaign, and to optimize the parameters as appropriate.
+% TODO pyQT scatter screenshot?
 
 \subsection{ICSP python module}
 A small python module is available in \texttt{src/icsp}. It buils upon the firmware feature described in \ref{sect:icsp}, and offers a simple interface to communicate with PIC microcontrollers over ICSP. In the same folder there is also a device library which offers an organized structure, and allows to support other PICs.
@@ -167,7 +168,7 @@ A small python module is available in \texttt{src/icsp}. It buils upon the firmw
 \subsection{Trace acquisition}\label{sect:traceacquisition}
 To capture traces from my oscilloscope, I used pyVISA\footnote{\url{https://github.com/pyvisa/pyvisa}}, a python \gls{visa} implementation that allows to control test equipment over USB, Ethernet, GPIB, etc. Once I identified the correct trigger settings on the oscilloscope, the device could be remotely configured to perform acquisitions in a loop. Each trace is then retrieved and stored in a python array in a Jupyter notebook, since I was acquiring a limited amount of data (~200 traces) I had enough memory not to save the traces to disk.
 
-The same Jupyter notebook was also used to perform the analysis of the traces that will be discussed later using numpy, matplotlib and seaborn.
+The same Jupyter notebook was also used to perform the trace analysis that will be discussed later using numpy, matplotlib and seaborn.
 
 
 \section{Glitching approach}\label{sect:approach}
@@ -191,22 +192,22 @@ To validate my setup and verify if the microcontroller could be glitched via vol
 %
 This program allowed the glitcher to sync with the \gls{dut} sensing \texttt{PORTA} pin 0, and to easily detect if the glitch was successful or not with \texttt{PORTA} pins 1 and 2.
 
-The above code was indeed glitchable with the following parameters:
+The above code could be glitched with the following parameters:
 \begin{itemize}
 	\item \textbf{Power supply}: 3.3V
 	\item \textbf{Glitch voltage}: 2.25V
 	\item \textbf{Glitch width}: 20 Pico cycles
 \end{itemize}
 
-The above parameters were found essentially by trial and error, trying to glitch the target with a wide range of widths and delays, and then adjusting the voltage on the lab power supply. Once I had around 20\% of brownouts, I slightly reduced the glitch width, and then I was able to glitch the \gls{dut} consistently.
+These parameters were found essentially by trial and error, trying to glitch the target with a wide range of widths and delays while adjusting the voltage on the lab power supply. Once I had around 20\% of brownouts, I slightly reduced the glitch width, and then I was able to glitch the target consistently.
 Judging by the oscilloscope traces, most of the glitches resulted in the loops being shorter, which means that most likely the glitch was targeting the ALU and resulting in wrong comparisons.
 
 \subsection{Flash readout}\label{sect:flashreadout}
-Encouraged by the success of the previous experiment, I tried to glitch program memory (flash) reads. The reasoning behind this is that the code protection bit is stored in a Configuration Word in a special area of the program memory. Since, as mentioned in \cref{sec:memoryprotection}, the Configuration Word contains value relevant to the chip features during early boot, I assumed that it would be read from flash memory at startup, and possibly stored in registers or flip-flops. Glitching the read operation would then result in the chip booting with a different configuration to the one stored in flash, possibly with code protection disabled.
+Encouraged by the success of the previous experiment, I tried to glitch program memory (flash) reads. The rationale behind this choice is that the code protection bit is stored in Configuration Word 1, located in a special area of the program memory. As mentioned in \cref{sec:memoryprotection}, the Configuration Word contains value relevant to the chip features during early boot, so I assumed that it would be read from flash memory at startup, and possibly stored in registers or flip-flops. Glitching this read operation might result in the chip booting with a different configuration to the one stored in flash, possibly with code protection disabled.
 
 I then modified the software in the PIC to read out a word from the flash memory, and send it to the glitcher over I2C. In turn, the Pico would forward it to the host software, where it is compared with the expected value. Code in \cref{lst:flash_readout} populates two global variables with the 14-bit word from memory which will later be sent to the glitcher by the I2C interrupt handler.
 
-The two while loops at the beginning are used to wait for a positive pulse, which is necessary to avoid a potential race condition when the brownout reset of the target is triggered. If the PIC was not waiting for a pulse, on reset it would immediately fetch a value from memory, this time without the glitch, and send it over I2C to the glitcher, which would be still waiting for the value from the previous boot, resulting in a false negative.
+The two while loops at the beginning are used to wait for a positive pulse from the glitcher. They are necessary to avoid a potential race condition when the brownout reset of the target is triggered. If the PIC was not waiting for some kind of "green light" from the glitcher, on reset it would immediately fetch a value from memory (this time without the glitch), and send it over I2C to the glitcher, which would be still waiting for the value from the previous boot, resulting in a false negative.
 
 \begin{flushleft}
 	\captionsetup{type=listing}
@@ -249,24 +250,24 @@ I optimistically expected to be able to glitch the target as easily as before, p
 	\label{fig:flash_glitch_trace}
 \end{center}
 
-As shown in \cref{fig:flash_glitch_trace}, for the glitch to succeed the delay had to be relatively small, thus the glitch had to be triggered very early in the glitch window. Looking at \cref{lst:flash_readout}, we notice that the output pin is pulled up just before \texttt{EECON} register's bit \texttt{RD} is set to 1. I speculate that this glitch might be interfering with the register write, effectively not triggering the flash read from the memory subsystem, while the flash peripheral itself operates unaffected.
+As shown in \cref{fig:flash_glitch_trace}, for the glitch to succeed the delay had to be relatively small, thus the glitch is triggered very early in the glitch window. Looking at \cref{lst:flash_readout}, we notice that the output pin is pulled up just before \texttt{EECON} register's bit \texttt{RD} is set to 1. I speculate that this glitch might be interfering with the register write, effectively preventing the memory subsystem from starting the flash read operation, while the flash peripheral itself operates unaffected.
 
 \subsection{Code protection}\label{sect:codeprotection}
 Not succeeding in glitching the flash readout, I decided to analyze the power consumption of the PIC16F1936 during the boot process with and without code protection enabled.
 
 \Cref{sect:traceacquisition} describes the host software setup used to acquire the traces. A specific command was added to the glitcher firmware to guarantee constant execution times to a resolution of ~5ns, so that the traces could be aligned in post-processing.
 
-Seeing a difference in the power consumption after a certain amount of time from boot would imply that the code protection bit has been read by that point, and that I could reduce the search space for a suitable glitch. Given that the code protection bit is stored near other values important for the chip configuration, as mentioned in \cref{sec:memoryprotection}, I expected to see a difference in power consumption at early boot, potentially even before the \mclr pin is brought to \gls{vil}.
+Seeing a difference in the power consumption after a certain, fixed, moment in time from boot would imply that the code protection bit has been read by that point, and that I could reduce the search space for a suitable glitch. Given that the code protection bit is stored near other values important for the chip configuration, as mentioned in \cref{sec:memoryprotection}, I expected to see a difference in power consumption at early boot, potentially even before the \mclr pin is brought to \gls{vil}.
 
-The power consumption was measured with an Ohmite APC0805T49R9Z 49,9$\Omega$ precision resistor in series with the ground pin of the PIC, and my Siglent SDS1104X-E oscilloscope. Having this oscilloscope an 8-bit ADC, the measurements are probably not very accurate. Furthermore, the ground pin of the PIC is shared with the ground pin of the Raspberry Pi Pico, thus with my laptop. This setup can't by any means be considered accurate, however it should be good enough to see a difference in power consumption between the two configurations with.
+The power consumption was measured with an Ohmite APC0805T49R9Z 49,9$\Omega$ precision resistor in series with the ground pin of the PIC, and my Siglent SDS1104X-E oscilloscope. Having this oscilloscope an 8-bit ADC, the measurements are probably not very accurate. Furthermore, the ground pin of the PIC is shared with the ground pin of the Raspberry Pi Pico, which effectively connects it to my laptop. This setup can't by any means be considered accurate, however it should be good enough to see some difference in power consumption between the two configurations.
 
-To compare the traces, I borrowed the mathematical tools from \gls{cpa}, namely the Pearson correlation coefficient (\cref{eq:pearson}) and the \gls{hamweight} of the difference between the two traces. I chose the \gls{hamweight} over \gls{hamdist} because I expected the register or flip-flop to start in an empty state, thus the two leakage models would be equivalent.
+To compare the traces, I borrowed the mathematical tools from \gls{cpa}, namely the Pearson correlation coefficient (\cref{eq:pearson}) and the \gls{hamweight} of the difference between the two traces. I chose the \gls{hamweight} over \gls{hamdist} because I expected the register or flip-flop where the value is copied to start in an empty state, thus the two models would be equivalent.
 
 \begin{equation}\label{eq:pearson}
 	r_{xy} =\frac{\sum ^n _{i=1}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum ^n _{i=1}(x_i - \bar{x})^2} \sqrt{\sum ^n _{i=1}(y_i - \bar{y})^2}}
 \end{equation}
 
-Acquiring 100 traces per configuration, I stored them in the Measurements matrix \(MM\), where each row is a trace, and each column is a sample. I also have the Power-prediction matrix \(PP\), a \((200, 1)\) column matrix with the hamming weights (HW) of the Configuration Word 1 with and without code protection.
+Acquiring 100 traces per configuration, I stored them in the Measurements matrix \(MM\), where each row is a trace, and each column is a timestamp. Individual items are the power consumption at timestamp \(t\) in the \(n\)-th execution. I also have the Power-prediction matrix \(PP\), a \((200, 1)\) column matrix with the hamming weights (HW) of Configuration Word 1 with and without code protection.
 
 \[
 MM = 
@@ -290,7 +291,7 @@ PP =
 \end{bmatrix}
 \]
 
-The two matrices are correlated by column with \cref{eq:pearson}, and the results are plotted in \cref{fig:trace_corr} along with a single powertrace to easily identify the boot stages. When the correlation value is close to 1, power consumption in that instant is directly related to the state of the code protection bit. Comparing this picture with \cref{fig:powertrace}, we notice that there is high correlation in 3 key moments:
+The two matrices are correlated by column with \cref{eq:pearson}, and the results are plotted in \cref{fig:trace_corr} along with a single power trace to easily identify the boot stages. When the correlation value is close to 1, power consumption in that instant is directly related to the state of the code protection bit. Comparing this picture with \cref{fig:powertrace}, we notice that there is high correlation in 3 key moments:
 \begin{itemize}
 	\item The first peak, when the chip is powered on. At this resolution, this is probably due to measurement error, but further analysis could be done focusing on this moment.
 	\item After the ICSP key has been sent to the target, and before first ICSP command is issued. I have no explanation for this, but it signals the fact that by this point the chip already knows if code protection is enabled or not.
@@ -311,7 +312,9 @@ What is missing in this picture is a clear correlation during early boot, someth
 \section{Lessons learned and future work}
 The order of steps in \cref{sect:approach} do not \textit{strictly} reflect the chronological order in which events unfolded during this project. In fact, I tried to attack the code protection right after I managed to glitch the arithmetic operations. After some days of wondering why I was getting no results, I noticed my fundamental mistake: I had characterized the wrong operation. The results of \cref{sect:flashreadout} explain why I was unsuccessful in glitching the code protection bit. The first and most important lesson learned is: carefully evaluate if your model is correct.
 
-Then, I have to say I learned a lot about how to do all of this myself. I had never brought up an automated measurement setup, nor built a glitcher hardware/software from the basic parts, for how simple this circuit might be. Much can definitely be improved in the electronics to achieve faster, cleaner glithces, but I am happy with the results I obtained.
+Then, I have to say I learned a lot about how to do all of this myself. I had never built an automated measurement setup, nor the hardware/software for a glitcher from basic parts, for how simple this specific circuit might be. Much can definitely be improved in the electronics to achieve faster, cleaner glithces, but I am happy with the results I obtained.
+
+While writing this report I noticed few potential improvements for this work: I could have analyzed power consumption in higher detail close to the boot moment with the process in \cref{sect:codeprotection}. This is somewhat difficult due to the limitations of my current setup: with an 8-bits ADC it is possible to either prevent clipping on the initial peak, or analyze the remainder of the trace with sufficient detail. Also, I didn't consider characterizing the copy \underline{to} registers in \cref{sect:flashreadout}. Most likely, during the boot process, data is copied from the \texttt{EEDATH}/\texttt{EEDATL} flash subsytem registers to a scratch register or flip flops that can be individually addressed. This could be an interesting target with the current setup.
 
 In the future, other glitching techniques must be considered: I only tried dowvolting the device, but it might be possible to overvolt it for short period of times during the flash readout, for how dangerous this might be to the chip. Clock glitching is not suitable as the chip runs on its internal oscillator during flash readout operations. \gls{emfi} is also very interesting, as there are multiple peripherals that could be affected: flash, memory bus, or even the internal clock. For this I am planning to build a ChipSHOUTER-PicoEMP board\footnote{\url{https://github.com/newaetech/chipshouter-picoemp}} in the near future.
 
@@ -319,7 +322,7 @@ Finally, in \cref{fig:pic_die} there is a capture of the PIC16F1936 die, taken w
 
 \begin{figure}[htbp]
 	\centering%
-	\includegraphics[width=.70\textwidth]{pic_die_HDMI_microscope.jpg}
+	\includegraphics[width=.55\textwidth]{pic_die_HDMI_microscope.jpg}
 	\caption{PIC16F1936 silicon die}
 	\label{fig:pic_die}
 \end{figure}
@@ -334,8 +337,15 @@ Finally, in \cref{fig:pic_die} there is a capture of the PIC16F1936 die, taken w
 \bibliography{bibliography}
 }
 
-\clearpage%
+\hfill%
 \begin{appendix}
+\section{Software}
+Source code of Raspberry Pi Pico glitcher, host software, ICSP python module, Jupyter Notebooks and target firmware can be found at
+
+\begin{center}
+	\url{https://github.com/ceres-c/PicoMax}
+\end{center}
+\clearpage%
 \section{Hardware}\label{app:hardware}
 \begin{center}
 	\includegraphics[height=.95\textheight]{../hardware/schematic.pdf}
