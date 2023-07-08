@@ -233,7 +233,7 @@ int main() {
 			sleep_ms(20); // Give some breathing space to read + setup I2C
 
 			uint16_t page_content = 0;
-			int i2c_read_ret = i2c_read_blocking(picomax_i2c, PIC_SLAVE_ADDR, (uint8_t*)&page_content, 2, false);
+			int i2c_read_ret = i2c_read_timeout_us(picomax_i2c, PIC_SLAVE_ADDR, (uint8_t*)&page_content, 2, false, 50000);
 			if (i2c_read_ret < 0) {
 				// Read failed
 				putchar(RESP_KO);

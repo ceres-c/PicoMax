@@ -71,7 +71,7 @@ class ICSP():
 		self.s.timeout = self.default_timeout
 
 		return r
-	
+
 	def read_config(self) -> dict:
 		conf_mem_data = self.read_program(self.device.config_memory.addr, self.device.config_memory.size)
 		ret = {}
@@ -112,9 +112,11 @@ class ICSP():
 	def erase_row_program(self, addr: int) -> None:
 		self.s.write(CMD_ERASE_ROW_PROG)
 		self.s.write(struct.pack('<I', addr))
+		self.s.timeout = self.extra_timeout
 		r = self.s.read(len(RESP_OK))
 		if r != RESP_OK:
 			raise Exception(f'[!] The programmer could not erase the required row. Got:\n{r}\nAborting.')
+		self.s.timeout = self.default_timeout
 
 	def write_program(self, start_addr: int, data: bytes) -> None:
 		if len(data) != BYTES_PER_WORD:

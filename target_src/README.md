@@ -1,7 +1,8 @@
 This folder contains a Microchip MPLAB project for the PIC16F1936 target. It
-essentially performs a __program memory__ (flash) read after it receives a
-single pulse from the glitcher. The value loaded from memory is stored in a
-global variable, and the glitcher can then get it via an I2C read.
+essentially performs a __program memory__ (flash) read from addrexx `0xAAA`
+after it receives a single pulse from the glitcher. The value loaded from
+memory is stored in a global variable, and the glitcher can then get it via an
+I2C read.
 
 The PIC behaves as an I2C slave, and the glitcher as the master. I2C handling
 is as barebones as it gets, borderline broken: it has been tested with one

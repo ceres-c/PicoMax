@@ -52,8 +52,17 @@ intermediate voltage that will not instantly trigger the brownout detector of
 your target, but still achieve a succesful glitch.
 
 ## Succesful glitching setup
-I managed to glitch a loop running on a PIC16F1936 (see MPLAB project with code
-in `target_src`) with the following setup:
+I have managed to glitch the program in `target_src` running on a PIC16LF1936
+with the following setup:
+```
+power supply: 3.3V
+glitch voltage: 1.40V
+glitch delay: ~235 cycles
+glitch width: ~35 cycles
+```
+
+Previously, I had managed to glitch a loop opearting on variables in registers
+(see git history to find the old MPLAB project) with the following setup:
 ```
 power supply: 3.3V
 glitch voltage: 2.25V
@@ -61,15 +70,16 @@ glitch width: 20 cycles
 ```
 
 I have found the glitch voltage playing around with the power supply knob until
-I got ~20% brownout resets, then tried with multiple glitch widths until I got
-a succesful glitch with this command
+I got ~20% brownout resets, then increased it a bit and tried with multiple
+glitch widths until I got succesful glitches with this command
 
 ```bash
-python3 controller.py -d 100 500 50 -w 10 50 5 -o
+python3 controller.py -d 100 500 5 -w 10 50 2 -o
 ```
 
 ### Scope captures
-In the captures below you can see a succesfull glitch.
+In the captures below you can see a succesfull glitch of the variable in
+register loop.
 - Channel 1 (yellow) is the input to the A, B and C pins of the MAX4619
 - Channel 2 (magenta) is the PIC pin that will be raised when the glitch fails
 (event not shown here)
